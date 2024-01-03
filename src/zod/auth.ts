@@ -44,3 +44,14 @@ export const AuthSignUpSchema = z
   );
 
 export type AuthSignUpFields = z.infer<typeof AuthSignUpSchema>;
+
+/*====================================
+  AUTHENTICATION: FORGOT PASSWORD FORM
+=====================================*/
+export const AuthForgotPasswordSchema = z.object({
+  email: z
+    .string({ required_error: "Please enter your email address " })
+    .email({ message: "Please enter a valid email address" }),
+});
+
+export type AuthForgotPasswordFields = z.infer<typeof AuthForgotPasswordSchema>;
