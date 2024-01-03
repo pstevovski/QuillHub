@@ -10,7 +10,7 @@ export default function AuthLayout({
         <p>Unfold Your Imagination, Share Your Universe</p>
       </section>
 
-      <section className="flex flex-col justify-center items-center h-screen">
+      <section className="w-1/2 mx-auto flex flex-col justify-center items-center h-screen">
         {children}
       </section>
     </div>
