@@ -4,6 +4,7 @@
 import Button from "@/components/Buttons/Button";
 import FormPasswordInput from "@/components/Form/FormPasswordInput";
 import FormTextInput from "@/components/Form/FormTextInput";
+import Link from "next/link";
 
 // Validation schemas
 import { AuthSignInFields, AuthSignInSchema } from "@/zod/auth";
@@ -38,11 +39,24 @@ export default function AuthSignInForm() {
       <FormPasswordInput
         register={register("password")}
         error={errors.password}
+        modifierClass="mb-8"
       />
 
-      <Button type="submit" variant="primary" size="full">
+      <Button type="submit" variant="primary" size="full" modifierClass="mb-2">
         Sign In
       </Button>
+
+      <div className="flex justify-between items-center text-slate-400 text-xs">
+        <Link
+          className="hover:text-blue-400 duration-200"
+          href="/auth/forgot-password"
+        >
+          Forgot Password?
+        </Link>
+        <Link className="hover:text-blue-400 duration-200" href="/auth/signup">
+          No Account? Sign Up
+        </Link>
+      </div>
     </form>
   );
 }
