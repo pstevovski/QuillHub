@@ -36,7 +36,8 @@ export default function FormPasswordInput({
           type={isPasswordVisible ? "text" : "password"}
           className={cn(
             "text-sm w-full border p-2 rounded mb-5 focus:outline-none placeholder:text-slate-300 transition-[border-color]",
-            error ? "border-red-500 mb-0" : ""
+            error ? "border-red-500 mb-0" : "",
+            modifierClass
           )}
           placeholder="**********"
           {...register}
