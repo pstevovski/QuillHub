@@ -28,11 +28,12 @@ export default function AuthSignInForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit(handleSignIn)}>
+    <form onSubmit={handleSubmit(handleSignIn)} autoComplete="">
       <FormTextInput
         register={register("email")}
         error={errors.email}
         placeholder="your@email.com"
+        autoComplete="new-password"
       />
       <FormPasswordInput
         register={register("password")}
