@@ -55,3 +55,25 @@ export const AuthForgotPasswordSchema = z.object({
 });
 
 export type AuthForgotPasswordFields = z.infer<typeof AuthForgotPasswordSchema>;
+
+/*====================================
+  AUTHENTICATION: RESET PASSWORD FORM
+=====================================*/
+export const AuthResetPasswordSchema = z
+  .object({
+    password: z
+      .string({ required_error: "Please enter your password" })
+      .min(6, "Password must be at least 6 characters long!"),
+    confirm_password: z
+      .string({ required_error: "Please confirm your password" })
+      .min(6, "Password must be at least 6 characters long!"),
+  })
+  .refine(
+    (userDetails) => userDetails.password === userDetails.confirm_password,
+    {
+      message: "Passwords do not match!",
+      path: ["confirm_password"],
+    }
+  );
+
+export type AuthResetPasswordFields = z.infer<typeof AuthResetPasswordSchema>;
