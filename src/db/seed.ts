@@ -33,6 +33,7 @@ async function seedUsers() {
   }
 }
 
+/** Seeds the database with mock roles */
 async function seedRoles() {
   try {
     await db.insert(roles).values([
@@ -56,6 +57,7 @@ async function seedRoles() {
   }
 }
 
+/** Seeds the database with mock bridges between users and roles */
 async function seedUserRoles() {
   try {
     await db.insert(userRoles).values([
@@ -78,17 +80,23 @@ async function seedUserRoles() {
 
 /** Populate the database with mock data for development purposes */
 async function seedDatabase() {
-  console.log("Started seeding database...");
-  console.time("Elapsed Time: ");
-  // await Promise.all([
-  await seedUsers(),
-    await seedRoles(),
-    await seedUserRoles(),
-    // ]);
+  try {
+    console.log("Started seeding database...");
+    console.time("Elapsed Time: ");
+    await Promise.all([
+      await seedUsers(),
+      await seedRoles(),
+      await seedUserRoles(),
+    ]);
     console.log("Seeding database completed!");
-  console.timeEnd("Elapsed Time: ");
-
-  process.exit(0);
+    console.timeEnd("Elapsed Time: ");
+    process.exit(0);
+  } catch (error: any) {
+    console.log("Failed seeding database!");
+    console.log("");
+    console.log("Error: ", error.message);
+    process.exit(1);
+  }
 }
 
 seedDatabase();
