@@ -30,8 +30,25 @@ export default function AuthSignUpForm() {
   });
 
   // todo: connect with API and send actual request
-  const handleSignUp: SubmitHandler<AuthSignUpFields> = (credentials) => {
-    console.log("CREDENTIALS: ", credentials);
+  // todo: extract fetch logic into utility function
+  // todo: configure the API URL to be used based on ENV
+  const handleSignUp: SubmitHandler<AuthSignUpFields> = async (newUser) => {
+    try {
+      const res = await fetch("http://localhost:3000/api/auth/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(newUser),
+      });
+      const data = await res.json();
+
+      if (!res.ok) throw new Error(data.error);
+
+      alert("User successfully created");
+    } catch (error: any) {
+      alert(error.message);
+    }
   };
 
   return (
