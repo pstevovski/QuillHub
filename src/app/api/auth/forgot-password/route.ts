@@ -1,33 +1,29 @@
 import AuthService from "@/services/authentication";
 import handleErrorMessage from "@/utils/handleErrorMessage";
-import { AuthSignUpSchema } from "@/zod/auth";
+import { AuthForgotPasswordSchema } from "@/zod/auth";
 
 export async function POST(request: Request) {
   try {
-    const user = await request.json();
+    const payload = await request.json();
 
     // Check the received payload and if its not valid,
     // throw an error and prevent saving the entry to the database
-    const validatePayload = AuthSignUpSchema.safeParse({
-      email: user.email,
-      first_name: user.first_name,
-      last_name: user.last_name,
-      password: user.password,
-      confirm_password: user.confirm_password,
+    const validatePayload = AuthForgotPasswordSchema.safeParse({
+      email: payload.email,
     });
 
     if (!validatePayload.success) {
       return Response.json(
-        { error: "Invalid values provided!" },
+        { error: "Missing or invalid value provided!" },
         { status: 422 }
       );
     }
 
     // Save the user in the database
-    await AuthService.signUp(user);
+    await AuthService.forgotPassword(payload.email);
 
     return Response.json(
-      { message: "User registered successfully!" },
+      { message: "Email sent! Please check your inbox." },
       { status: 200 }
     );
   } catch (error) {
