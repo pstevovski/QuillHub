@@ -13,6 +13,8 @@ import { AuthSignUpFields, AuthSignUpSchema } from "@/zod/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "sonner";
+import fetchHandler from "@/utils/fetchHandler";
+import handleErrorMessage from "@/utils/handleErrorMessage";
 
 export default function AuthSignUpForm() {
   const {
@@ -31,23 +33,12 @@ export default function AuthSignUpForm() {
   });
 
   // todo: extract fetch logic into utility function
-  // todo: configure the API URL to be used based on ENV
   const handleSignUp: SubmitHandler<AuthSignUpFields> = async (newUser) => {
     try {
-      const res = await fetch("http://localhost:3000/api/auth/signup", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(newUser),
-      });
-      const data = await res.json();
-
-      if (!res.ok) throw new Error(data.error);
-
+      await fetchHandler("POST", "auth/signup", newUser);
       toast.success("User registered successfully!");
-    } catch (error: any) {
-      toast.error(error.message);
+    } catch (error) {
+      toast.error(handleErrorMessage(error));
     }
   };
 

@@ -1,4 +1,5 @@
 import AuthService from "@/services/authentication";
+import handleErrorMessage from "@/utils/handleErrorMessage";
 import { AuthSignUpSchema } from "@/zod/auth";
 
 export async function POST(request: Request) {
@@ -29,7 +30,7 @@ export async function POST(request: Request) {
       { message: "User registered successfully!" },
       { status: 200 }
     );
-  } catch (error: any) {
-    return Response.json({ error: error.message }, { status: 500 });
+  } catch (error) {
+    return Response.json({ error: handleErrorMessage(error) }, { status: 500 });
   }
 }
