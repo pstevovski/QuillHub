@@ -15,14 +15,14 @@
   - **DONE** Hash the passwords before storing them in the database when seeding the users [x]
 - **DONE** Add function as a main entry point for seeding the database with all different types of mock data [x]
 
-## Feature - Authentication
+## Feature - Authentication & Authorization
 
 ### Sign Up
 
-- Create authentication service for handling account registration (sign up)
-- Save newly created accounts in local database
-  - Passwords need to be encrypted using `bcrypt`
-- Connect sign up form with the corresponding API endpoint and service
+- **DONE** Create authentication service for handling account registration (sign up) [x]
+- **DONE** Save newly created accounts in local database [x]
+  - **DONE** Passwords need to be encrypted using `bcrypt` [x]
+- **DONE** Connect sign up form with the corresponding API endpoint and service [x]
 
 ### Sign In
 
@@ -32,12 +32,14 @@
 ### Forgot & Reset Password
 
 - Create service that will trigger sending an email containing a link
-  that will redirect the user to the reset password page
-  - This link will have a token attached to it
-  - These tokens will be saved in a separate table in the database
+  that will redirect the user to the reset password page [x]
+  - This link will have a token attached to it [x]
+  - These tokens will be saved in a separate table in the database [x]
   - Once the token is used it will automatically be removed from the database to prevent
-    subsequent password resets. If a user wants to reset the password, they first must use the forgot password option
+    subsequent password resets. If a user wants to reset the password, they first must use the forgot password option [x]
+  - Send emails using Gmail SMTP [x]
 - Create service that will handle updating (resetting) the password for the targeted user
+- This table should be cleaned after X amount of time
 
 ### JWT
 
@@ -45,10 +47,3 @@
   - Without using third-party service such as NextAuth
 - Implement authentication with third party site such as Google
   - Without using third-party service such as NextAuth (??)
-
-### **DONE** Roles & User Roles bridge [x]
-
-- **DONE** Define table for 'roles' [x]
-- **DONE** Add seeders for roles to be added to the database [x]
-- **DONE** Define table for 'user_roles' that will act as a bridge table between `users` and `roles` [x]
-- **DONE** Add seeders for the user roles bridge [x]
