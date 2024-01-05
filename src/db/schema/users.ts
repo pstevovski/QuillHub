@@ -50,3 +50,14 @@ export const roles = mysqlTable("roles", {
 
 export type Role = typeof roles.$inferSelect;
 export type RoleNew = typeof roles.$inferInsert;
+
+/*===========================================
+  TABLE: USER PASSWORD RESET REQUESTS
+============================================*/
+export const userPasswordResets = mysqlTable("user_password_resets", {
+  id: serial("id").primaryKey(),
+  email: varchar("email", { length: 255 }).notNull(),
+  token: varchar("token", { length: 512 }).notNull().unique(),
+});
+
+export type UserPasswordReset = typeof roles.$inferSelect;
