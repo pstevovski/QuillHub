@@ -1,13 +1,16 @@
 import { sql } from "drizzle-orm";
 import {
-  bigint,
   mysqlEnum,
   mysqlTable,
   serial,
   varchar,
+  timestamp,
+  bigint,
 } from "drizzle-orm/mysql-core";
-import { roles } from "./roles";
 
+/*===========================================
+  TABLE: USERS
+============================================*/
 export const users = mysqlTable("users", {
   id: serial("id").primaryKey(),
   email: varchar("email", { length: 255 }).notNull().unique(),
@@ -23,19 +26,26 @@ export const users = mysqlTable("users", {
   theme: mysqlEnum("theme", ["light", "dark", "system"])
     .default("light")
     .notNull(),
+  role_id: bigint("role_id", { mode: "number", unsigned: true }) // FK
+    .notNull()
+    .references(() => roles.id),
 });
 
 export type User = typeof users.$inferSelect;
 export type UserNew = typeof users.$inferInsert;
 
-/** Bridge table between "Users" and "Roles"  */
-export const userRoles = mysqlTable("user_roles", {
-  user_id: bigint("user_id", { mode: "number", unsigned: true })
-    .notNull()
-    .references(() => users.id),
-  role_id: bigint("role_id", { mode: "number", unsigned: true })
-    .notNull()
-    .references(() => roles.id),
+/*===========================================
+  TABLE: ROLES
+============================================*/
+export const roles = mysqlTable("roles", {
+  id: serial("id").primaryKey(),
+  name: varchar("name", { length: 30 }).notNull().unique(),
+  label: varchar("label", { length: 30 }).notNull(),
+  description: varchar("description", { length: 255 })
+    .default(sql`null`)
+    .$type<string | null>(),
+  created_at: timestamp("created_at", { mode: "date", fsp: 6 }).defaultNow(),
 });
 
-export type UserRole = typeof userRoles.$inferSelect;
+export type Role = typeof roles.$inferSelect;
+export type RoleNew = typeof roles.$inferInsert;

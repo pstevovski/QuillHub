@@ -1,5 +1,5 @@
 import { hashUserPassword } from "@/utils/bcrypt";
-import { userRoles, users } from "./schema/users";
+import { users } from "./schema/users";
 import db from "./connection";
 import { roles } from "./schema/roles";
 
@@ -12,18 +12,21 @@ async function seedUsers() {
         first_name: "John",
         last_name: "Doe",
         password: await hashUserPassword("Test123"),
+        role_id: 2,
       },
       {
         email: "jane@doe.com",
         first_name: "Jane",
         last_name: "Doe",
         password: await hashUserPassword("Password123"),
+        role_id: 1,
       },
       {
         email: "example@user.com",
         first_name: "Example",
         last_name: "User",
         password: await hashUserPassword("TestingPassword123"),
+        role_id: 1,
       },
     ]);
   } catch (error: any) {
@@ -57,37 +60,12 @@ async function seedRoles() {
   }
 }
 
-/** Seeds the database with mock bridges between users and roles */
-async function seedUserRoles() {
-  try {
-    await db.insert(userRoles).values([
-      {
-        user_id: 1,
-        role_id: 2,
-      },
-      {
-        user_id: 2,
-        role_id: 1,
-      },
-      { user_id: 3, role_id: 1 },
-    ]);
-  } catch (error: any) {
-    console.log("Failed seeding user roles...");
-    console.log("Error: ", error.message);
-    process.exit(1);
-  }
-}
-
 /** Populate the database with mock data for development purposes */
 async function seedDatabase() {
   try {
     console.log("Started seeding database...");
     console.time("Elapsed Time: ");
-    await Promise.all([
-      await seedUsers(),
-      await seedRoles(),
-      await seedUserRoles(),
-    ]);
+    await Promise.all([await seedRoles(), await seedUsers()]);
     console.log("Seeding database completed!");
     console.timeEnd("Elapsed Time: ");
     process.exit(0);
