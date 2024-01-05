@@ -12,6 +12,7 @@ import { AuthSignUpFields, AuthSignUpSchema } from "@/zod/auth";
 // Forms
 import { zodResolver } from "@hookform/resolvers/zod";
 import { SubmitHandler, useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 export default function AuthSignUpForm() {
   const {
@@ -29,7 +30,6 @@ export default function AuthSignUpForm() {
     resolver: zodResolver(AuthSignUpSchema),
   });
 
-  // todo: connect with API and send actual request
   // todo: extract fetch logic into utility function
   // todo: configure the API URL to be used based on ENV
   const handleSignUp: SubmitHandler<AuthSignUpFields> = async (newUser) => {
@@ -45,9 +45,9 @@ export default function AuthSignUpForm() {
 
       if (!res.ok) throw new Error(data.error);
 
-      alert("User successfully created");
+      toast.success("User registered successfully!");
     } catch (error: any) {
-      alert(error.message);
+      toast.error(error.message);
     }
   };
 
