@@ -28,6 +28,7 @@ export const users = mysqlTable("users", {
     .notNull(),
   role_id: bigint("role_id", { mode: "number", unsigned: true }) // FK
     .notNull()
+    .default(1)
     .references(() => roles.id),
 });
 
