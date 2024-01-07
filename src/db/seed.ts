@@ -1,7 +1,6 @@
 import { hashUserPassword } from "@/utils/bcrypt";
-import { users } from "./schema/users";
+import { users, roles } from "./schema/users";
 import db from "./connection";
-import { roles } from "./schema/roles";
 
 /** Seeds the database with mock users */
 async function seedUsers() {
