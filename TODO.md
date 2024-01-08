@@ -29,16 +29,18 @@
 - Create authentication service for handling user sign ins in the application
 - Compare provided password with encrypted password saved in the database for the user trying to sign in
 
-### Forgot & Reset Password
+### **DONE** Forgot & Reset Password [x]
 
-- Create service that will trigger sending an email containing a link
+- **DONE** Create service that will trigger sending an email containing a link
   that will redirect the user to the reset password page [x]
-  - This link will have a token attached to it [x]
-  - These tokens will be saved in a separate table in the database [x]
-  - Once the token is used it will automatically be removed from the database to prevent
+  - **DONE** This link will have a token attached to it [x]
+  - **DONE** These tokens will be saved in a separate table in the database [x]
+  - **DONE** Once the token is used it will automatically be removed from the database to prevent
     subsequent password resets. If a user wants to reset the password, they first must use the forgot password option [x]
-  - Send emails using Gmail SMTP [x]
-- Create service that will handle updating (resetting) the password for the targeted user
+  - **DONE** Send emails using Gmail SMTP [x]
+- **DONE** Create service that will handle updating (resetting) the password for the targeted user [x]
+- **DONE** Create API endpoin to use this service and connect the frontend 'client' form responsible for sending the API request [x]
+
 - This table should be cleaned after X amount of time
 
 ### JWT
