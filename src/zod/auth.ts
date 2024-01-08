@@ -61,6 +61,9 @@ export type AuthForgotPasswordFields = z.infer<typeof AuthForgotPasswordSchema>;
 =====================================*/
 export const AuthResetPasswordSchema = z
   .object({
+    token: z.string({
+      required_error: "Please provide a valid password reset token",
+    }),
     password: z
       .string({ required_error: "Please enter your password" })
       .min(6, "Password must be at least 6 characters long!"),
