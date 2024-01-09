@@ -38,6 +38,8 @@
 - Implement "Remember Me" functionality
   - To be included in the payload upon signin
   - If selected, set the expiration date to 1 year
+- Move JWT-related utility functions in a separate `TokenService`
+- Double check JWT signtaure verification process
 
 ### **DONE** Forgot & Reset Password [x]
 
