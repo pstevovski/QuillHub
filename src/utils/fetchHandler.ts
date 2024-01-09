@@ -8,11 +8,10 @@ export default async function fetchHandler(
   body: Record<string, unknown> | undefined
 ) {
   try {
-    // todo: handling of access token
     const URL: string = `${process.env.NEXT_PUBLIC_API_BASE_URL}/${endpoint}`;
-
     const response = await fetch(URL, {
       method,
+      credentials: "include",
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
