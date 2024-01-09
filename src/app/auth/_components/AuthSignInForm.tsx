@@ -1,5 +1,10 @@
 "use client";
 
+// Utilities & Hooks
+import { toast } from "sonner";
+import handleErrorMessage from "@/utils/handleErrorMessage";
+import fetchHandler from "@/utils/fetchHandler";
+
 // Components
 import Button from "@/components/Buttons/Button";
 import FormPasswordInput from "@/components/Form/FormPasswordInput";
@@ -23,9 +28,12 @@ export default function AuthSignInForm() {
     resolver: zodResolver(AuthSignInSchema),
   });
 
-  // todo: connect with API and send actual request
-  const handleSignIn: SubmitHandler<AuthSignInFields> = (credentials) => {
-    console.log("CREDENTIALS: ", credentials);
+  const handleSignIn: SubmitHandler<AuthSignInFields> = async (credentials) => {
+    try {
+      await fetchHandler("POST", "auth/signin", credentials);
+    } catch (error) {
+      toast.error(handleErrorMessage(error));
+    }
   };
 
   return (
