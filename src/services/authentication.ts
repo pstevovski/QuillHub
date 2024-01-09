@@ -4,8 +4,8 @@ import db from "@/db/connection";
 import { UserNew, userPasswordResets, users } from "@/db/schema/users";
 import { hashUserPassword } from "@/utils/bcrypt";
 import handleErrorMessage from "@/utils/handleErrorMessage";
-import nodemailer from "nodemailer";
 import { eq } from "drizzle-orm";
+import EmailService, { EMAIL_TEMPLATES_PASSWORD_RESET } from "./email";
 
 /**
  * Service used for handling Authentication functionality
@@ -41,36 +41,12 @@ class Auth {
       // Store the request that was made for forgotten password
       await db.insert(userPasswordResets).values({ email, token });
 
-      // Send the email
-      let transporter = nodemailer.createTransport({
-        host: "smtp.gmail.com",
-        port: 465,
-        secure: true,
-        auth: {
-          user: process.env.GMAIL_USERNAME,
-          pass: process.env.GMAIL_APP_PASSWORD,
-        },
-      });
-
-      await transporter.sendMail({
-        from: '"Quillhub" info@quillhub.com',
-        to: email,
-        subject: "Password Reset",
-        html: `
-          <div>
-            <h1>Quillhub</h1>
-            <p><em>Unfold Your Imagination, Share Your Universe</em></p>
-            <h3>You have requested password reset for your accout</h3>
-            <br/>
-            <a href="${process.env.NEXT_PUBLIC_EMAIL_REDIRECT_URL}/auth/reset-password?token=${token}">Click here to reset your password</a>
-            <br/>
-            <br/>
-            <br/>
-            <hr/>
-            <p>If you did not request password reset for your account, please ignore this email.</p>
-          </div>
-        `,
-      });
+      // Send the email for password reset
+      await EmailService.sendEmail(
+        email,
+        "Password Reset",
+        EMAIL_TEMPLATES_PASSWORD_RESET(token)
+      );
     } catch (error) {
       const errorMessage: string = handleErrorMessage(error);
       console.log(`Failed sending password reset email: ${errorMessage}`);
