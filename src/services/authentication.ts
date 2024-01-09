@@ -5,6 +5,7 @@ import { UserNew, userPasswordResets, users } from "@/db/schema/users";
 import { hashUserPassword } from "@/utils/bcrypt";
 import handleErrorMessage from "@/utils/handleErrorMessage";
 import nodemailer from "nodemailer";
+import { eq } from "drizzle-orm";
 
 /**
  * Service used for handling Authentication functionality
@@ -74,6 +75,50 @@ class Auth {
       const errorMessage: string = handleErrorMessage(error);
       console.log(`Failed sending password reset email: ${errorMessage}`);
       throw new Error("Failed sending password reset email!");
+    }
+  }
+
+  async resetPassword(token: string, newPassword: string) {
+    try {
+      // Find the user whose password should be updated based on received token
+      const targetedEmail = await db
+        .select()
+        .from(userPasswordResets)
+        .where(eq(userPasswordResets.token, token));
+
+      // Throw an error if email cannot be found
+      if (!targetedEmail || !targetedEmail[0]) throw new Error("Invalid token");
+
+      // Find the targeted user based on the email
+      const targetedUser = await db
+        .select()
+        .from(users)
+        .where(eq(users.email, targetedEmail[0].email));
+
+      // Throw an error if no such user can be found
+      if (!targetedUser || !targetedUser[0]) {
+        throw new Error("Account does not exist");
+      }
+
+      // Update the password for this user
+      const hashedNewPassword: string = await hashUserPassword(newPassword);
+      await db
+        .update(users)
+        .set({ password: hashedNewPassword })
+        .where(eq(users.id, targetedUser[0].id));
+
+      console.log(
+        `Password successfully updated for: ${targetedUser[0].email}`
+      );
+
+      // Remove the token & email combination from database once the password was updated
+      await db
+        .delete(userPasswordResets)
+        .where(eq(userPasswordResets.token, token));
+    } catch (error) {
+      const errorMessage: string = handleErrorMessage(error);
+      console.log(`Failed resetting password: ${errorMessage}`);
+      throw new Error(`Failed resetting password: ${errorMessage}`);
     }
   }
 }

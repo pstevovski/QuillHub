@@ -39,7 +39,7 @@ export default function AuthResetPasswordPage({
         into the application
       </p>
 
-      <AuthResetPasswordForm />
+      <AuthResetPasswordForm token={searchParams.token} />
     </div>
   );
 }

@@ -1,5 +1,10 @@
 "use client";
 
+// Utilities & Hooks
+import { toast } from "sonner";
+import handleErrorMessage from "@/utils/handleErrorMessage";
+import fetchHandler from "@/utils/fetchHandler";
+
 // Components
 import Button from "@/components/Buttons/Button";
 import Link from "next/link";
@@ -12,21 +17,25 @@ import { AuthResetPasswordFields, AuthResetPasswordSchema } from "@/zod/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { SubmitHandler, useForm } from "react-hook-form";
 
-export default function AuthResetPasswordForm() {
+export default function AuthResetPasswordForm({ token }: { token: string }) {
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<AuthResetPasswordFields>({
-    defaultValues: { password: "", confirm_password: "" },
+    defaultValues: { token: token, password: "", confirm_password: "" },
     resolver: zodResolver(AuthResetPasswordSchema),
   });
 
-  // todo: connect with API and send actual request
-  const handleResetPassword: SubmitHandler<AuthResetPasswordFields> = (
-    credentials
+  const handleResetPassword: SubmitHandler<AuthResetPasswordFields> = async (
+    payload
   ) => {
-    console.log("CREDENTIALS: ", credentials);
+    try {
+      const data = await fetchHandler("POST", "auth/reset-password", payload);
+      toast.success(data.message);
+    } catch (error) {
+      toast.error(handleErrorMessage(error));
+    }
   };
 
   return (
