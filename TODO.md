@@ -24,10 +24,20 @@
   - **DONE** Passwords need to be encrypted using `bcrypt` [x]
 - **DONE** Connect sign up form with the corresponding API endpoint and service [x]
 
-### Sign In
+### Sign In & Sign Out w/ JWT
 
+- **DONE** Implement authentication and authorization process using json web token [x]
+  - **DONE** Without using third-party service such as NextAuth [x]
+  - **DONE** JWT will be stored using cookies as an `HttpOnly` cookie [x]
+  - **DONE** The `fetchHandler` should be updated to include credentials with each request [x]
 - Create authentication service for handling user sign ins in the application
 - Compare provided password with encrypted password saved in the database for the user trying to sign in
+- **DONE** Add middleware protection for pages and API routes [x]
+  - Currently only works for "/test" page
+  - Pages & API endpoints that we want to protect should be included here
+- Implement "Remember Me" functionality
+  - To be included in the payload upon signin
+  - If selected, set the expiration date to 1 year
 
 ### **DONE** Forgot & Reset Password [x]
 
@@ -45,7 +55,5 @@
 
 ### JWT
 
-- Implement authentication and authorization process using json web token
-  - Without using third-party service such as NextAuth
 - Implement authentication with third party site such as Google
   - Without using third-party service such as NextAuth (??)
