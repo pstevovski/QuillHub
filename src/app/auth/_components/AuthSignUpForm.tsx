@@ -1,5 +1,11 @@
 "use client";
 
+// Utilities & Hooks
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+import fetchHandler from "@/utils/fetchHandler";
+import handleErrorMessage from "@/utils/handleErrorMessage";
+
 // Components
 import Button from "@/components/Buttons/Button";
 import FormPasswordInput from "@/components/Form/FormPasswordInput";
@@ -12,15 +18,14 @@ import { AuthSignUpFields, AuthSignUpSchema } from "@/zod/auth";
 // Forms
 import { zodResolver } from "@hookform/resolvers/zod";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { toast } from "sonner";
-import fetchHandler from "@/utils/fetchHandler";
-import handleErrorMessage from "@/utils/handleErrorMessage";
 
 export default function AuthSignUpForm() {
+  const router = useRouter();
+
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<AuthSignUpFields>({
     defaultValues: {
       email: "",
@@ -32,11 +37,13 @@ export default function AuthSignUpForm() {
     resolver: zodResolver(AuthSignUpSchema),
   });
 
-  // todo: extract fetch logic into utility function
   const handleSignUp: SubmitHandler<AuthSignUpFields> = async (newUser) => {
     try {
-      await fetchHandler("POST", "auth/signup", newUser);
-      toast.success("User registered successfully!");
+      const data = await fetchHandler("POST", "auth/signup", newUser);
+      toast.success(data.message);
+
+      // Redirect to login page
+      setTimeout(() => router.push("/auth/signin"), 1000);
     } catch (error) {
       toast.error(handleErrorMessage(error));
     }
@@ -73,7 +80,14 @@ export default function AuthSignUpForm() {
         modifierClass="mb-8"
       />
 
-      <Button type="submit" variant="primary" size="full" modifierClass="mb-4">
+      <Button
+        type="submit"
+        variant="primary"
+        size="full"
+        modifierClass="mb-4"
+        isLoading={isSubmitting}
+        disabled={isSubmitting}
+      >
         Sign Up
       </Button>
 
