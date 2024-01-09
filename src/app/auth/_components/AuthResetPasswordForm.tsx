@@ -16,12 +16,14 @@ import { AuthResetPasswordFields, AuthResetPasswordSchema } from "@/zod/auth";
 // Forms
 import { zodResolver } from "@hookform/resolvers/zod";
 import { SubmitHandler, useForm } from "react-hook-form";
+import { useRouter } from "next/navigation";
 
 export default function AuthResetPasswordForm({ token }: { token: string }) {
+  const router = useRouter();
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<AuthResetPasswordFields>({
     defaultValues: { token: token, password: "", confirm_password: "" },
     resolver: zodResolver(AuthResetPasswordSchema),
@@ -32,7 +34,10 @@ export default function AuthResetPasswordForm({ token }: { token: string }) {
   ) => {
     try {
       const data = await fetchHandler("POST", "auth/reset-password", payload);
-      toast.success(data.message);
+      setTimeout(() => {
+        toast.success(`${data.message}! You will be redirected shortly.`);
+        router.push("/auth/signin");
+      }, 2000);
     } catch (error) {
       toast.error(handleErrorMessage(error));
     }
@@ -51,7 +56,14 @@ export default function AuthResetPasswordForm({ token }: { token: string }) {
         autoComplete="new-password"
       />
 
-      <Button type="submit" variant="primary" size="full" modifierClass="mb-4">
+      <Button
+        type="submit"
+        variant="primary"
+        size="full"
+        modifierClass="mb-4"
+        isLoading={isSubmitting}
+        disabled={isSubmitting}
+      >
         Reset Password
       </Button>
 

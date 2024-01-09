@@ -17,7 +17,7 @@ export default function AuthSignInForm() {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<AuthSignInFields>({
     defaultValues: { email: "", password: "" },
     resolver: zodResolver(AuthSignInSchema),
@@ -42,7 +42,14 @@ export default function AuthSignInForm() {
         modifierClass="mb-8"
       />
 
-      <Button type="submit" variant="primary" size="full" modifierClass="mb-2">
+      <Button
+        type="submit"
+        variant="primary"
+        size="full"
+        modifierClass="mb-2"
+        disabled={isSubmitting}
+        isLoading={isSubmitting}
+      >
         Sign In
       </Button>
 

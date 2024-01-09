@@ -25,7 +25,7 @@ export async function POST(request: Request) {
     await AuthService.resetPassword(payload.token, payload.password);
 
     return Response.json(
-      { message: "Your password was successfully reset!" },
+      { message: "Your password was successfully reset" },
       { status: 200 }
     );
   } catch (error) {
