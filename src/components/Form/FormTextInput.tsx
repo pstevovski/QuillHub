@@ -18,22 +18,23 @@ export default function FormTextInput({
   ...props
 }: FormTextInputProps) {
   return (
-    <div>
+    <div className={cn("relative", modifierClass)}>
       {label ? <label htmlFor={props.id}>{label}</label> : null}
 
       <input
         type="text"
         className={cn(
-          "text-sm w-full border-2 p-2 rounded mb-5 focus:outline-none placeholder:text-slate-300 transition-[border-color]",
-          error ? "text-red-600 border-red-500 mb-0" : "",
-          modifierClass
+          "text-sm w-full border p-3 rounded-md mb-10 focus:outline-none placeholder:text-slate-300 transition-[border-color]",
+          error ? "text-red-600 border-red-500" : ""
         )}
         {...register}
         {...props}
       />
 
       {error ? (
-        <p className="text-sm text-red-600 mb-2">{error.message}</p>
+        <p className="absolute left-0 bottom-4 text-xs font-medium text-red-600">
+          {error.message}
+        </p>
       ) : null}
     </div>
   );

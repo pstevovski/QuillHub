@@ -28,16 +28,15 @@ export default function FormPasswordInput({
   const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
 
   return (
-    <div>
+    <div className={cn("relative", modifierClass)}>
       {label ? <label htmlFor={props.id}>{label}</label> : null}
 
       <div className="relative">
         <input
           type={isPasswordVisible ? "text" : "password"}
           className={cn(
-            "text-sm w-full border p-2 rounded mb-5 focus:outline-none placeholder:text-slate-300 transition-[border-color]",
-            error ? "text-red-600 border-red-500 mb-0" : "",
-            modifierClass
+            "text-sm w-full border p-3 rounded-md mb-10 focus:outline-none placeholder:text-slate-300 transition-[border-color]",
+            error ? "text-red-600 border-red-500" : ""
           )}
           placeholder="**********"
           {...register}
@@ -45,7 +44,7 @@ export default function FormPasswordInput({
         />
 
         <div
-          className="absolute right-5 top-2 text-2xl text-slate-300 cursor-pointer hover:text-slate-400 duration-200"
+          className="absolute right-5 top-[12px] text-2xl text-slate-300 cursor-pointer hover:text-slate-400 duration-200"
           onClickCapture={() => setIsPasswordVisible(!isPasswordVisible)}
         >
           {isPasswordVisible ? <PasswordShow /> : <PasswordHide />}
@@ -53,7 +52,9 @@ export default function FormPasswordInput({
       </div>
 
       {error ? (
-        <p className="text-sm text-red-500 mb-2">{error.message}</p>
+        <p className="absolute left-0 bottom-4 text-xs font-medium text-red-600">
+          {error.message}
+        </p>
       ) : null}
     </div>
   );
