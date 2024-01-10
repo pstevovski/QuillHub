@@ -2,6 +2,7 @@
 
 // Utilities & Hooks
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 import handleErrorMessage from "@/utils/handleErrorMessage";
 import fetchHandler from "@/utils/fetchHandler";
 
@@ -24,6 +25,7 @@ import { FaCircleInfo as InfoIcon } from "react-icons/fa6";
 import Tooltip from "@/components/Tooltips/Tooltip";
 
 export default function AuthSignInForm() {
+  const router = useRouter();
   const {
     register,
     handleSubmit,
@@ -36,6 +38,7 @@ export default function AuthSignInForm() {
   const handleSignIn: SubmitHandler<AuthSignInFields> = async (details) => {
     try {
       await fetchHandler("POST", "auth/signin", details);
+      router.push("/protected");
     } catch (error) {
       toast.error(handleErrorMessage(error));
     }
