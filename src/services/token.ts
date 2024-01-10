@@ -21,10 +21,16 @@ class Token {
   }
 
   /** Issue a new token and save it as an HttpOnly cookie */
-  async signToken(payload: Record<string, unknown>): Promise<string> {
+  async signToken(
+    payload: Record<string, unknown>,
+    remember_me: boolean = false
+  ): Promise<string> {
     try {
       const iat = Math.floor(Date.now() / 1000);
-      const exp = iat * 60 * 60 * 24; // Expires 24h from the moment it was issued
+      let exp = iat + 60 * 60 * 24; // Expires 24h from the moment it was issued
+
+      // If user selected option to be remembered then extend expiration to 30 days
+      if (remember_me) exp = iat + 60 * 60 * 24 * 30;
 
       const token = await new SignJWT({ ...payload })
         .setProtectedHeader({ alg: "HS256", typ: "JWT" })
