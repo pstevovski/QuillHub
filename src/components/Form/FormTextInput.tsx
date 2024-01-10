@@ -24,8 +24,8 @@ export default function FormTextInput({
       <input
         type="text"
         className={cn(
-          "text-sm w-full border p-2 rounded mb-5 focus:outline-none placeholder:text-slate-300 transition-[border-color]",
-          error ? "border-red-500 mb-0" : "",
+          "text-sm w-full border-2 p-2 rounded mb-5 focus:outline-none placeholder:text-slate-300 transition-[border-color]",
+          error ? "text-red-600 border-red-500 mb-0" : "",
           modifierClass
         )}
         {...register}
@@ -33,7 +33,7 @@ export default function FormTextInput({
       />
 
       {error ? (
-        <p className="text-sm text-red-500 mb-2">{error.message}</p>
+        <p className="text-sm text-red-600 mb-2">{error.message}</p>
       ) : null}
     </div>
   );
