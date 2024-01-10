@@ -10,7 +10,7 @@ export const AuthSignInSchema = z.object({
   password: z
     .string({ required_error: "Please enter your password" })
     .min(1, "Please enter your password"),
-  remember_me: z.boolean().optional(),
+  remember_me: z.boolean(),
 });
 
 export type AuthSignInFields = z.infer<typeof AuthSignInSchema>;
