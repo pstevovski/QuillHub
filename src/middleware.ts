@@ -37,5 +37,5 @@ export async function middleware(request: NextRequest) {
 
 // todo: set configuration for which routes should the middleware be enabled
 export const config = {
-  matcher: ["/auth/:path*", "/test"],
+  matcher: ["/auth/:path*", "/protected"],
 };

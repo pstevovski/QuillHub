@@ -30,19 +30,28 @@
   - **DONE** Without using third-party service such as NextAuth [x]
   - **DONE** JWT will be stored using cookies as an `HttpOnly` cookie [x]
   - **DONE** The `fetchHandler` should be updated to include credentials with each request [x]
-- Create authentication service for handling user sign ins in the application
-- Compare provided password with encrypted password saved in the database for the user trying to sign in
+- **DONE** Create authentication service for handling user sign ins in the application [x]
+- **DONE** Compare provided password with encrypted password saved in the database for the user trying to sign in [x]
 - **DONE** Add middleware protection for pages and API routes [x]
-  - Currently only works for "/test" page
-  - Pages & API endpoints that we want to protect should be included here
-- Implement "Remember Me" functionality
-  - Add FormCheckbox component
-  - Add usage of this component to the signin page to handle "remember_me" field
-  - Updated Zod schema for signin to include checking for this field (?)
-  - To be included in the payload upon signin
-  - If selected, set the expiration date to 1 year
+- **DONE** Implement "Remember Me" functionality [x]
+  - **DONE** Add FormCheckbox component [x]
+  - **DONE** Add usage of this component to the signin page to handle "remember_me" field [x]
+  - **DONE** Updated Zod schema for signin to include checking for this field [x]
+  - **DONE** If selected, set the expiration date to 30 days from moment when token was issued [x]
 - **DONE** Move JWT-related utility functions in a separate `TokenService` [x]
+- **DONE** Add sign out route [x]
+- **DONE** Add service for handling sign out process [x]
+- **DONE** Remove the HttpOnly cookie upon sign out [x]
+- **DONE** Redirect user to signin page [x]
 - Double check JWT signtaure verification process
+
+### Middleware
+
+- example: https://github.com/vercel/examples/blob/main/edge-middleware/jwt-authentication/middleware.ts
+- Protect specific API endpoints requiring authentication
+- Protect specific pages requiring authentication
+- Add utility function that will check for pages/api endpoints that are on the "protected" list
+- bug: fix error that occurs when signing out of the application regarding token verification
 
 ### **DONE** Forgot & Reset Password [x]
 
