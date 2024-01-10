@@ -64,6 +64,15 @@ class Token {
       );
     }
   }
+
+  /** Removes the HttpOnly cookie when user signs out of the application */
+  async removeToken() {
+    try {
+      cookies().delete(this.TOKEN_NAME);
+    } catch (error) {
+      throw new Error(handleErrorMessage(error));
+    }
+  }
 }
 
 const TokenService = new Token();

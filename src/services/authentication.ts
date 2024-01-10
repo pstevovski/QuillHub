@@ -133,6 +133,14 @@ class Auth {
       throw new Error(`Failed resetting password: ${errorMessage}`);
     }
   }
+
+  async signOut() {
+    try {
+      await TokenService.removeToken();
+    } catch (error) {
+      throw new Error(handleErrorMessage(error));
+    }
+  }
 }
 
 const AuthService = new Auth();
