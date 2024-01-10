@@ -1,6 +1,7 @@
+// Utilities
 import { NextRequest, NextResponse } from "next/server";
-import { signToken } from "@/utils/jwt";
 import handleErrorMessage from "@/utils/handleErrorMessage";
+import TokenService from "@/services/token";
 
 export async function POST(request: NextRequest) {
   const payload = await request.json();
@@ -9,11 +10,11 @@ export async function POST(request: NextRequest) {
   // todo: add check for the email/password combination
   // todo: add 'signin' method in the auth service to handle this
   // todo: move signing the token within that method
-  // todo: update the payload that will be saved within the token
+  // todo: update the payload that will be saved within the token to include "Remember Me" field
 
   // Generate a new token that will be saved as HttpOnly cookie
   try {
-    await signToken(payload);
+    await TokenService.signToken(payload);
     return NextResponse.json({ status: 200 });
   } catch (error) {
     console.error(`Sign In failed: ${handleErrorMessage(error)}`);

@@ -36,9 +36,12 @@
   - Currently only works for "/test" page
   - Pages & API endpoints that we want to protect should be included here
 - Implement "Remember Me" functionality
+  - Add FormCheckbox component
+  - Add usage of this component to the signin page to handle "remember_me" field
+  - Updated Zod schema for signin to include checking for this field (?)
   - To be included in the payload upon signin
   - If selected, set the expiration date to 1 year
-- Move JWT-related utility functions in a separate `TokenService`
+- **DONE** Move JWT-related utility functions in a separate `TokenService` [x]
 - Double check JWT signtaure verification process
 
 ### **DONE** Forgot & Reset Password [x]
