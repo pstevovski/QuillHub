@@ -1,26 +1,45 @@
 // Utilities
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
+import { AuthSignInFields, AuthSignInSchema } from "@/zod/auth";
+import type { NextRequest } from "next/server";
 import handleErrorMessage from "@/utils/handleErrorMessage";
-import TokenService from "@/services/token";
+import AuthService from "@/services/authentication";
 
 export async function POST(request: NextRequest) {
-  const payload = await request.json();
+  const payload = (await request.json()) as AuthSignInFields;
 
-  // todo: validate the payload that is received
-  // todo: add check for the email/password combination
-  // todo: add 'signin' method in the auth service to handle this
-  // todo: move signing the token within that method
-  // todo: update the payload that will be saved within the token to include "Remember Me" field
+  const validatePayload = AuthSignInSchema.safeParse({
+    email: payload.email,
+    password: payload.password,
+    remember_me: payload.remember_me,
+  });
+
+  if (!validatePayload.success) {
+    return Response.json(
+      { error: "Please enter your email and password!" },
+      { status: 422 }
+    );
+  }
 
   // Generate a new token that will be saved as HttpOnly cookie
   try {
-    await TokenService.signToken(payload);
+    await AuthService.signIn(
+      payload.email,
+      payload.password,
+      payload.remember_me
+    );
     return NextResponse.json({ status: 200 });
   } catch (error) {
-    console.error(`Sign In failed: ${handleErrorMessage(error)}`);
+    const errorMessage: string = handleErrorMessage(error);
+    const invalidCredentials = errorMessage
+      .toLowerCase()
+      .startsWith("invalid credentials");
+
     return Response.json(
-      { error: "Sign In failed. Something went wrong!" },
-      { status: 500 }
+      {
+        error: invalidCredentials ? errorMessage : "Something went wrong!",
+      },
+      { status: invalidCredentials ? 422 : 500 }
     );
   }
 }
