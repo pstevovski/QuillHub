@@ -1,16 +1,52 @@
 import "dotenv/config";
 
 import db from "@/db/connection";
-import { UserNew, userPasswordResets, users } from "@/db/schema/users";
-import { hashUserPassword } from "@/utils/bcrypt";
+import { User, UserNew, userPasswordResets, users } from "@/db/schema/users";
+import { compareUserPassword, hashUserPassword } from "@/utils/bcrypt";
 import handleErrorMessage from "@/utils/handleErrorMessage";
 import { eq } from "drizzle-orm";
 import EmailService, { EMAIL_TEMPLATES_PASSWORD_RESET } from "./email";
+import TokenService from "./token";
 
 /**
  * Service used for handling Authentication functionality
  **/
 class Auth {
+  async signIn(email: string, password: string, remember_me: boolean) {
+    try {
+      // Check if the user with the provided email exists in the database
+      const targetedUser: User[] = await db
+        .select()
+        .from(users)
+        .where(eq(users.email, email));
+
+      if (!targetedUser.length) throw new Error("Invalid credentials!");
+
+      // Check if the password that was provided matches the hashed password saved in the database
+      const checkPasswordMatch = await compareUserPassword(
+        password,
+        targetedUser[0].password
+      );
+
+      if (!checkPasswordMatch) throw new Error("Invalid credentials!");
+
+      // Issue a new token and save it as HttpOnly cookie
+      await TokenService.signToken(
+        {
+          id: targetedUser[0].id,
+          email,
+          first_name: targetedUser[0].first_name,
+          last_name: targetedUser[0].last_name,
+          role_id: targetedUser[0].role_id,
+        },
+        remember_me
+      );
+    } catch (error) {
+      console.error(`Sign In Failed: Attempted sign in for ${email}`);
+      throw new Error(handleErrorMessage(error));
+    }
+  }
+
   async signUp(newUser: UserNew) {
     try {
       // Hash the password before storing the data in the database
