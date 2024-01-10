@@ -17,7 +17,6 @@ import { AuthSignInFields, AuthSignInSchema } from "@/zod/auth";
 // Forms
 import { zodResolver } from "@hookform/resolvers/zod";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { useRouter } from "next/navigation";
 import FormCheckbox from "@/components/Form/FormCheckbox";
 
 // Assets
@@ -25,7 +24,6 @@ import { FaCircleInfo as InfoIcon } from "react-icons/fa6";
 import Tooltip from "@/components/Tooltips/Tooltip";
 
 export default function AuthSignInForm() {
-  const router = useRouter();
   const {
     register,
     handleSubmit,
@@ -38,7 +36,6 @@ export default function AuthSignInForm() {
   const handleSignIn: SubmitHandler<AuthSignInFields> = async (details) => {
     try {
       await fetchHandler("POST", "auth/signin", details);
-      router.push("/test");
     } catch (error) {
       toast.error(handleErrorMessage(error));
     }
@@ -65,7 +62,11 @@ export default function AuthSignInForm() {
           register={register("remember_me")}
         />
 
-        <Tooltip text="Remain signed in for 30 days" side="top" sideOffset={12}>
+        <Tooltip
+          text="Remain signed in for 30 days. Its best to use this option on a personal computer."
+          side="top"
+          sideOffset={12}
+        >
           <InfoIcon className="text-slate-300 text-md mt-[2px]" />
         </Tooltip>
       </div>
