@@ -43,8 +43,7 @@
 - **DONE** Add service for handling sign out process [x]
 - **DONE** Remove the HttpOnly cookie upon sign out [x]
 - **DONE** Redirect user to signin page [x]
-- Implement `last_signin` functionality
-- Double check JWT signtaure verification process
+- **DONE** Implement `last_signin` functionality [x]
 
 ### **DONE** Middleware [x]
 
