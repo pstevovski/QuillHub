@@ -45,7 +45,4 @@ export async function middleware(request: NextRequest) {
   if (request.nextUrl.pathname.startsWith("/auth") && hasValidToken) {
     return NextResponse.redirect(new URL("/", request.url));
   }
-
-  // If everything is fine, allow access to the route that the user has requested
-  return NextResponse.next();
 }
