@@ -6,6 +6,7 @@ import {
   varchar,
   timestamp,
   bigint,
+  datetime,
 } from "drizzle-orm/mysql-core";
 
 /*===========================================
@@ -30,6 +31,9 @@ export const users = mysqlTable("users", {
     .notNull()
     .default(1)
     .references(() => roles.id),
+  last_signin: datetime("last_signin", { mode: "date", fsp: 6 })
+    .default(sql`null`)
+    .$type<Date | null>(),
 });
 
 export type User = typeof users.$inferSelect;
