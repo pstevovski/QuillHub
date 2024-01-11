@@ -55,6 +55,9 @@ class Token {
 
   /** Verify the validity of the provided token */
   async verifyToken(token: string) {
+    // Do not try to verify non-existing token
+    if (!token) return undefined;
+
     try {
       const { payload } = await jwtVerify(token, this.encodeJWTSecretKey());
       return payload;
