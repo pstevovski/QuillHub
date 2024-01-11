@@ -41,9 +41,16 @@ class Auth {
         },
         remember_me
       );
+
+      // Update the last time when the user has signed in
+      await db
+        .update(users)
+        .set({ last_signin: new Date() })
+        .where(eq(users.id, targetedUser[0].id));
     } catch (error) {
-      console.error(`Sign In Failed: Attempted sign in for ${email}`);
-      throw new Error(handleErrorMessage(error));
+      const errorMessage: string = handleErrorMessage(error);
+      console.log(`Sign In failed for ${email}. Reason: ${errorMessage}`);
+      throw new Error(errorMessage);
     }
   }
 
