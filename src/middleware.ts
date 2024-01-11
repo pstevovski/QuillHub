@@ -10,7 +10,7 @@ import { handleCheckIfProtectedRoute } from "./utils/protectedRoutes";
 // Do not invoke the middleware function on NextJS and items served from "public" (e.g. favicon)
 // On all other defined routes the middleware should be triggered
 export const config = {
-  matcher: "/((?!static|.*\\..*|_next).*)",
+  matcher: "/((?!_next/static|_next/image|favicon.ico).*)",
 };
 
 export async function middleware(request: NextRequest) {
