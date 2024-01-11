@@ -43,15 +43,15 @@
 - **DONE** Add service for handling sign out process [x]
 - **DONE** Remove the HttpOnly cookie upon sign out [x]
 - **DONE** Redirect user to signin page [x]
+- Implement `last_signin` functionality
 - Double check JWT signtaure verification process
 
-### Middleware
+### **DONE** Middleware [x]
 
-- example: https://github.com/vercel/examples/blob/main/edge-middleware/jwt-authentication/middleware.ts
-- Protect specific API endpoints requiring authentication
-- Protect specific pages requiring authentication
-- Add utility function that will check for pages/api endpoints that are on the "protected" list
-- bug: fix error that occurs when signing out of the application regarding token verification
+- **DONE** Protect specific API endpoints requiring authentication [x]
+- **DONE** Protect specific pages requiring authentication [x]
+- **DONE** Add utility function that will check for pages/api endpoints that are on the "protected" list [x]
+- **DONE** bug: fix error that occurs when signing out of the application regarding token verification [x]
 
 ### **DONE** Forgot & Reset Password [x]
 
@@ -66,8 +66,3 @@
 - **DONE** Create API endpoin to use this service and connect the frontend 'client' form responsible for sending the API request [x]
 
 - This table should be cleaned after X amount of time
-
-### JWT
-
-- Implement authentication with third party site such as Google
-  - Without using third-party service such as NextAuth (??)
