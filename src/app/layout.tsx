@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 import { GeistSans } from "geist/font/sans";
+import { Toaster } from "sonner";
 
 export const metadata: Metadata = {
   title: "Quillhub",
@@ -16,6 +17,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${GeistSans.className} antialiased`}>{children}</body>
+      <Toaster richColors closeButton />
     </html>
   );
 }
