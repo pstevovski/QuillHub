@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 
 // Utilities
 import handleErrorMessage from "@/utils/handleErrorMessage";
-import { SignJWT, jwtVerify } from "jose";
+import { SignJWT, decodeJwt, jwtVerify } from "jose";
 
 class Token {
   public TOKEN_NAME: string = "jwt-token";
@@ -65,6 +65,20 @@ class Token {
       throw new Error(
         `Token verification failed: ${handleErrorMessage(error)}`
       );
+    }
+  }
+
+  /** Decodes the provided token containing some user-specific details */
+  async decodeToken() {
+    const token = cookies().get(this.TOKEN_NAME)?.value;
+    if (!token) return;
+
+    try {
+      const decodedToken = decodeJwt(token);
+      return decodedToken;
+    } catch (error) {
+      console.log(`Failed decoding token: ${handleErrorMessage(error)}`);
+      throw new Error("Failed decoding token!");
     }
   }
 
