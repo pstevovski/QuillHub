@@ -64,9 +64,10 @@ class Token {
       const { payload } = await jwtVerify(token, this.encodeJWTSecretKey());
       return payload;
     } catch (error) {
-      throw new Error(
-        `Token verification failed: ${handleErrorMessage(error)}`
+      console.error(
+        `ERROR: Token verification failed: ${handleErrorMessage(error)}`
       );
+      return false;
     }
   }
 
