@@ -54,7 +54,9 @@ class Token {
   }
 
   /** Verify the validity of the provided token */
-  async verifyToken(token: string) {
+  async verifyToken() {
+    const token = cookies().get(this.TOKEN_NAME)?.value;
+
     // Do not try to verify non-existing token
     if (!token) return undefined;
 

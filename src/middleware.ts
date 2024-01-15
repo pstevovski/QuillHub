@@ -23,7 +23,7 @@ export async function middleware(request: NextRequest) {
   // Verify the token that the user sent in the request
   // prettier-ignore
   const hasValidToken = await TokenService
-    .verifyToken(authToken)
+    .verifyToken()
     .catch((error) => console.error("Failed verifying access token: ", error.message)
   );
 
