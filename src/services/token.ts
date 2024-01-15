@@ -6,62 +6,94 @@ import handleErrorMessage from "@/utils/handleErrorMessage";
 import { SignJWT, decodeJwt, jwtVerify } from "jose";
 
 class Token {
-  public TOKEN_NAME: string = "jwt-token";
+  public ACCESS_TOKEN_NAME: string = "jwt-access-token";
+  public REFRESH_TOKEN_NAME: string = "jwt-refresh-token";
+  private ACCESS_TOKEN_EXP: number = 60 * 60; // 1 hour
 
-  /** Read secret key from ENV and encode it before returning for usage */
-  private encodeJWTSecretKey() {
-    const secretKey: string | undefined = process.env.JWT_SECRET_KEY;
-
-    if (!secretKey)
+  private encodedAccessTokenSecretKey() {
+    const accessTokenSecret = process.env.JWT_ACCESS_TOKEN_SECRET_KEY;
+    if (!accessTokenSecret) {
       throw new Error(
-        "The environment variable for JWT_SECRET_KEY is missing or invalid."
+        "The environment variable for JWT_ACCESS_TOKEN_SECRET_KEY is missing or invalid."
       );
+    }
 
-    return new TextEncoder().encode(secretKey);
+    return new TextEncoder().encode(accessTokenSecret);
+  }
+
+  private encodedRefreshTokenSecretKey() {
+    const refreshTokenSecret = process.env.JWT_REFRESH_TOKEN_SECRET_KEY;
+    if (!refreshTokenSecret) {
+      throw new Error(
+        "The environment variable for JWT_REFRESH_TOKEN_SECRET_KEY is missing or invalid."
+      );
+    }
+
+    return new TextEncoder().encode(refreshTokenSecret);
   }
 
   /** Issue a new token and save it as an HttpOnly cookie */
-  async signToken(
+  async issueNewTokens(
     payload: Record<string, unknown>,
     remember_me: boolean = false
-  ): Promise<string> {
+  ): Promise<number> {
     try {
       const iat = Math.floor(Date.now() / 1000);
-      let exp = iat + 60 * 60 * 24; // Expires 24h from the moment it was issued
+      let accessTokenExpiration = iat + this.ACCESS_TOKEN_EXP; // Expires 1h from when it was issued
+      let refreshTokenExpiration = iat + this.ACCESS_TOKEN_EXP * 8; // Expires 8h from when it was issued
 
-      // If user selected option to be remembered then extend expiration to 30 days
-      if (remember_me) exp = iat + 60 * 60 * 24 * 30;
+      // If user selected option to be remembered, increase the duration of the tokens
+      if (remember_me) {
+        accessTokenExpiration = iat + this.ACCESS_TOKEN_EXP * 24 * 30; // 30 days
+        refreshTokenExpiration = iat + this.ACCESS_TOKEN_EXP * 24 * 90; // 90 days
+      }
 
-      const token = await new SignJWT({ ...payload })
+      // Access token and cookie
+      const accessToken = await new SignJWT({ ...payload })
         .setProtectedHeader({ alg: "HS256", typ: "JWT" })
-        .setExpirationTime(exp)
+        .setExpirationTime(accessTokenExpiration)
         .setIssuedAt(iat)
         .setNotBefore(iat)
-        .sign(this.encodeJWTSecretKey());
+        .sign(this.encodedAccessTokenSecretKey());
 
-      // Save the token in a cookie
       cookies().set({
-        name: this.TOKEN_NAME,
-        value: token,
+        name: this.ACCESS_TOKEN_NAME,
+        value: accessToken,
         httpOnly: true,
-        expires: exp * 1000,
+        expires: accessTokenExpiration * 1000,
       });
 
-      return token;
+      // Refresh token and cookie
+      const refreshToken = await new SignJWT({ ...payload })
+        .setProtectedHeader({ alg: "HS256", typ: "JWT" })
+        .setExpirationTime(refreshTokenExpiration)
+        .setIssuedAt(iat)
+        .setNotBefore(iat)
+        .sign(this.encodedRefreshTokenSecretKey());
+
+      cookies().set({
+        name: this.REFRESH_TOKEN_NAME,
+        value: refreshToken,
+        httpOnly: true,
+        expires: refreshTokenExpiration * 1000,
+      });
+
+      return accessTokenExpiration * 1000;
     } catch (error) {
       throw new Error(handleErrorMessage(error));
     }
   }
 
   /** Verify the validity of the provided token */
-  async verifyToken() {
-    const token = cookies().get(this.TOKEN_NAME)?.value;
-
+  async verifyToken(token: string | undefined) {
     // Do not try to verify non-existing token
-    if (!token) return undefined;
+    if (!token) return;
 
     try {
-      const { payload } = await jwtVerify(token, this.encodeJWTSecretKey());
+      const { payload } = await jwtVerify(
+        token,
+        this.encodedAccessTokenSecretKey()
+      );
       return payload;
     } catch (error) {
       console.error(
@@ -72,8 +104,7 @@ class Token {
   }
 
   /** Decodes the provided token containing some user-specific details */
-  async decodeToken() {
-    const token = cookies().get(this.TOKEN_NAME)?.value;
+  async decodeToken(token: string) {
     if (!token) return;
 
     try {
@@ -85,10 +116,16 @@ class Token {
     }
   }
 
-  /** Removes the HttpOnly cookie when user signs out of the application */
-  async removeToken() {
+  /** Removes the tokens that were issued to the user from cookies */
+  async clearTokens() {
+    await TokenService.removeToken(TokenService.ACCESS_TOKEN_NAME);
+    await TokenService.removeToken(TokenService.REFRESH_TOKEN_NAME);
+  }
+
+  private async removeToken(token: string) {
+    if (!token) return;
     try {
-      cookies().delete(this.TOKEN_NAME);
+      cookies().delete(token);
     } catch (error) {
       throw new Error(handleErrorMessage(error));
     }
