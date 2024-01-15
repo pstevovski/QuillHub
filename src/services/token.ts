@@ -32,7 +32,11 @@ class Token {
     return new TextEncoder().encode(refreshTokenSecret);
   }
 
-  /** Issue a new token and save it as an HttpOnly cookie */
+  /**
+   * Issue a new token and save it as an HttpOnly cookie
+   *
+   * Returns a timestamp representing the expiration date of the issued `"access"` token.
+   **/
   async issueNewTokens(
     payload: Record<string, unknown>,
     remember_me: boolean = false

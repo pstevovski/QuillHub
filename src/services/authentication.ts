@@ -30,8 +30,7 @@ class Auth {
 
       if (!checkPasswordMatch) throw new Error("Invalid credentials!");
 
-      // Issue a new token and save it as HttpOnly cookie
-      await TokenService.signToken(
+      const expirationTimestamp = await TokenService.issueNewTokens(
         {
           id: targetedUser[0].id,
           email,
@@ -47,6 +46,8 @@ class Auth {
         .update(users)
         .set({ last_signin: new Date() })
         .where(eq(users.id, targetedUser[0].id));
+
+      return expirationTimestamp;
     } catch (error) {
       const errorMessage: string = handleErrorMessage(error);
       console.log(`Sign In failed for ${email}. Reason: ${errorMessage}`);
@@ -143,7 +144,7 @@ class Auth {
 
   async signOut() {
     try {
-      await TokenService.removeToken();
+      await TokenService.clearTokens();
     } catch (error) {
       throw new Error(handleErrorMessage(error));
     }
