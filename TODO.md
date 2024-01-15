@@ -1,15 +1,16 @@
 ## Token Serivce & Middleware updates
 
-- Add a new endpoint for refreshing tokens -> `token/refresh`
-- Add method for handling refreshing the tokens
-- Add client context provider that will be checking the `expiresTimetsamp` value saved in local storage
-  every 10 seconds to check if its time to refresh the existing token silently
-  - The check will be for 10 minutes BEFORE the expiration time of the token
-  - If its time to refresh it, send request to the new endpoint that will issue new `accessToken`
-    and update its value saved as an `httpOnly` cookie
-  - After this update the `expiresTimestamp` value saved in local storage
-  - If there's no `refresh token` or it has expired, then clear out all tokens from cookies and redirect
-    the user to the signin page
+- **DONE** Add a new endpoint for refreshing tokens -> `token/refresh` [x]
+- **DONE** Add method for handling refreshing the tokens [x]
+- **DONE** Add client context provider that will be checking the `expiresTimetsamp` value saved in local storage
+  every 10 seconds to check if its time to refresh the existing token silently [x]
+  - **DONE** The check will be for 10 minutes BEFORE the expiration time of the token [x]
+  - **DONE** If its time to refresh it, send request to the new endpoint that will issue new `accessToken`
+    and update its value saved as an `httpOnly` cookie [x]
+  - **DONE** After this update the `expiresTimestamp` value saved in local storage [x]
+  - **DONE** If there's no `refresh token` or it has expired, then clear out all tokens from cookies and redirect
+    the user to the signin page [x]
+- Handle `remember_me` scenario in refresh token method
 
 ## Homepage
 
