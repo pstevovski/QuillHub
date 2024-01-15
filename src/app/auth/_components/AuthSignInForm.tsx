@@ -37,8 +37,12 @@ export default function AuthSignInForm() {
 
   const handleSignIn: SubmitHandler<AuthSignInFields> = async (details) => {
     try {
-      const expirationTime = await fetchHandler("POST", "auth/signin", details);
-      localStorage.setItem("quillhub-expirationTime", expirationTime);
+      const { expirationTimestamp } = await fetchHandler(
+        "POST",
+        "auth/signin",
+        details
+      );
+      localStorage.setItem("expiresTimestamp", expirationTimestamp);
 
       router.push("/protected");
     } catch (error) {
