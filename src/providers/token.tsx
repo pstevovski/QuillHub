@@ -15,6 +15,7 @@ function TokenContextProvider({ children }: { children: React.ReactNode }) {
       if (!expirationTime || isNaN(parseInt(expirationTime))) {
         await fetchHandler("POST", "auth/signout", undefined);
         localStorage.removeItem("expiresTimestamp");
+        window.location.replace("/auth/signin");
         return;
       }
 
