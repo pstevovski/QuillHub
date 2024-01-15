@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 
 export async function POST() {
   try {
-    const refreshedToken = await TokenService.refreshToken();
+    const refreshedToken = await TokenService.refreshAccessToken();
     return NextResponse.json({ expiresTime: refreshedToken }, { status: 200 });
   } catch (error) {
     return NextResponse.json(

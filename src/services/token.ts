@@ -88,9 +88,8 @@ class Token {
     }
   }
 
-  /** Verify the validity of the provided token */
+  /** Verifies the validity of the Access token */
   async verifyToken(token: string | undefined) {
-    // Do not try to verify non-existing token
     if (!token) return;
 
     try {
@@ -101,9 +100,25 @@ class Token {
       return payload;
     } catch (error) {
       console.error(
-        `ERROR: Token verification failed: ${handleErrorMessage(error)}`
+        `Access Token verification failed: ${handleErrorMessage(error)}`
       );
-      return false;
+    }
+  }
+
+  /** Verifies the validity of the Refresh token */
+  async verifyRefreshToken(token: string | undefined) {
+    if (!token) return;
+
+    try {
+      const { payload } = await jwtVerify(
+        token,
+        this.encodedRefreshTokenSecretKey()
+      );
+      return payload;
+    } catch (error) {
+      console.error(
+        `Refresh Token verification failed: ${handleErrorMessage(error)}`
+      );
     }
   }
 
@@ -117,6 +132,49 @@ class Token {
     } catch (error) {
       console.log(`Failed decoding token: ${handleErrorMessage(error)}`);
       throw new Error("Failed decoding token!");
+    }
+  }
+
+  /** Refreshes the user's current access token to provide continous usage of the app */
+  async refreshAccessToken() {
+    const refreshToken = cookies().get(this.REFRESH_TOKEN_NAME)?.value;
+    if (!refreshToken) throw new Error("Invalid or missing refresh token!");
+
+    const verifiedRefreshToken = await this.verifyRefreshToken(refreshToken);
+    if (!verifiedRefreshToken) {
+      throw new Error("Provided refresh token is invalid or expired.");
+    }
+
+    // ISSUE NEW ACCESS TOKEN
+    try {
+      const iat = Math.floor(Date.now() / 1000);
+      let accessTokenExpiration = iat + this.ACCESS_TOKEN_EXP; // Expires 1h from when it was issued
+
+      // If user selected option to be remembered, increase the duration of the tokens
+      // todo: handle this scenario
+      // if (remember_me) {
+      //   accessTokenExpiration = iat + this.ACCESS_TOKEN_EXP * 24 * 30; // 30 days
+      //   refreshTokenExpiration = iat + this.ACCESS_TOKEN_EXP * 24 * 90; // 90 days
+      // }
+
+      // Access token and cookie
+      const accessToken = await new SignJWT({ ...verifiedRefreshToken })
+        .setProtectedHeader({ alg: "HS256", typ: "JWT" })
+        .setExpirationTime(accessTokenExpiration)
+        .setIssuedAt(iat)
+        .setNotBefore(iat)
+        .sign(this.encodedAccessTokenSecretKey());
+
+      cookies().set({
+        name: this.ACCESS_TOKEN_NAME,
+        value: accessToken,
+        httpOnly: true,
+        expires: accessTokenExpiration * 1000,
+      });
+
+      return accessTokenExpiration * 1000;
+    } catch (error) {
+      throw new Error(handleErrorMessage(error));
     }
   }
 
