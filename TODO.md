@@ -1,18 +1,15 @@
 ## Token Serivce & Middleware updates
 
-- Update the token service `verifyToken` to return:
-  - a boolean indicating if the token is valid or not, based on payload value (if present)
-  - a user property containing only user-related details from the verified token
-  - and the full original payload (if needed somewhere)
-- Add additional method `refreshToken` that will be called from within `verifyToken`:
-
-  - This will make use of the `exp` (expires_at) property
-  - If the time of token verification was close to expiration (e.g. 10 minutes OR less from it), silently refresh the token
-
-- Update the middleware to remove unnecessary first check if the requested URL is starting with `/auth`
-  - Same applies for the other check for `/auth` route request
-  - Reason for this: The dedicated authentication pages will be removed
-  - Process will be handled trough a modal-like box that the user can interact with trough the header
+- Add a new endpoint for refreshing tokens -> `token/refresh`
+- Add method for handling refreshing the tokens
+- Add client context provider that will be checking the `expiresTimetsamp` value saved in local storage
+  every 10 seconds to check if its time to refresh the existing token silently
+  - The check will be for 10 minutes BEFORE the expiration time of the token
+  - If its time to refresh it, send request to the new endpoint that will issue new `accessToken`
+    and update its value saved as an `httpOnly` cookie
+  - After this update the `expiresTimestamp` value saved in local storage
+  - If there's no `refresh token` or it has expired, then clear out all tokens from cookies and redirect
+    the user to the signin page
 
 ## Homepage
 
