@@ -19,7 +19,7 @@ function TokenContextProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
-      const earlyExpirationTime = parseInt(expirationTime) - 1000 * 60 * 10; // 10 minutes earlier
+      const earlyExpirationTime = parseInt(expirationTime) - 1000 * 60 * 2; // 2 minutes earlier
 
       // If user's current time is at, or after, the early-expiration time,
       // send a request to the API in order to do "silent" refresh of the token
