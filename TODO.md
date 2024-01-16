@@ -10,7 +10,13 @@
   - **DONE** After this update the `expiresTimestamp` value saved in local storage [x]
   - **DONE** If there's no `refresh token` or it has expired, then clear out all tokens from cookies and redirect
     the user to the signin page [x]
-- Handle `remember_me` scenario in refresh token method
+- **DONE** Handle `remember_me` scenario in refresh token method [x]
+  - **DONE** No need, if this is selected refresh token lasts 90 days and after
+    the first 30 days of access token duration, the token will then be 
+    checked for expiration every 8h [x]
+- Refresh access token in middleware function, if the token is not valid but theres a valid refresh token
+  - Maybe change the behavior: instead of checking for valid access token, check for existance of valid refresh token?
+
 
 ## Homepage
 
