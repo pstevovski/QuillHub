@@ -8,7 +8,12 @@ import { SignJWT, decodeJwt, jwtVerify } from "jose";
 class Token {
   public ACCESS_TOKEN_NAME: string = "jwt-access-token";
   public REFRESH_TOKEN_NAME: string = "jwt-refresh-token";
-  private ACCESS_TOKEN_EXP: number = 60 * 60; // 1 hour
+
+  /** 
+   * The base expiration duration of the access token, represented in seconds.
+   * Defaults to 1h - 3600 seconds.
+   */
+  private ACCESS_TOKEN_EXP: number = 3600;
 
   private encodedAccessTokenSecretKey() {
     const accessTokenSecret = process.env.JWT_ACCESS_TOKEN_SECRET_KEY;
@@ -43,8 +48,8 @@ class Token {
   ): Promise<number> {
     try {
       const iat = Math.floor(Date.now() / 1000);
-      let accessTokenExpiration = iat + this.ACCESS_TOKEN_EXP; // Expires 1h from when it was issued
-      let refreshTokenExpiration = iat + this.ACCESS_TOKEN_EXP * 8; // Expires 8h from when it was issued
+      let accessTokenExpiration = iat + this.ACCESS_TOKEN_EXP * 8; // Expires 8h from when it was issued
+      let refreshTokenExpiration = iat + this.ACCESS_TOKEN_EXP * 24; // Expires 24h from when it was issued
 
       // If user selected option to be remembered, increase the duration of the tokens
       if (remember_me) {
@@ -145,17 +150,9 @@ class Token {
       throw new Error("Provided refresh token is invalid or expired.");
     }
 
-    // ISSUE NEW ACCESS TOKEN
     try {
       const iat = Math.floor(Date.now() / 1000);
-      let accessTokenExpiration = iat + this.ACCESS_TOKEN_EXP; // Expires 1h from when it was issued
-
-      // If user selected option to be remembered, increase the duration of the tokens
-      // todo: handle this scenario
-      // if (remember_me) {
-      //   accessTokenExpiration = iat + this.ACCESS_TOKEN_EXP * 24 * 30; // 30 days
-      //   refreshTokenExpiration = iat + this.ACCESS_TOKEN_EXP * 24 * 90; // 90 days
-      // }
+      let accessTokenExpiration = iat + this.ACCESS_TOKEN_EXP * 8; // Expires 8h from when it was issued
 
       // Access token and cookie
       const accessToken = await new SignJWT({ ...verifiedRefreshToken })
