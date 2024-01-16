@@ -9,11 +9,8 @@ class Token {
   public ACCESS_TOKEN_NAME: string = "jwt-access-token";
   public REFRESH_TOKEN_NAME: string = "jwt-refresh-token";
 
-  /** 
-   * The base expiration duration of the access token, represented in seconds.
-   * Defaults to 1h - 3600 seconds.
-   */
-  private ACCESS_TOKEN_EXP: number = 3600;
+  private ACCESS_TOKEN_DURATION_MS: number = 1000 * 60 * 10; // 10 minutes
+  private REFRESH_TOKEN_DURATION_DEFAULT_MS: number = 1000 * 60 * 60 * 24; // 24 hours
 
   private encodedAccessTokenSecretKey() {
     const accessTokenSecret = process.env.JWT_ACCESS_TOKEN_SECRET_KEY;
@@ -47,47 +44,50 @@ class Token {
     remember_me: boolean = false
   ): Promise<number> {
     try {
-      const iat = Math.floor(Date.now() / 1000);
-      let accessTokenExpiration = iat + this.ACCESS_TOKEN_EXP * 8; // Expires 8h from when it was issued
-      let refreshTokenExpiration = iat + this.ACCESS_TOKEN_EXP * 24; // Expires 24h from when it was issued
+      const issuedAt = Date.now();
+      const accessTokenExpiration = issuedAt + this.ACCESS_TOKEN_DURATION_MS; // Expires 10 minutes from when it was issued
+
+      // prettier-ignore
+      let refreshTokenExpiration = issuedAt + this.REFRESH_TOKEN_DURATION_DEFAULT_MS * 7; // Expires 7 days from when it was isssued
 
       // If user selected option to be remembered, increase the duration of the tokens
+      // Expires 90 days from when it was issued
       if (remember_me) {
-        accessTokenExpiration = iat + this.ACCESS_TOKEN_EXP * 24 * 30; // 30 days
-        refreshTokenExpiration = iat + this.ACCESS_TOKEN_EXP * 24 * 90; // 90 days
+        // prettier-ignore
+        refreshTokenExpiration = issuedAt + this.REFRESH_TOKEN_DURATION_DEFAULT_MS * 90;
       }
 
       // Access token and cookie
       const accessToken = await new SignJWT({ ...payload })
         .setProtectedHeader({ alg: "HS256", typ: "JWT" })
-        .setExpirationTime(accessTokenExpiration)
-        .setIssuedAt(iat)
-        .setNotBefore(iat)
+        .setExpirationTime("10m")
+        .setIssuedAt(Math.floor(issuedAt / 1000))
+        .setNotBefore("-10s")
         .sign(this.encodedAccessTokenSecretKey());
 
       cookies().set({
         name: this.ACCESS_TOKEN_NAME,
         value: accessToken,
         httpOnly: true,
-        expires: accessTokenExpiration * 1000,
+        expires: accessTokenExpiration,
       });
 
       // Refresh token and cookie
       const refreshToken = await new SignJWT({ ...payload })
         .setProtectedHeader({ alg: "HS256", typ: "JWT" })
-        .setExpirationTime(refreshTokenExpiration)
-        .setIssuedAt(iat)
-        .setNotBefore(iat)
+        .setExpirationTime(remember_me ? "90d" : "7d")
+        .setIssuedAt(Math.floor(issuedAt / 1000))
+        .setNotBefore("-10s")
         .sign(this.encodedRefreshTokenSecretKey());
 
       cookies().set({
         name: this.REFRESH_TOKEN_NAME,
         value: refreshToken,
         httpOnly: true,
-        expires: refreshTokenExpiration * 1000,
+        expires: refreshTokenExpiration,
       });
 
-      return accessTokenExpiration * 1000;
+      return accessTokenExpiration;
     } catch (error) {
       throw new Error(handleErrorMessage(error));
     }
@@ -151,25 +151,23 @@ class Token {
     }
 
     try {
-      const iat = Math.floor(Date.now() / 1000);
-      let accessTokenExpiration = iat + this.ACCESS_TOKEN_EXP * 8; // Expires 8h from when it was issued
-
-      // Access token and cookie
-      const accessToken = await new SignJWT({ ...verifiedRefreshToken })
+      const issuedAt = Date.now();
+      const refreshedTokenExpiration = issuedAt + this.ACCESS_TOKEN_DURATION_MS; // Expires 10 minutes from when it was issued
+      const refreshedToken = await new SignJWT({ ...verifiedRefreshToken })
         .setProtectedHeader({ alg: "HS256", typ: "JWT" })
-        .setExpirationTime(accessTokenExpiration)
-        .setIssuedAt(iat)
-        .setNotBefore(iat)
+        .setExpirationTime("10m")
+        .setIssuedAt(Math.floor(issuedAt / 1000))
+        .setNotBefore("-10s")
         .sign(this.encodedAccessTokenSecretKey());
 
       cookies().set({
         name: this.ACCESS_TOKEN_NAME,
-        value: accessToken,
+        value: refreshedToken,
         httpOnly: true,
-        expires: accessTokenExpiration * 1000,
+        expires: refreshedTokenExpiration,
       });
 
-      return accessTokenExpiration * 1000;
+      return refreshedTokenExpiration;
     } catch (error) {
       throw new Error(handleErrorMessage(error));
     }
