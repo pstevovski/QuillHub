@@ -9,6 +9,8 @@ class Token {
   public ACCESS_TOKEN_NAME: string = "jwt-access-token";
   public REFRESH_TOKEN_NAME: string = "jwt-refresh-token";
 
+  private ACCESS_TOKEN_EXPIRES_IN: string = "10m";
+  private TOKEN_NOT_BEFORE: string = "-10s"; // 10 seconds prior to issuing
   private ACCESS_TOKEN_DURATION_MS: number = 1000 * 60 * 10; // 10 minutes
   private REFRESH_TOKEN_DURATION_DEFAULT_MS: number = 1000 * 60 * 60 * 24; // 24 hours
 
@@ -60,9 +62,9 @@ class Token {
       // Access token and cookie
       const accessToken = await new SignJWT({ ...payload })
         .setProtectedHeader({ alg: "HS256", typ: "JWT" })
-        .setExpirationTime("10m")
+        .setExpirationTime(this.ACCESS_TOKEN_EXPIRES_IN)
         .setIssuedAt(Math.floor(issuedAt / 1000))
-        .setNotBefore("-10s")
+        .setNotBefore(this.TOKEN_NOT_BEFORE)
         .sign(this.encodedAccessTokenSecretKey());
 
       cookies().set({
@@ -77,7 +79,7 @@ class Token {
         .setProtectedHeader({ alg: "HS256", typ: "JWT" })
         .setExpirationTime(remember_me ? "90d" : "7d")
         .setIssuedAt(Math.floor(issuedAt / 1000))
-        .setNotBefore("-10s")
+        .setNotBefore(this.TOKEN_NOT_BEFORE)
         .sign(this.encodedRefreshTokenSecretKey());
 
       cookies().set({
@@ -155,9 +157,9 @@ class Token {
       const refreshedTokenExpiration = issuedAt + this.ACCESS_TOKEN_DURATION_MS; // Expires 10 minutes from when it was issued
       const refreshedToken = await new SignJWT({ ...verifiedRefreshToken })
         .setProtectedHeader({ alg: "HS256", typ: "JWT" })
-        .setExpirationTime("10m")
+        .setExpirationTime(this.ACCESS_TOKEN_EXPIRES_IN)
         .setIssuedAt(Math.floor(issuedAt / 1000))
-        .setNotBefore("-10s")
+        .setNotBefore(this.TOKEN_NOT_BEFORE)
         .sign(this.encodedAccessTokenSecretKey());
 
       cookies().set({
