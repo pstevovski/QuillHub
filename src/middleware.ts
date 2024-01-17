@@ -6,6 +6,7 @@ import { cookies } from "next/headers";
 // Services
 import TokenService from "./services/token";
 import { handleCheckIfProtectedRoute } from "./utils/protectedRoutes";
+import fetchHandler from "./utils/fetchHandler";
 
 // Do not invoke the middleware function on NextJS and items served from "public" (e.g. favicon)
 // On all other defined routes the middleware should be triggered
@@ -15,10 +16,32 @@ export const config = {
 
 export async function middleware(request: NextRequest) {
   const accessToken = cookies().get(TokenService.ACCESS_TOKEN_NAME)?.value;
+  const refreshToken = request.cookies.get(
+    TokenService.REFRESH_TOKEN_NAME
+  )?.value;
 
   // Do not take the authenication token into consideration if
   // the user is currently on one of the the authentication pages
   if (request.nextUrl.pathname.startsWith("/auth") && !accessToken) return;
+
+  // Issue a new access token before accessing the resource, if the previous one expired
+  if (refreshToken && !accessToken) {
+    const { token, expires } = await fetchHandler("POST", "token/refresh", {
+      refreshToken,
+    });
+
+    // Append the newly issued access token as a cookie before
+    // sending back the response from the middleware
+    const response = NextResponse.next();
+    response.cookies.set(TokenService.ACCESS_TOKEN_NAME, token, {
+      httpOnly: true,
+      expires,
+      sameSite: "lax",
+      secure: true,
+    });
+
+    return response;
+  }
 
   // Verify the token that the user sent in the request
   const hasValidAccessToken = await TokenService.verifyToken(accessToken).catch(
