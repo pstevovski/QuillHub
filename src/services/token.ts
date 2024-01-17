@@ -72,6 +72,8 @@ class Token {
         value: accessToken,
         httpOnly: true,
         expires: accessTokenExpiration,
+        sameSite: "lax",
+        secure: true,
       });
 
       // Refresh token and cookie
@@ -87,6 +89,8 @@ class Token {
         value: refreshToken,
         httpOnly: true,
         expires: refreshTokenExpiration,
+        sameSite: "lax",
+        secure: true,
       });
 
       return accessTokenExpiration;
@@ -143,33 +147,39 @@ class Token {
   }
 
   /** Refreshes the user's current access token to provide continous usage of the app */
-  async refreshAccessToken() {
-    const refreshToken = cookies().get(this.REFRESH_TOKEN_NAME)?.value;
-    if (!refreshToken) throw new Error("Invalid or missing refresh token!");
+  async refreshAccessToken(refreshToken: string | undefined) {
+    if (!refreshToken) {
+      this.clearTokens();
+      throw new Error("Invalid or missing refresh token!");
+    }
 
     const verifiedRefreshToken = await this.verifyRefreshToken(refreshToken);
     if (!verifiedRefreshToken) {
+      this.clearTokens();
       throw new Error("Provided refresh token is invalid or expired.");
     }
 
     try {
       const issuedAt = Date.now();
-      const refreshedTokenExpiration = issuedAt + this.ACCESS_TOKEN_DURATION_MS; // Expires 10 minutes from when it was issued
-      const refreshedToken = await new SignJWT({ ...verifiedRefreshToken })
+      const expires = issuedAt + this.ACCESS_TOKEN_DURATION_MS; // Expires 10 minutes from when it was issued
+      const token = await new SignJWT({ ...verifiedRefreshToken })
         .setProtectedHeader({ alg: "HS256", typ: "JWT" })
         .setExpirationTime(this.ACCESS_TOKEN_EXPIRES_IN)
         .setIssuedAt(Math.floor(issuedAt / 1000))
         .setNotBefore(this.TOKEN_NOT_BEFORE)
         .sign(this.encodedAccessTokenSecretKey());
 
+      // This will be used when the request originates from the client's browser
       cookies().set({
-        name: this.ACCESS_TOKEN_NAME,
-        value: refreshedToken,
+        name: this.REFRESH_TOKEN_NAME,
+        value: token,
         httpOnly: true,
-        expires: refreshedTokenExpiration,
+        expires: expires,
+        sameSite: "lax",
+        secure: true,
       });
 
-      return refreshedTokenExpiration;
+      return { token, expires };
     } catch (error) {
       throw new Error(handleErrorMessage(error));
     }
