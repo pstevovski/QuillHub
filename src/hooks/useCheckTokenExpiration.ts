@@ -35,8 +35,7 @@ export function useCheckTokenExpiration() {
       try {
         const expirationTime = localStorage.getItem("expiresTimestamp");
 
-        // If there's no expiration time value in local storage or its invalid
-        // then trigger user logout action
+        // Trigger logout and clear out local storage
         if (!expirationTime || isNaN(parseInt(expirationTime))) {
           await fetchHandler("POST", "auth/signout", undefined);
           localStorage.removeItem("expiresTimestamp");
@@ -48,14 +47,14 @@ export function useCheckTokenExpiration() {
         // send a request to the API in order to do "silent" refresh of the token
         const earlyExpirationTime = parseInt(expirationTime) - 1000 * 60 * 2; // 2 minutes earlier
         if (Date.now() >= earlyExpirationTime) {
-          const { expiresTime } = await fetchHandler(
+          const { expires } = await fetchHandler(
             "POST",
             "token/refresh",
             undefined
           );
 
           // Update the expiration value
-          localStorage.setItem("expiresTimestamp", expiresTime);
+          localStorage.setItem("expiresTimestamp", expires);
         }
       } catch (error) {
         toast.error(handleErrorMessage(error));
