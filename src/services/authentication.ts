@@ -33,9 +33,6 @@ class Auth {
       const expirationTimestamp = await TokenService.issueNewTokens(
         {
           id: targetedUser[0].id,
-          email,
-          first_name: targetedUser[0].first_name,
-          last_name: targetedUser[0].last_name,
           role_id: targetedUser[0].role_id,
         },
         remember_me
