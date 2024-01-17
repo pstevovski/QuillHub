@@ -1,5 +1,3 @@
-import type { NextRequest } from "next/server";
-
 const PROTECTED_ROUTES: string[] = ["/protected"];
 
 /**
@@ -13,8 +11,8 @@ const PROTECTED_ROUTES: string[] = ["/protected"];
  * add it to the list of `PROTECTED_ROUTES` constant.
  *
  * */
-export function handleCheckIfProtectedRoute(request: NextRequest): boolean {
+export function handleCheckIfProtectedRoute(requestedRoute: string): boolean {
   return PROTECTED_ROUTES.some((route) => {
-    return request.nextUrl.pathname.startsWith(route);
+    return requestedRoute.startsWith(route);
   });
 }

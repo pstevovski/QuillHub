@@ -27,7 +27,9 @@ export async function middleware(request: NextRequest) {
 
   // If user does not have a valid token and tried accessing proected route
   // then either redirect to signin page or show JSON message if requested route was API endpoint
-  const isProtectedRoute: boolean = handleCheckIfProtectedRoute(request);
+  const isProtectedRoute: boolean = handleCheckIfProtectedRoute(
+    request.nextUrl.pathname
+  );
   if (!hasValidAccessToken && isProtectedRoute) {
     if (request.nextUrl.pathname.startsWith("/api")) {
       return NextResponse.json(
