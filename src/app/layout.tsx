@@ -5,7 +5,7 @@ import { GeistSans } from "geist/font/sans";
 import { Toaster } from "sonner";
 
 export const metadata: Metadata = {
-  title: "Quillhub",
+  title: "QuillHub",
   description: "Unfold Your Imagination, Share Your Universe",
 };
 
