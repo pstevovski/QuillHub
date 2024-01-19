@@ -3,7 +3,6 @@ import "./globals.css";
 
 import { GeistSans } from "geist/font/sans";
 import { Toaster } from "sonner";
-import { TokenContextProvider } from "@/providers/token";
 
 export const metadata: Metadata = {
   title: "Quillhub",
@@ -17,10 +16,8 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <TokenContextProvider>
-        <body className={`${GeistSans.className} antialiased`}>{children}</body>
-        <Toaster richColors closeButton />
-      </TokenContextProvider>
+      <body className={`${GeistSans.className} antialiased`}>{children}</body>
+      <Toaster richColors closeButton />
     </html>
   );
 }
