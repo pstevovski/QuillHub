@@ -30,7 +30,7 @@ class Auth {
 
       if (!checkPasswordMatch) throw new Error("Invalid credentials!");
 
-      const expirationTimestamp = await TokenService.issueNewTokens(
+      await TokenService.issueNewTokens(
         {
           id: targetedUser[0].id,
           role_id: targetedUser[0].role_id,
@@ -43,8 +43,6 @@ class Auth {
         .update(users)
         .set({ last_signin: new Date() })
         .where(eq(users.id, targetedUser[0].id));
-
-      return expirationTimestamp;
     } catch (error) {
       const errorMessage: string = handleErrorMessage(error);
       console.log(`Sign In failed for ${email}. Reason: ${errorMessage}`);
