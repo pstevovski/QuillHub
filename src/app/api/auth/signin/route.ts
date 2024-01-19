@@ -23,13 +23,13 @@ export async function POST(request: NextRequest) {
 
   // Generate a new token that will be saved as HttpOnly cookie
   try {
-    const expirationTimestamp = await AuthService.signIn(
+    await AuthService.signIn(
       payload.email,
       payload.password,
       payload.remember_me
     );
 
-    return NextResponse.json({ expirationTimestamp }, { status: 200 });
+    return NextResponse.json(null, { status: 200 });
   } catch (error) {
     const errorMessage: string = handleErrorMessage(error);
     const invalidCredentials = errorMessage

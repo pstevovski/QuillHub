@@ -44,7 +44,7 @@ class Token {
   async issueNewTokens(
     payload: Record<string, unknown>,
     remember_me: boolean = false
-  ): Promise<number> {
+  ): Promise<void> {
     try {
       const issuedAt = Date.now();
       const accessTokenExpiration = issuedAt + this.ACCESS_TOKEN_DURATION_MS; // Expires 10 minutes from when it was issued
@@ -92,8 +92,6 @@ class Token {
         sameSite: "lax",
         secure: true,
       });
-
-      return accessTokenExpiration;
     } catch (error) {
       throw new Error(handleErrorMessage(error));
     }
