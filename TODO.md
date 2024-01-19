@@ -12,11 +12,20 @@
     the user to the signin page [x]
 - **DONE** Handle `remember_me` scenario in refresh token method [x]
   - **DONE** No need, if this is selected refresh token lasts 90 days and after
-    the first 30 days of access token duration, the token will then be 
+    the first 30 days of access token duration, the token will then be
     checked for expiration every 8h [x]
-- Refresh access token in middleware function, if the token is not valid but theres a valid refresh token
-  - Maybe change the behavior: instead of checking for valid access token, check for existance of valid refresh token?
-
+- **DONE** Refresh access token in middleware function, if the token is not valid but theres a valid refresh token [x]
+- **DONE** Remove handling of "expiresTimestamp" - NOT NEEDED [x]
+  - **DONE** Remove `TokenContextProvider` [x]
+  - **DONE** Remove `useCheckTokenExpiration` hook [x]
+  - **DONE** Remove handling of `expiresTimestamp` in regards to local storage
+  - Reason for this:
+    - All checks happen in the middleware before processing the resource that was requested
+    - If theres a valid refresh token, but no access token and/or cookie for it (e.g. it expired)
+      then whenever a page or API endpoint is requested, middleware is triggered which first issues a new access token
+      and proceeds to the requested resource
+    - If theres no valid refresh token and no access token, middleware clears out all cookies and redirects user to auth/signin page
+      preventing any requests to the protected endpoints
 
 ## Homepage
 
