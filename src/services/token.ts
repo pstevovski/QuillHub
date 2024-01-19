@@ -132,7 +132,8 @@ class Token {
   }
 
   /** Decodes the provided token containing some user-specific details */
-  async decodeToken(token: string) {
+  async decodeToken() {
+    const token = cookies().get(this.ACCESS_TOKEN_NAME)?.value;
     if (!token) return;
 
     try {
@@ -166,16 +167,6 @@ class Token {
         .setIssuedAt(Math.floor(issuedAt / 1000))
         .setNotBefore(this.TOKEN_NOT_BEFORE)
         .sign(this.encodedAccessTokenSecretKey());
-
-      // This will be used when the request originates from the client's browser
-      cookies().set({
-        name: this.REFRESH_TOKEN_NAME,
-        value: token,
-        httpOnly: true,
-        expires: expires,
-        sameSite: "lax",
-        secure: true,
-      });
 
       return { token, expires };
     } catch (error) {
