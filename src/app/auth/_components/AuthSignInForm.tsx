@@ -38,6 +38,7 @@ export default function AuthSignInForm() {
   const handleSignIn: SubmitHandler<AuthSignInFields> = async (details) => {
     try {
       await fetchHandler("POST", "auth/signin", details);
+
       router.push("/protected");
     } catch (error) {
       toast.error(handleErrorMessage(error));

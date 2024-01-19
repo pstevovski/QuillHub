@@ -28,7 +28,8 @@ export async function POST(request: NextRequest) {
       payload.password,
       payload.remember_me
     );
-    return NextResponse.json({ status: 200 });
+
+    return NextResponse.json(null, { status: 200 });
   } catch (error) {
     const errorMessage: string = handleErrorMessage(error);
     const invalidCredentials = errorMessage

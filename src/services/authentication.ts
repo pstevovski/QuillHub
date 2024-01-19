@@ -30,13 +30,9 @@ class Auth {
 
       if (!checkPasswordMatch) throw new Error("Invalid credentials!");
 
-      // Issue a new token and save it as HttpOnly cookie
-      await TokenService.signToken(
+      await TokenService.issueNewTokens(
         {
           id: targetedUser[0].id,
-          email,
-          first_name: targetedUser[0].first_name,
-          last_name: targetedUser[0].last_name,
           role_id: targetedUser[0].role_id,
         },
         remember_me
@@ -143,7 +139,7 @@ class Auth {
 
   async signOut() {
     try {
-      await TokenService.removeToken();
+      await TokenService.clearTokens();
     } catch (error) {
       throw new Error(handleErrorMessage(error));
     }
