@@ -23,7 +23,6 @@ import FormCheckbox from "@/components/Form/FormCheckbox";
 // Assets
 import { FaCircleInfo as InfoIcon } from "react-icons/fa6";
 import Tooltip from "@/components/Tooltips/Tooltip";
-import { useEffect } from "react";
 
 export default function AuthSignInForm() {
   const router = useRouter();
@@ -38,25 +37,13 @@ export default function AuthSignInForm() {
 
   const handleSignIn: SubmitHandler<AuthSignInFields> = async (details) => {
     try {
-      const { expirationTimestamp } = await fetchHandler(
-        "POST",
-        "auth/signin",
-        details
-      );
-      localStorage.setItem("expiresTimestamp", expirationTimestamp);
+      await fetchHandler("POST", "auth/signin", details);
 
       router.push("/protected");
     } catch (error) {
       toast.error(handleErrorMessage(error));
     }
   };
-
-  // When this component is mounted due to
-  // user visitng the "Authentication - Sign In" page,
-  // clear out the local storage from any token expiration entries
-  useEffect(() => {
-    localStorage.removeItem("expiresTimestamp");
-  }, []);
 
   return (
     <form onSubmit={handleSubmit(handleSignIn)} autoComplete="">

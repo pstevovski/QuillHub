@@ -18,9 +18,6 @@ export default function AuthSignOut({
     try {
       await fetchHandler("POST", "auth/signout", undefined);
 
-      // Remove expiration timetstamp from localstorage
-      localStorage.removeItem("expiresTimestamp");
-
       // note: this is a "hacky" solution to
       // be able to clear out the received details for the authenticated user
       window.location.replace("/auth/signin");
