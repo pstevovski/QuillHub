@@ -29,11 +29,27 @@
 
 ## Homepage
 
-- Add the header of the application
-- Add the main CTA section of the homepage
-  - Will list the name of the app, the quote, and a CTA button
-  - The button will either be `Sign In` or `Write a Post!` based on if the user is authenticated or not
-- Add initial titles for other sections such as Trending, Bookmarked ..?
+- **DONE** Add the main CTA section of the homepage [x]
+  - **DONE** Will list the name of the app, the quote, and a "Start Writing" CTA button [x]
+- **DONE** Add initial Trending section [x]
+- **DONE** Add handling of blog section filters based on search parameters,
+  so different sections will be shown based on what the user has currently selected [x]
+  - **DONE** Add client component for handling this [x]
+
+## Authentication Flow Updates
+
+- Update the layout's header for new authentication flow purposes:
+  - When clicked on "Sign In" button, a modal should open up where the user can sign in/register/forget/reset password
+  - When user is already signed in, instead of a button, show:
+    - User avatar which will use the logged in user's initials (or selected profile picture?)
+    - Message `Hi, ${username}` with a chevron
+    - When clicked, opens up a dropdown menu that contains the following links (order TBD):
+      - Sign Out
+      - My Profile
+      - Stats
+      - Settings
+      - Bookmarks
+      - ..?
 - Update the authentication flow:
   - Remove (now) unnecessary authentication pages
   - Add a card (or modal) for authentication
@@ -42,3 +58,29 @@
     - Input fields will have labels besides placeholders
     - Different auth forms should enter/exit from within the same modal based on what the user has selected
     - For "Reset Password" action check if the URL has a `token=123&modal=reset_password` parameter to open the modal with the correct form
+- Remove current "/protected" page and from the list of protected endpoints
+
+## Create & Edit Blog Post page
+
+- Page:
+
+  - Protected page
+  - Should have a form containing a couple of fields:
+    - Title
+    - Image
+    - Topic
+    - Content (WYSIWYG editor)
+    - Status
+  - Edit page will be the same, with pre-populated fields
+  - ..?
+
+- API:
+  - Protected endpoints
+  - Service for handling blog posts, including methods for:
+    - creating
+    - updating
+    - deleting
+    - getting specific blog post details
+    - getting all blog posts
+  - Database table schema & migration
+  - ..?
