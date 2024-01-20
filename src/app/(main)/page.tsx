@@ -1,8 +1,19 @@
 import { BlogPostCard } from "@/components/BlogPost/BlogPostCard";
 import Link from "next/link";
 import { FaArrowRightLong as SeeAllIcon } from "react-icons/fa6";
+import HomepageBlogFilters, {
+  type BlogFilter,
+} from "./_components/BlogFilters";
+import TokenService from "@/services/token";
 
-export default async function Home() {
+export default async function Home({
+  searchParams,
+}: {
+  searchParams: { filter: BlogFilter | undefined };
+}) {
+  const blogsFilter = searchParams.filter;
+  const userToken = await TokenService.decodeToken();
+
   return (
     <main>
       {/* CTA section */}
@@ -36,30 +47,37 @@ export default async function Home() {
         </Link>
       </section>
 
-      {/* TRENDING SECTION */}
-      <section className="px-24 py-24">
-        <h2 className="text-4xl font-semibold text-slate-600">Trending</h2>
-        <p className="text-slate-400 mb-12">
-          Checkout some of the blog posts that are trending lately!
-          <Link
-            href="/trending"
-            className="ml-2 text-teal-500 inline-flex items-center"
-          >
-            See All
-            <SeeAllIcon className="ml-2" />
-          </Link>
-        </p>
+      <HomepageBlogFilters userToken={userToken} />
 
-        <div className="grid grid-cols-2 gap-14">
-          <BlogPostCard />
-          <BlogPostCard />
-          <BlogPostCard />
-          <BlogPostCard />
+      {/* WIP: TRENDING SECTION*/}
+      {[undefined, "trending"].includes(blogsFilter) ? (
+        <section className="px-24 py-24">
+          <h2 className="text-4xl font-semibold text-slate-600">Trending</h2>
+          <p className="text-slate-400 mb-12">
+            Checkout some of the blog posts that are trending lately!
+            <Link
+              href="/trending"
+              className="ml-2 text-teal-500 inline-flex items-center group"
+            >
+              See All
+              <SeeAllIcon className="opacity-0 group-hover:opacity-100 group-hover:translate-x-1 duration-300" />
+            </Link>
+          </p>
+
+          <div className="grid grid-cols-2 gap-14">
+            <BlogPostCard />
+            <BlogPostCard />
+            <BlogPostCard />
+            <BlogPostCard />
+          </div>
+        </section>
+      ) : (
+        <div className="p-24 text-center">
+          <h2 className="text-2xl font-semibold text-slate-400">
+            No blog posts available at this moment.
+          </h2>
         </div>
-      </section>
-
-      {/* TODO: BOOKMARKED SECTION */}
-      {/* TODO: FOR YOU SECTION */}
+      )}
     </main>
   );
 }
