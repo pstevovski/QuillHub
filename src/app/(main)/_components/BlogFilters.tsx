@@ -63,7 +63,12 @@ export default function HomepageBlogFilters({
   };
 
   return (
-    <section className="px-24 mx-w-screen-2xl w-auto">
+    <section
+      className={cn(
+        "px-24 mx-auto duration-300",
+        userToken ? "max-w-screen-xl" : "max-w-screen-md"
+      )}
+    >
       <ul className="flex items-center justify-center gap-x-20">
         {BLOG_SECTIONS.filter((section) => {
           return !userToken
