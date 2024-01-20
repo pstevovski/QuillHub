@@ -1,4 +1,8 @@
+"use client";
+
+import cn from "@/utils/classnames";
 import Link from "next/link";
+import { useState } from "react";
 
 // Icons
 import { FaHeart as LikeIcon } from "react-icons/fa";
@@ -28,6 +32,51 @@ function BlogPostCardTitle({
   );
 }
 
+function BlogPostCardActions({
+  id,
+  is_liked,
+  is_bookmarked,
+}: {
+  id: number;
+  is_liked: boolean;
+  is_bookmarked: boolean;
+}) {
+  const [isLiked, setIsLiked] = useState<boolean>(is_liked);
+  const [isBookmarked, setIsBookmarked] = useState<boolean>(is_bookmarked);
+
+  const handleBlogPostLike = () => {
+    // todo: send API request
+    setIsLiked(!isLiked);
+    console.log(`Blog post with ID ${id} like action`);
+  };
+
+  const handleBlogPostBookmark = () => {
+    // todo: send API request
+    setIsBookmarked(!isBookmarked);
+    console.log(`Blog post with ID ${id} bookmark action`);
+  };
+
+  return (
+    <div className="flex items-center">
+      <LikeIcon
+        className={cn(
+          "text-slate-300 text-2xl mx-4 hover:text-rose-500 duration-300 cursor-pointer hover:scale-125",
+          isLiked ? "text-rose-500" : ""
+        )}
+        onClick={handleBlogPostLike}
+      />
+      <BookmarkIcon
+        className={cn(
+          "text-slate-300 text-2xl hover:text-teal-500 duration-300 cursor-pointer hover:scale-125",
+          isBookmarked ? "text-teal-500" : ""
+        )}
+        onClick={handleBlogPostBookmark}
+      />
+    </div>
+  );
+}
+
+// todo: Connect with real data
 export function BlogPostCard() {
   return (
     <div className="border w-full rounded-md col-span-12 lg:col-span-1">
@@ -42,10 +91,7 @@ export function BlogPostCard() {
           <BlogPostCardTitle title="Test" author="abc" date="123" />
 
           {/* like & bookmark icons */}
-          <div className="flex items-center">
-            <LikeIcon className="text-slate-300 text-2xl mx-4 hover:text-rose-500 duration-300 cursor-pointer" />
-            <BookmarkIcon className="text-slate-300 text-2xl hover:text-teal-500 duration-300 cursor-pointer" />
-          </div>
+          <BlogPostCardActions id={1} is_liked={false} is_bookmarked={true} />
         </div>
         <p className="mb-8">
           Lorem ipsum, dolor sit amet consectetur adipisicing elit. Non totam
