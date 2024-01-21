@@ -19,6 +19,7 @@ import { AuthSignUpFields, AuthSignUpSchema } from "@/zod/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { SubmitHandler, useForm } from "react-hook-form";
 
+// TODO: Remove
 export default function AuthSignUpForm() {
   const router = useRouter();
 

@@ -18,6 +18,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 
+// TODO: Delete
 export default function AuthResetPasswordForm({ token }: { token: string }) {
   const router = useRouter();
   const {

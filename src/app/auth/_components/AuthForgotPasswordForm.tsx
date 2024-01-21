@@ -17,6 +17,7 @@ import { toast } from "sonner";
 import handleErrorMessage from "@/utils/handleErrorMessage";
 import fetchHandler from "@/utils/fetchHandler";
 
+// TODO: Delete
 export default function AuthForgotPasswordForm() {
   const {
     register,
