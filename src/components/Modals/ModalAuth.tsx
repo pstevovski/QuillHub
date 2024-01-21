@@ -106,7 +106,7 @@ function ModalAuthSignIn({
 
   return (
     <motion.div
-      initial={{ x: "100%", opacity: 0 }}
+      initial={{ x: "-100%", opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
       exit={{ x: "-100%", opacity: 0 }}
       transition={{ duration: 0.3 }}
@@ -225,7 +225,7 @@ function ModalAuthSignUp({
     <motion.div
       initial={{ x: "100%", opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
-      exit={{ x: "-100%", opacity: 0 }}
+      exit={{ x: "100%", opacity: 0 }}
       transition={{ duration: 0.3 }}
       className="absolute p-6 w-full"
     >
@@ -317,7 +317,7 @@ function ModalAuthPasswordForgot({
     <motion.div
       initial={{ x: "100%", opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
-      exit={{ x: "-100%", opacity: 0 }}
+      exit={{ x: "100%", opacity: 0 }}
       transition={{ duration: 0.3 }}
       className="absolute p-6 w-full"
     >
@@ -395,7 +395,7 @@ function ModalAuthPasswordReset({
     <motion.div
       initial={{ x: "100%", opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
-      exit={{ x: "-100%", opacity: 0 }}
+      exit={{ x: "100%", opacity: 0 }}
       transition={{ duration: 0.3 }}
       className="absolute p-6 w-full"
     >
