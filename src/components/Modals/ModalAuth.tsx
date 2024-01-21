@@ -462,7 +462,7 @@ export function ModalAuth({
         animate={{ opacity: 0.3 }}
         exit={{ opacity: 0 }}
         transition={{ duration: 0.3 }}
-        className="fixed top-0 left-0 max-w-screen w-full h-screen bg-slate-400 opacity-30"
+        className="z-10 fixed top-0 left-0 max-w-screen w-full h-screen bg-slate-400 opacity-30"
       ></motion.div>
 
       {/* content */}
