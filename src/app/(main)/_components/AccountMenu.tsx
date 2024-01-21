@@ -1,7 +1,13 @@
 "use client";
 
-import Link from "next/link";
+// Utilities & Hooks
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { useState } from "react";
+import fetchHandler from "@/utils/fetchHandler";
+import handleErrorMessage from "@/utils/handleErrorMessage";
+import getNameInitials from "@/utils/initials";
+
 // Assets
 import {
   FaChevronDown as ChevronIcon,
@@ -15,11 +21,28 @@ import {
   IoBookmarks as MenuBookmarksIcon,
   IoSettings as MenuSettingsIcon,
 } from "react-icons/io5";
+
+// Components
+import Link from "next/link";
+import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 
-export default function AccountMenu(userDetails: any) {
-  console.log("USER DETAILS", userDetails);
+// Types
+import type { User } from "@/db/schema/users";
+
+export default function AccountMenu({ userDetails }: { userDetails: User }) {
+  const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
+
+  // Sign out the user
+  const handleSignOut = async () => {
+    try {
+      await fetchHandler("POST", "auth/signout", undefined);
+      router.refresh();
+    } catch (error) {
+      toast.error(handleErrorMessage(error));
+    }
+  };
 
   return (
     <div className="relative">
@@ -28,12 +51,24 @@ export default function AccountMenu(userDetails: any) {
         onClick={() => setIsMenuOpen(!isMenuOpen)}
       >
         {/* avatar */}
-        <div className="shrink-0 h-8 w-8 rounded-full bg-slate-200"></div>
+        <div className="flex justify-center items-center shrink-0 h-8 w-8 rounded-full bg-slate-200">
+          {userDetails.profile_picture ? (
+            <Image
+              className="h-8 w-8 rounded-full bg-slate-200"
+              src={userDetails.profile_picture}
+              alt="test"
+            />
+          ) : (
+            <span className="text-xs text-slate-500 font-medium">
+              {getNameInitials(userDetails.first_name, userDetails.last_name)}
+            </span>
+          )}
+        </div>
 
         {/* username */}
         <div className="flex items-center">
           <h5 className="max-w-[200px] w-full text-sm text-slate-400 truncate ml-2">
-            Hi, FIRST_NAME
+            Hi, {userDetails.first_name}
           </h5>
           <ChevronIcon className="text-slate-400 ml-2 text-xs" />
         </div>
@@ -82,7 +117,10 @@ export default function AccountMenu(userDetails: any) {
 
             <hr />
 
-            <button className="flex items-center w-full text-slate-400 hover:text-teal-500  bg-white hover:bg-slate-100 duration-300 px-4 py-3">
+            <button
+              onClick={handleSignOut}
+              className="flex items-center w-full text-slate-400 hover:text-teal-500  bg-white hover:bg-slate-100 rounded-bl-md rounded-br-md duration-300 px-4 py-3"
+            >
               <MenuSignOutIcon className="mr-3 text-xl" />
               Sign Out
             </button>
