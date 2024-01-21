@@ -1,19 +1,22 @@
 "use client";
 
-import { JWTPayload } from "jose";
-import Link from "next/link";
+// Hooks
 import { useState } from "react";
-import { RiQuillPenLine as QuillHubLogo } from "react-icons/ri";
-import { ModalAuth } from "../Modals/ModalAuth";
 import { useSearchParams } from "next/navigation";
+
+// Assets
+import { RiQuillPenLine as QuillHubLogo } from "react-icons/ri";
+
+// Components
 import { AnimatePresence } from "framer-motion";
+import { ModalAuth } from "../Modals/ModalAuth";
+import Link from "next/link";
 import AccountMenu from "@/app/(main)/_components/AccountMenu";
 
-export default function Header({
-  userToken,
-}: {
-  userToken: JWTPayload | undefined;
-}) {
+// Types
+import type { User } from "@/db/schema/users";
+
+export default function Header({ user }: { user: User | null }) {
   const searchParams = useSearchParams();
   const passwordResetToken = searchParams.get("passwordResetToken");
 
@@ -33,8 +36,8 @@ export default function Header({
           <QuillHubLogo className="text-2xl group-hover:rotate-[10deg] duration-300" />
         </Link>
 
-        {userToken ? (
-          <AccountMenu />
+        {user ? (
+          <AccountMenu userDetails={user} />
         ) : (
           <span
             className="text-slate-400 hover:text-teal-500 duration-300 cursor-pointer"
@@ -47,7 +50,7 @@ export default function Header({
       <hr className="border-none sticky top-[76px] max-w-screen-2xl mx-auto w-full h-[1px] bg-gradient-to-r from-white via-slate-200 to-white mb-6" />
 
       <AnimatePresence>
-        {!userToken && isAuthModalOpen ? (
+        {!user && isAuthModalOpen ? (
           <ModalAuth
             passwordResetToken={passwordResetToken}
             handleModalClose={() => setIsAuthModalOpen(false)}

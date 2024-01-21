@@ -1,5 +1,5 @@
 import Header from "@/components/Header/Header";
-import TokenService from "@/services/token";
+import UsersService from "@/services/users";
 import Link from "next/link";
 
 export default async function MainLayout({
@@ -7,12 +7,11 @@ export default async function MainLayout({
 }: {
   children: React.ReactNode;
 }) {
-  // Get the currently logged in user from the database
-  const userToken = await TokenService.decodeToken();
+  const currentUser = await UsersService.getCurrentUser();
 
   return (
     <>
-      <Header userToken={userToken} />
+      <Header user={currentUser} />
 
       <main className="container mx-auto max-w-screen-2xl ">{children}</main>
 
