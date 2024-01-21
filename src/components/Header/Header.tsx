@@ -7,6 +7,7 @@ import { useState } from "react";
 import { RiQuillPenLine as QuillHubLogo } from "react-icons/ri";
 import { ModalAuth } from "../Modals/ModalAuth";
 import { useSearchParams } from "next/navigation";
+import { AnimatePresence } from "framer-motion";
 
 export default function Header({
   userToken,
@@ -45,12 +46,14 @@ export default function Header({
       </header>
       <hr className="border-none sticky top-[76px] max-w-screen-2xl mx-auto w-full h-[1px] bg-gradient-to-r from-white via-slate-200 to-white mb-6" />
 
-      {userToken && isAuthModalOpen ? (
-        <ModalAuth
-          passwordResetToken={passwordResetToken}
-          handleModalClose={() => setIsAuthModalOpen(false)}
-        />
-      ) : null}
+      <AnimatePresence>
+        {!userToken && isAuthModalOpen ? (
+          <ModalAuth
+            passwordResetToken={passwordResetToken}
+            handleModalClose={() => setIsAuthModalOpen(false)}
+          />
+        ) : null}
+      </AnimatePresence>
     </>
   );
 }

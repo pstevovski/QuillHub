@@ -22,6 +22,7 @@ import FormPasswordInput from "../Form/FormPasswordInput";
 import FormCheckbox from "../Form/FormCheckbox";
 import Tooltip from "../Tooltips/Tooltip";
 import Button from "../Buttons/Button";
+import { motion, AnimatePresence } from "framer-motion";
 
 // Assets
 import { FaCircleInfo as InfoIcon } from "react-icons/fa6";
@@ -42,6 +43,42 @@ interface ModalAuthCommonProps {
 interface ModalAuthPasswordResetProps extends ModalAuthCommonProps {
   token: string | null;
 }
+
+const MOTION_MODAL_CONTAINER_VARIANTS = {
+  enter: {
+    opacity: 0,
+    x: "-50%",
+    y: "-20%",
+    height: 500,
+  },
+  animate: (modalType: ModalAuthType) => {
+    let height: number = 550;
+    switch (modalType) {
+      case "sign_up":
+        height = 770;
+        break;
+      case "password_forgot":
+        height = 320;
+        break;
+      case "password_reset":
+        height = 435;
+        break;
+    }
+
+    return {
+      opacity: 1,
+      x: "-50%",
+      y: "-50%",
+      height: height,
+    };
+  },
+  exit: {
+    opacity: 0,
+    x: "-50%",
+    y: "-20%",
+    height: 500,
+  },
+};
 
 function ModalAuthSignIn({
   handleModalAuthType,
@@ -68,7 +105,13 @@ function ModalAuthSignIn({
   };
 
   return (
-    <div>
+    <motion.div
+      initial={{ x: "100%", opacity: 0 }}
+      animate={{ x: 0, opacity: 1 }}
+      exit={{ x: "-100%", opacity: 0 }}
+      transition={{ duration: 0.3 }}
+      className="absolute p-6 w-full"
+    >
       <h3 className="text-2xl text-slate-600 font-semibold mb-2">Sign In</h3>
       <div className="flex items-center mb-8">
         <p className="text-md text-slate-400">New to QuillHub? </p>
@@ -133,7 +176,7 @@ function ModalAuthSignIn({
           Sign In
         </Button>
       </form>
-    </div>
+    </motion.div>
   );
 }
 
@@ -179,7 +222,13 @@ function ModalAuthSignUp({
   };
 
   return (
-    <div>
+    <motion.div
+      initial={{ x: "100%", opacity: 0 }}
+      animate={{ x: 0, opacity: 1 }}
+      exit={{ x: "-100%", opacity: 0 }}
+      transition={{ duration: 0.3 }}
+      className="absolute p-6 w-full"
+    >
       <div
         className="flex items-center cursor-pointer group mb-4"
         onClick={() => handleModalAuthType("sign_in")}
@@ -236,7 +285,7 @@ function ModalAuthSignUp({
           Sign Up
         </Button>
       </form>
-    </div>
+    </motion.div>
   );
 }
 
@@ -265,7 +314,13 @@ function ModalAuthPasswordForgot({
   };
 
   return (
-    <div>
+    <motion.div
+      initial={{ x: "100%", opacity: 0 }}
+      animate={{ x: 0, opacity: 1 }}
+      exit={{ x: "-100%", opacity: 0 }}
+      transition={{ duration: 0.3 }}
+      className="absolute p-6 w-full"
+    >
       <div
         className="flex items-center cursor-pointer group mb-4"
         onClick={() => handleModalAuthType("sign_in")}
@@ -300,7 +355,7 @@ function ModalAuthPasswordForgot({
           {isSubmitSuccessful ? "Email Sent!" : "Send Email"}
         </Button>
       </form>
-    </div>
+    </motion.div>
   );
 }
 
@@ -337,7 +392,13 @@ function ModalAuthPasswordReset({
   };
 
   return (
-    <div>
+    <motion.div
+      initial={{ x: "100%", opacity: 0 }}
+      animate={{ x: 0, opacity: 1 }}
+      exit={{ x: "-100%", opacity: 0 }}
+      transition={{ duration: 0.3 }}
+      className="absolute p-6 w-full"
+    >
       <div
         className="flex items-center cursor-pointer group mb-4"
         onClick={() => handleModalAuthType("sign_in")}
@@ -377,7 +438,7 @@ function ModalAuthPasswordReset({
           Reset Password
         </Button>
       </form>
-    </div>
+    </motion.div>
   );
 }
 
@@ -396,44 +457,64 @@ export function ModalAuth({
   return (
     <div>
       {/* overlay */}
-      <div className="fixed top-0 left-0 max-w-screen w-full h-screen bg-slate-400 opacity-30"></div>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 0.3 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.3 }}
+        className="fixed top-0 left-0 max-w-screen w-full h-screen bg-slate-400 opacity-30"
+      ></motion.div>
 
       {/* content */}
-      <div className="z-10 fixed top-1/2 left-1/2 p-6 border rounded max-w-lg w-full bg-white -translate-y-1/2 -translate-x-1/2">
+      <motion.div
+        className="z-10 fixed top-1/2 left-1/2 border rounded max-w-lg w-full bg-white overflow-hidden"
+        custom={modalType}
+        variants={MOTION_MODAL_CONTAINER_VARIANTS}
+        initial="enter"
+        animate="animate"
+        exit="exit"
+        transition={{ duration: 0.3 }}
+      >
         <CloseIcon
-          className="absolute top-6 right-4 text-2xl text-slate-400 hover:text-rose-500 duration-300 cursor-pointer"
+          className="absolute top-6 right-4 z-10 text-2xl text-slate-400 hover:text-rose-500 duration-300 cursor-pointer"
           onClick={handleModalClose}
         />
 
-        {modalType === "sign_in" ? (
-          <ModalAuthSignIn
-            handleModalAuthType={handleModalAuthType}
-            handleModalClose={handleModalClose}
-          />
-        ) : null}
+        <AnimatePresence initial={false}>
+          {modalType === "sign_in" ? (
+            <ModalAuthSignIn
+              key="sign-in"
+              handleModalAuthType={handleModalAuthType}
+              handleModalClose={handleModalClose}
+            />
+          ) : null}
 
-        {modalType === "sign_up" ? (
-          <ModalAuthSignUp
-            handleModalClose={handleModalClose}
-            handleModalAuthType={handleModalAuthType}
-          />
-        ) : null}
+          {modalType === "sign_up" ? (
+            <ModalAuthSignUp
+              key="sign-up"
+              handleModalClose={handleModalClose}
+              handleModalAuthType={handleModalAuthType}
+            />
+          ) : null}
 
-        {modalType === "password_forgot" ? (
-          <ModalAuthPasswordForgot
-            handleModalClose={handleModalClose}
-            handleModalAuthType={handleModalAuthType}
-          />
-        ) : null}
+          {modalType === "password_forgot" ? (
+            <ModalAuthPasswordForgot
+              key="password-forgot"
+              handleModalClose={handleModalClose}
+              handleModalAuthType={handleModalAuthType}
+            />
+          ) : null}
 
-        {modalType === "password_reset" ? (
-          <ModalAuthPasswordReset
-            token={passwordResetToken}
-            handleModalClose={handleModalClose}
-            handleModalAuthType={handleModalAuthType}
-          />
-        ) : null}
-      </div>
+          {modalType === "password_reset" ? (
+            <ModalAuthPasswordReset
+              key="password-reset"
+              token={passwordResetToken}
+              handleModalClose={handleModalClose}
+              handleModalAuthType={handleModalAuthType}
+            />
+          ) : null}
+        </AnimatePresence>
+      </motion.div>
     </div>
   );
 }
