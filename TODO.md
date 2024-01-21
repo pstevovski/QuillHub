@@ -38,27 +38,35 @@
 
 ## Authentication Flow Updates
 
-- Update the layout's header for new authentication flow purposes:
-  - When clicked on "Sign In" button, a modal should open up where the user can sign in/register/forget/reset password
-  - When user is already signed in, instead of a button, show:
-    - User avatar which will use the logged in user's initials (or selected profile picture?)
-    - Message `Hi, ${username}` with a chevron
-    - When clicked, opens up a dropdown menu that contains the following links (order TBD):
-      - Sign Out
-      - My Profile
-      - Stats
-      - Settings
-      - Bookmarks
-      - ..?
+- **DONE** Update the layout's header for new authentication flow purposes [x]:
+
+  - **DONE** When clicked on "Sign In" button, a modal should open up where the user can sign in/register/forget/reset password [x]
+
+    - **DONE** If user visits the homepage having a `resetPasswordToken` as a search parameter, open the authentication modal on the correct type (Reset Password) [x]
+
+  - **DONE** When user is already signed in, instead of a button, show: [x]
+    - **DONE** Prevent showing the authentication modals [x]
+    - **DONE** User avatar which will use the logged in user's initials (or selected profile picture) [x]
+    - **DONE** Message `Hi, ${first_name}` with a chevron [x]
+    - **DONE** When clicked, opens up a dropdown menu that contains the following links (order TBD):
+      - **DONE** Sign Out [x]
+      - **DONE** My Profile [x]
+      - **DONE** Stats [x]
+      - **DONE** Settings [x]
+      - **DONE** Bookmarks [x]
+
 - Update the authentication flow:
+
   - Remove (now) unnecessary authentication pages
-  - Add a card (or modal) for authentication
-  - Update the layout of the forms:
-    - Left sided text
-    - Input fields will have labels besides placeholders
-    - Different auth forms should enter/exit from within the same modal based on what the user has selected
-    - For "Reset Password" action check if the URL has a `token=123&modal=reset_password` parameter to open the modal with the correct form
-- Remove current "/protected" page and from the list of protected endpoints
+  - **DONE** Add authentication modal component [x]
+  - **DONE** Update the layout of the forms: [x]
+    - **DONE** Input fields will have labels besides placeholders [x]
+    - **DONE** Different auth forms should enter/exit from within the same modal based on what the user has selected [x]
+    - **DONE** For "Reset Password" action check if the URL has a `resetPasswordToken=123` parameter to open the modal with the correct form [x]
+
+- **DONE** Remove current "/protected" page and from the list of protected endpoints [x]
+  - **DONE** Update middleware removing the unnecesssary checks for the users trying to access `/auth` routes [x]
+  - Remove `auth/` folder and page routes
 
 ## Create & Edit Blog Post page
 
