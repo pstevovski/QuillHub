@@ -1,6 +1,5 @@
 "use client";
 
-import AuthSignOut from "@/app/auth/_components/AuthSignOut";
 import { JWTPayload } from "jose";
 import Link from "next/link";
 import { useState } from "react";
@@ -8,6 +7,7 @@ import { RiQuillPenLine as QuillHubLogo } from "react-icons/ri";
 import { ModalAuth } from "../Modals/ModalAuth";
 import { useSearchParams } from "next/navigation";
 import { AnimatePresence } from "framer-motion";
+import AccountMenu from "@/app/(main)/_components/AccountMenu";
 
 export default function Header({
   userToken,
@@ -24,7 +24,7 @@ export default function Header({
 
   return (
     <>
-      <header className="flex justify-between items-center max-w-screen-2xl mx-auto px-24 py-6 w-full sticky top-0 bg-white">
+      <header className="flex justify-between items-center max-w-screen-2xl mx-auto px-24 py-6 w-full sticky top-0 bg-white z-[9]">
         <Link
           href="/"
           className="flex items-center font-semibold text-lg text-teal-500 group"
@@ -34,7 +34,7 @@ export default function Header({
         </Link>
 
         {userToken ? (
-          <AuthSignOut authenticatedUser={userToken} />
+          <AccountMenu />
         ) : (
           <span
             className="text-slate-400 hover:text-teal-500 duration-300 cursor-pointer"
