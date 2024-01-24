@@ -55,9 +55,9 @@
       - **DONE** Settings [x]
       - **DONE** Bookmarks [x]
 
-- Update the authentication flow:
+- **DONE** Update the authentication flow: [x]
 
-  - Remove (now) unnecessary authentication pages
+  - **DONE** Remove (now) unnecessary authentication pages [x]
   - **DONE** Add authentication modal component [x]
   - **DONE** Update the layout of the forms: [x]
     - **DONE** Input fields will have labels besides placeholders [x]
@@ -65,8 +65,19 @@
     - **DONE** For "Reset Password" action check if the URL has a `resetPasswordToken=123` parameter to open the modal with the correct form [x]
 
 - **DONE** Remove current "/protected" page and from the list of protected endpoints [x]
+
   - **DONE** Update middleware removing the unnecesssary checks for the users trying to access `/auth` routes [x]
-  - Remove `auth/` folder and page routes
+  - **DONE** Remove `auth/` folder and page routes [x]
+
+- **DONE** Add redirect functionality if user tried accessing a protected page while not being logged in [x]
+
+  - **DONE** The URL for the requested page will be saved as a search parameter [x]
+  - **DONE** User will be redirected to homepage and the signin modal will open [x]
+  - **DONE** Once the user logs in, he'll be redirected to the URL that was initially requested [x]
+  - **DONE** Add a message to the signin modal if requested url search parameter is present [x]
+
+- Fix clearing out the "resetPasswordToken" search parameter
+  - Maybe rename this parameter to something more concise?
 
 ## Create & Edit Blog Post page
 
