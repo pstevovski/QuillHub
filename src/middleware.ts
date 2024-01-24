@@ -56,7 +56,13 @@ export async function middleware(request: NextRequest) {
         { status: 401 }
       );
     } else {
-      return NextResponse.redirect(new URL("/", request.url));
+      // Redirect the user back to the homepage,
+      // open the authentication modal and include redirect url
+      request.nextUrl.searchParams.set("modal", "sign_in");
+      request.nextUrl.searchParams.set("redirectUrl", request.nextUrl.pathname);
+      return NextResponse.redirect(
+        new URL(`/${request.nextUrl.search}`, request.url)
+      );
     }
   }
 }
