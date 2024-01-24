@@ -1,7 +1,15 @@
 "use client";
 
+// Utilities & Hooks
+import { useRouter, useSearchParams } from "next/navigation";
+import { useState } from "react";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { toast } from "sonner";
 import fetchHandler from "@/utils/fetchHandler";
 import handleErrorMessage from "@/utils/handleErrorMessage";
+import cn from "@/utils/classnames";
+
+// Schema
 import {
   AuthForgotPasswordFields,
   AuthForgotPasswordSchema,
@@ -13,16 +21,14 @@ import {
   AuthSignUpSchema,
 } from "@/zod/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { SubmitHandler, useForm } from "react-hook-form";
-import { toast } from "sonner";
+
+// Components
+import { motion, AnimatePresence } from "framer-motion";
 import FormTextInput from "../Form/FormTextInput";
 import FormPasswordInput from "../Form/FormPasswordInput";
 import FormCheckbox from "../Form/FormCheckbox";
 import Tooltip from "../Tooltips/Tooltip";
 import Button from "../Buttons/Button";
-import { motion, AnimatePresence } from "framer-motion";
 
 // Assets
 import { FaCircleInfo as InfoIcon } from "react-icons/fa6";
@@ -85,6 +91,9 @@ function ModalAuthSignIn({
   handleModalClose,
 }: ModalAuthCommonProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectUrl = searchParams.get("redirectUrl");
+
   const {
     register,
     handleSubmit,
@@ -97,7 +106,14 @@ function ModalAuthSignIn({
   const handleSignIn: SubmitHandler<AuthSignInFields> = async (credentials) => {
     try {
       await fetchHandler("POST", "auth/signin", credentials);
-      router.refresh();
+
+      // Redirect user to the initially requested URL, or silently refresh the web app
+      if (redirectUrl) {
+        router.replace(redirectUrl);
+      } else {
+        router.refresh();
+      }
+
       handleModalClose();
     } catch (error) {
       toast.error(handleErrorMessage(error));
@@ -113,7 +129,7 @@ function ModalAuthSignIn({
       className="absolute p-6 w-full"
     >
       <h3 className="text-2xl text-slate-600 font-semibold mb-2">Sign In</h3>
-      <div className="flex items-center mb-8">
+      <div className={cn("flex items-center", redirectUrl ? "mb-2" : "mb-8")}>
         <p className="text-md text-slate-400">New to QuillHub? </p>
         <button
           type="button"
@@ -123,6 +139,12 @@ function ModalAuthSignIn({
           Create an account
         </button>
       </div>
+
+      {redirectUrl ? (
+        <p className="text-sm text-rose-500 font-medium mb-6">
+          Before accessing the page that you requested, you must be signed in.
+        </p>
+      ) : null}
 
       <form onSubmit={handleSubmit(handleSignIn)} autoComplete="off">
         <FormTextInput
