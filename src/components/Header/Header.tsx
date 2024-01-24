@@ -19,10 +19,11 @@ import type { User } from "@/db/schema/users";
 export default function Header({ user }: { user: User | null }) {
   const searchParams = useSearchParams();
   const passwordResetToken = searchParams.get("passwordResetToken");
+  const modalSearchParam = searchParams.get("modal");
 
   // Automatically open the modal if necessary search param is present
   const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(() => {
-    return !!passwordResetToken;
+    return Boolean(modalSearchParam || passwordResetToken);
   });
 
   return (
