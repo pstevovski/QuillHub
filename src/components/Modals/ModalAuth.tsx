@@ -465,14 +465,14 @@ function ModalAuthPasswordReset({
 }
 
 export function ModalAuth({
-  passwordResetToken,
+  passwordToken,
   handleModalClose,
 }: {
-  passwordResetToken: string | null;
+  passwordToken: string | null;
   handleModalClose: () => void;
 }) {
   const [modalType, setModalType] = useState<ModalAuthType>(() => {
-    return passwordResetToken ? "password_reset" : "sign_in";
+    return passwordToken ? "password_reset" : "sign_in";
   });
   const handleModalAuthType = (type: ModalAuthType) => setModalType(type);
 
@@ -530,7 +530,7 @@ export function ModalAuth({
           {modalType === "password_reset" ? (
             <ModalAuthPasswordReset
               key="password-reset"
-              token={passwordResetToken}
+              token={passwordToken}
               handleModalClose={handleModalClose}
               handleModalAuthType={handleModalAuthType}
             />
