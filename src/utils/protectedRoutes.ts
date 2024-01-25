@@ -1,4 +1,4 @@
-const PROTECTED_ROUTES: string[] = ["/protected"];
+const PROTECTED_ROUTES: string[] = [];
 
 /**
  * Utility function that checks if the route that

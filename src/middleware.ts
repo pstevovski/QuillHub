@@ -20,10 +20,6 @@ export async function middleware(request: NextRequest) {
     TokenService.REFRESH_TOKEN_NAME
   )?.value;
 
-  // Do not take the authenication token into consideration if
-  // the user is currently on one of the the authentication pages
-  if (request.nextUrl.pathname.startsWith("/auth") && !accessToken) return;
-
   // Issue a new access token before accessing the resource, if the previous one expired
   if (refreshToken && !accessToken) {
     const { token, expires } = await fetchHandler("POST", "token/refresh", {
@@ -60,12 +56,13 @@ export async function middleware(request: NextRequest) {
         { status: 401 }
       );
     } else {
-      return NextResponse.redirect(new URL("/auth/signin", request.url));
+      // Redirect the user back to the homepage,
+      // open the authentication modal and include redirect url
+      request.nextUrl.searchParams.set("modal", "sign_in");
+      request.nextUrl.searchParams.set("redirectUrl", request.nextUrl.pathname);
+      return NextResponse.redirect(
+        new URL(`/${request.nextUrl.search}`, request.url)
+      );
     }
-  }
-
-  // Redirect the user to the home page when trying to access Authentication pages with valid token
-  if (request.nextUrl.pathname.startsWith("/auth") && hasValidAccessToken) {
-    return NextResponse.redirect(new URL("/", request.url));
   }
 }

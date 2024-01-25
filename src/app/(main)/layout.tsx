@@ -1,6 +1,9 @@
-import TokenService from "@/services/token";
+// Components
+import UsersService from "@/services/users";
 import Link from "next/link";
-import AuthSignOut from "../auth/_components/AuthSignOut";
+import UserMenu from "./_components/UserMenu";
+
+// Assets
 import { RiQuillPenLine as QuillHubLogo } from "react-icons/ri";
 
 export default async function MainLayout({
@@ -8,12 +11,11 @@ export default async function MainLayout({
 }: {
   children: React.ReactNode;
 }) {
-  // Get the currently logged in user from the database
-  const token = await TokenService.decodeToken();
+  const user = await UsersService.getCurrentUser();
 
   return (
     <>
-      <header className="flex justify-between items-center max-w-screen-2xl mx-auto px-10 py-6 w-full sticky top-0 bg-white">
+      <header className="flex justify-between items-center max-w-screen-2xl mx-auto px-24 py-6 w-full sticky top-0 bg-white z-[9]">
         <Link
           href="/"
           className="flex items-center font-semibold text-lg text-teal-500 group"
@@ -22,13 +24,8 @@ export default async function MainLayout({
           <QuillHubLogo className="text-2xl group-hover:rotate-[10deg] duration-300" />
         </Link>
 
-        {token ? (
-          <AuthSignOut authenticatedUser={token} />
-        ) : (
-          <Link href="/auth/signin">Sign In</Link>
-        )}
+        <UserMenu user={user} />
       </header>
-      <hr className="border-none sticky top-[76px] max-w-screen-2xl mx-auto w-full h-[1px] bg-gradient-to-r from-white via-slate-200 to-white mb-6" />
 
       <main className="container mx-auto max-w-screen-2xl ">{children}</main>
 

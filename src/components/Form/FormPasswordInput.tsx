@@ -29,7 +29,11 @@ export default function FormPasswordInput({
 
   return (
     <div className={cn("relative", modifierClass)}>
-      {label ? <label htmlFor={props.id}>{label}</label> : null}
+      {label ? (
+        <label className="block text-slate-400 text-sm mb-2" htmlFor={props.id}>
+          {label}
+        </label>
+      ) : null}
 
       <div className="relative">
         <input
