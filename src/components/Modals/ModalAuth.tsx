@@ -406,8 +406,6 @@ function ModalAuthPasswordReset({
       const data = await fetchHandler("POST", "auth/reset-password", payload);
       toast.success(data.message);
       handleModalAuthType("sign_in");
-
-      // TODO: remove search param
     } catch (error) {
       toast.error(handleErrorMessage(error));
     }
@@ -477,7 +475,7 @@ export function ModalAuth({
   const handleModalAuthType = (type: ModalAuthType) => setModalType(type);
 
   return (
-    <div>
+    <>
       {/* overlay */}
       <motion.div
         initial={{ opacity: 0 }}
@@ -537,6 +535,6 @@ export function ModalAuth({
           ) : null}
         </AnimatePresence>
       </motion.div>
-    </div>
+    </>
   );
 }
