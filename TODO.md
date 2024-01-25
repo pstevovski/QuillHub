@@ -76,8 +76,8 @@
   - **DONE** Once the user logs in, he'll be redirected to the URL that was initially requested [x]
   - **DONE** Add a message to the signin modal if requested url search parameter is present [x]
 
-- Fix clearing out the "resetPasswordToken" search parameter
-  - Maybe rename this parameter to something more concise?
+- **DONE** Fix clearing out the "resetPasswordToken" search parameter [x]
+  - **DONE** Maybe rename this parameter to something more concise? [x]
 
 ## Create & Edit Blog Post page
 
