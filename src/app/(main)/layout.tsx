@@ -1,17 +1,31 @@
-import Header from "@/components/Header/Header";
+// Components
 import UsersService from "@/services/users";
 import Link from "next/link";
+import UserMenu from "./_components/UserMenu";
+
+// Assets
+import { RiQuillPenLine as QuillHubLogo } from "react-icons/ri";
 
 export default async function MainLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const currentUser = await UsersService.getCurrentUser();
+  const user = await UsersService.getCurrentUser();
 
   return (
     <>
-      <Header user={currentUser} />
+      <header className="flex justify-between items-center max-w-screen-2xl mx-auto px-24 py-6 w-full sticky top-0 bg-white z-[9]">
+        <Link
+          href="/"
+          className="flex items-center font-semibold text-lg text-teal-500 group"
+        >
+          QuillHub
+          <QuillHubLogo className="text-2xl group-hover:rotate-[10deg] duration-300" />
+        </Link>
+
+        <UserMenu user={user} />
+      </header>
 
       <main className="container mx-auto max-w-screen-2xl ">{children}</main>
 
