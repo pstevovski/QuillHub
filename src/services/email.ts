@@ -8,7 +8,7 @@ export const EMAIL_TEMPLATES_PASSWORD_RESET = (token: string): string => {
     <p><em>Unfold Your Imagination, Share Your Universe</em></p>
     <h3>You have requested password reset for your accout</h3>
     <br/>
-    <a href="${process.env.NEXT_PUBLIC_EMAIL_REDIRECT_URL}?passwordResetToken=${token}">Click here to reset your password</a>
+    <a href="${process.env.NEXT_PUBLIC_EMAIL_REDIRECT_URL}?password_token=${token}">Click here to reset your password</a>
     <br/>
     <br/>
     <br/>
