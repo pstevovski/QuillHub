@@ -2,7 +2,7 @@
 
 // Hooks
 import { useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 // Assets
 import { RiQuillPenLine as QuillHubLogo } from "react-icons/ri";
@@ -18,13 +18,21 @@ import type { User } from "@/db/schema/users";
 
 export default function Header({ user }: { user: User | null }) {
   const searchParams = useSearchParams();
-  const passwordResetToken = searchParams.get("passwordResetToken");
+  const router = useRouter();
+  const passwordToken = searchParams.get("password_token");
   const modalSearchParam = searchParams.get("modal");
 
   // Automatically open the modal if necessary search param is present
   const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(() => {
-    return Boolean(modalSearchParam || passwordResetToken);
+    return Boolean(modalSearchParam || passwordToken);
   });
+
+  const handleCloseAuthModal = () => {
+    setIsAuthModalOpen(false);
+
+    // Clear out any of the search parameters that could potentially exist
+    router.replace(window.location.pathname);
+  };
 
   return (
     <>
@@ -53,8 +61,8 @@ export default function Header({ user }: { user: User | null }) {
       <AnimatePresence>
         {!user && isAuthModalOpen ? (
           <ModalAuth
-            passwordResetToken={passwordResetToken}
-            handleModalClose={() => setIsAuthModalOpen(false)}
+            passwordToken={passwordToken}
+            handleModalClose={handleCloseAuthModal}
           />
         ) : null}
       </AnimatePresence>
