@@ -4,6 +4,7 @@
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useState } from "react";
+import { handleCheckIfProtectedRoute } from "@/utils/protectedRoutes";
 import fetchHandler from "@/utils/fetchHandler";
 import handleErrorMessage from "@/utils/handleErrorMessage";
 import getNameInitials from "@/utils/initials";
@@ -38,6 +39,13 @@ export default function AccountMenu({ userDetails }: { userDetails: User }) {
   const handleSignOut = async () => {
     try {
       await fetchHandler("POST", "auth/signout", undefined);
+
+      // Check if the current route is protected
+      // If so, redirect the user to the homepage, otherwise stay on same page
+      const currentRoute = window.location.pathname;
+
+      if (handleCheckIfProtectedRoute(currentRoute)) router.replace("/");
+
       router.refresh();
     } catch (error) {
       toast.error(handleErrorMessage(error));
