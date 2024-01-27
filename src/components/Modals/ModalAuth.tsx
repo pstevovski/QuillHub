@@ -108,8 +108,9 @@ function ModalAuthSignIn({
       await fetchHandler("POST", "auth/signin", credentials);
 
       // Redirect user to the initially requested URL, or silently refresh the web app
+      // note: Using `router.push` didn't work as intended.
       if (redirectUrl) {
-        router.replace(redirectUrl);
+        window.location.replace(redirectUrl);
       } else {
         router.refresh();
       }
