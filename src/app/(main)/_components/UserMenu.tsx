@@ -2,7 +2,7 @@
 
 // Hooks
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 // Types
 import type { User } from "@/db/schema/users";
@@ -29,6 +29,11 @@ export default function UserMenu({ user }: { user: User | null }) {
     // Clear out any of the URL parameters
     setTimeout(() => router.replace(window.location.pathname), 1000);
   };
+
+  useEffect(() => {
+    if (!modalSearchParam) return;
+    setIsAuthModalOpen(true);
+  }, [modalSearchParam]);
 
   return (
     <>
