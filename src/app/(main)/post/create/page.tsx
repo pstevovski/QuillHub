@@ -5,6 +5,7 @@ import FormTextInput from "@/components/Form/FormTextInput";
 import { PostsNew } from "@/db/schema/posts";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
+import { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 
 // Assets
@@ -18,11 +19,15 @@ const PostCreateSchema = z.object({
   content: z.string({
     required_error: "Please provide the content for your blog post",
   }),
+  status: z.string({
+    required_error: "Please select the status of the blog post",
+  }),
 });
 
 export default function PostCreate() {
   const {
     register,
+    setValue,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<PostsNew>({
@@ -58,6 +63,12 @@ export default function PostCreate() {
       </p>
 
       <form onSubmit={handleSubmit(handlePostCreate)}>
+        <span {...register("views")} onClick={() => setValue("views", 123456)}>
+          views testing
+        </span>
+
+        <button>Submit</button>
+
         <FormTextInput
           label="Title"
           register={register("title")}
@@ -67,15 +78,25 @@ export default function PostCreate() {
           modifierClass="max-w-lg"
         />
 
-        <Dropdown handleDropdownSelection={(value) => alert(value)}>
-          <Dropdown.Label>Test</Dropdown.Label>
-          <Dropdown.Trigger loading={false} disabled={false}>
-            <span className="text-sm">Select an item</span>
-          </Dropdown.Trigger>
+        <Dropdown
+          type="multi-select"
+          handleDropdownSelection={(selection) => {
+            setValue(
+              "status",
+              selection[0].value as "draft" | "archived" | "published"
+            );
+          }}
+        >
+          <Dropdown.Label>Status</Dropdown.Label>
+          <Dropdown.Trigger
+            loading={false}
+            disabled={false}
+            placeholderText="Select Status"
+          />
           <Dropdown.Body>
-            <Dropdown.Item text="Item #1" value="item_1">
-              Item #1
-            </Dropdown.Item>
+            <Dropdown.Item value="draft">Draft</Dropdown.Item>
+            <Dropdown.Item value="archived">Archived</Dropdown.Item>
+            <Dropdown.Item value="published">Published</Dropdown.Item>
           </Dropdown.Body>
         </Dropdown>
       </form>
