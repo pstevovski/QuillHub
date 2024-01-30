@@ -6,14 +6,14 @@ import { FaChevronDown as ChevronIcon } from "react-icons/fa";
 import Loader from "../Loaders/Loader";
 
 interface DropdownTriggerProps {
-  children: React.ReactNode;
   loading: boolean;
   disabled: boolean;
+  placeholderText: string;
   modifierClass?: string;
 }
 
 export default function DropdownTrigger({
-  children,
+  placeholderText = "",
   loading = false,
   disabled = false,
   modifierClass = "",
@@ -34,7 +34,11 @@ export default function DropdownTrigger({
       )}
       onClick={handleToggleDropdown}
     >
-      {children}
+      <span className="text-sm text-slate-400">
+        {context.selection
+          .map((selectedItem) => selectedItem.text)
+          .join(", ") || placeholderText}
+      </span>
 
       <div className="flex items-center">
         {loading ? <Loader modifierClass="mr-3" /> : null}

@@ -9,5 +9,14 @@ export default function DropdownLabel({
   children,
   modifierClass = "",
 }: DropdownLabelProps) {
-  return <div className={cn("relative w-full", modifierClass)}>{children}</div>;
+  return (
+    <div
+      className={cn(
+        "relative w-full text-slate-400 text-sm mb-2",
+        modifierClass
+      )}
+    >
+      {children}
+    </div>
+  );
 }

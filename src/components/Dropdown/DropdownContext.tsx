@@ -1,10 +1,13 @@
 "use client";
 
 import { createContext, useContext } from "react";
+import { DropdownSelectedItem } from "./DropdownItem";
 
 export interface DropdownPropsContext {
   isOpen: boolean;
+  selection: DropdownSelectedItem[];
   handleToggleDropdown: () => void;
+  handleDropdownSelectItem: (selectedItem: DropdownSelectedItem) => void;
 }
 
 const DropdownContext = createContext<DropdownPropsContext | null>(null);
