@@ -26,6 +26,8 @@ export default function DropdownActionTrigger({
     context.handleToggleDropdownMenu();
   };
 
+  // todo: make use of "useOnClickOutside" hook
+
   return (
     <div
       className={cn(
