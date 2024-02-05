@@ -18,7 +18,7 @@ export default function DropdownActionBody({
   return (
     <ul
       className={cn(
-        "absolute top-[calc(100%+10px)] left-0 max-w-40 w-full border rounded-md bg-white duration-200",
+        "z-50 absolute top-[calc(100%+10px)] left-0 max-w-40 w-full border rounded-md bg-white duration-200",
         modifierClass
       )}
     >

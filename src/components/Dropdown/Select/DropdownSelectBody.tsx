@@ -18,7 +18,7 @@ export default function DropdownSelectBody({
   return (
     <ul
       className={cn(
-        "absolute top-[calc(100%+10px)] left-0 w-full border rounded-md bg-white",
+        "z-50 absolute top-[calc(100%+10px)] left-0 w-full border rounded-md bg-white",
         modifierClass
       )}
     >
