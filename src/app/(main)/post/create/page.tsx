@@ -1,11 +1,14 @@
 "use client";
 
-import Dropdown from "@/components/Dropdown/Dropdown";
+import DropdownAction from "@/components/Dropdown/Action/DropdownAction";
+import DropdownSelect from "@/components/Dropdown/Select/DropdownSelect";
+import { DropdownSelectClickedItem } from "@/components/Dropdown/Select/DropdownSelectItem";
+import FormFieldErrorMessage from "@/components/Form/FormFieldErrorMessage";
 import FormTextInput from "@/components/Form/FormTextInput";
 import { PostsNew } from "@/db/schema/posts";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 
 // Assets
@@ -13,9 +16,11 @@ import { FaArrowLeftLong as GoBackIcon } from "react-icons/fa6";
 import { z } from "zod";
 
 const PostCreateSchema = z.object({
-  title: z.string({
-    required_error: "Please provide the title for your blog post",
-  }),
+  title: z
+    .string({
+      required_error: "Please provide the title for your blog post",
+    })
+    .min(5),
   content: z.string({
     required_error: "Please provide the content for your blog post",
   }),
@@ -39,6 +44,31 @@ export default function PostCreate() {
     },
     resolver: zodResolver(PostCreateSchema),
   });
+
+  // Dropdown Selection
+  const [selection, setSelection] = useState<DropdownSelectClickedItem[]>([]);
+  const handleDropdownSelection = (selectedItem: DropdownSelectClickedItem) => {
+    // single select
+    // setSelection([item]);
+
+    // multi select
+    const selectionCopy = [...selection];
+    const selectedItemIndex = selectionCopy.findIndex(
+      (item) => item.value === selectedItem.value
+    );
+
+    if (selectedItemIndex >= 0) {
+      selectionCopy.splice(selectedItemIndex, 1);
+    } else {
+      selectionCopy.push(selectedItem);
+    }
+
+    setSelection(selectionCopy);
+  };
+
+  useEffect(() => {
+    console.log("SELECTION", selection);
+  }, [selection]);
 
   const handlePostCreate: SubmitHandler<PostsNew> = async (values) => {
     console.log("creating blog post...", values);
@@ -78,27 +108,35 @@ export default function PostCreate() {
           modifierClass="max-w-lg"
         />
 
-        <Dropdown
-          type="multi-select"
-          handleDropdownSelection={(selection) => {
-            setValue(
-              "status",
-              selection[0].value as "draft" | "archived" | "published"
-            );
-          }}
+        <DropdownSelect
+          selection={selection}
+          handleSelection={handleDropdownSelection}
         >
-          <Dropdown.Label>Status</Dropdown.Label>
-          <Dropdown.Trigger
+          <DropdownSelect.Label>Testing Selection</DropdownSelect.Label>
+          <DropdownSelect.Trigger
             loading={false}
             disabled={false}
-            placeholderText="Select Status"
+            placeholderText="Testing Select"
           />
-          <Dropdown.Body>
-            <Dropdown.Item value="draft">Draft</Dropdown.Item>
-            <Dropdown.Item value="archived">Archived</Dropdown.Item>
-            <Dropdown.Item value="published">Published</Dropdown.Item>
-          </Dropdown.Body>
-        </Dropdown>
+          <DropdownSelect.Body>
+            <DropdownSelect.Item value="value_1">Value #1</DropdownSelect.Item>
+            <DropdownSelect.Item value="value_2">Value #2</DropdownSelect.Item>
+            <DropdownSelect.Item value="value_3">Value #3</DropdownSelect.Item>
+          </DropdownSelect.Body>
+        </DropdownSelect>
+        <FormFieldErrorMessage error={errors.title} />
+
+        <DropdownAction>
+          <DropdownAction.Trigger loading={false} disabled={false} />
+          <DropdownAction.Body>
+            <DropdownAction.Item
+              value="value_4"
+              handleClickedActionItem={(item) => alert(item.text)}
+            >
+              Value #4
+            </DropdownAction.Item>
+          </DropdownAction.Body>
+        </DropdownAction>
       </form>
     </div>
   );

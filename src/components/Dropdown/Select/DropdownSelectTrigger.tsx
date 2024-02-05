@@ -4,8 +4,6 @@ import cn from "@/utils/classnames";
 import { FaChevronDown as ChevronIcon } from "react-icons/fa";
 import { useDropdownSelectContext } from "./DropdownSelectContext";
 import Loader from "@/components/Loaders/Loader";
-import { useRef } from "react";
-import useOnClickOutside from "@/hooks/useOnClickOutside";
 
 interface DropdownSelectTriggerProps {
   loading: boolean;
