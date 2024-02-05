@@ -1,14 +1,25 @@
 import cn from "@/utils/classnames";
 import { useRef } from "react";
 import { useDropdownSelectContext } from "./DropdownSelectContext";
-import { DropdownItemProps } from "../DropdownItem";
+
+interface DropdownSelectItemProps {
+  children: React.ReactNode;
+  value: string | number | boolean;
+  disabled?: boolean;
+  modifierClass?: string;
+}
+
+export interface DropdownSelectClickedItem {
+  text: string;
+  value: string | number | boolean;
+}
 
 export default function DropdownSelectItem({
   children,
   value,
   disabled = false,
   modifierClass = "",
-}: DropdownItemProps) {
+}: DropdownSelectItemProps) {
   const context = useDropdownSelectContext();
   const dropdownItemRef = useRef<HTMLLIElement | null>(null);
 

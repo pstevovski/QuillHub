@@ -1,22 +1,26 @@
 "use client";
 
+// Utilities & Hooks
 import cn from "@/utils/classnames";
 import { useState } from "react";
-import { DropdownClickedItem } from "../interfaces";
+
+// Components
 import DropdownSelectContext from "./DropdownSelectContext";
-import DropdownTrigger from "../DropdownTrigger";
 import DropdownLabel from "../DropdownLabel";
-import DropdownBody from "../DropdownBody";
-import DropdownSelectItem from "./DropdownSelectItem";
+import DropdownSelectBody from "./DropdownSelectBody";
+import DropdownSelectItem, {
+  type DropdownSelectClickedItem,
+} from "./DropdownSelectItem";
+import DropdownSelectTrigger from "./DropdownSelectTrigger";
 
 interface DropdownSelectProps {
   children: React.ReactNode;
-  selection: DropdownClickedItem[];
+  selection: DropdownSelectClickedItem[];
   modifierClass?: string;
-  handleSelection: (selection: DropdownClickedItem) => void;
+  handleSelection: (selection: DropdownSelectClickedItem) => void;
 }
 
-function Dropdown({
+function DropdownSelect({
   children,
   selection = [],
   handleSelection,
@@ -41,9 +45,9 @@ function Dropdown({
   );
 }
 
-Dropdown.Trigger = DropdownTrigger;
-Dropdown.Label = DropdownLabel;
-Dropdown.Body = DropdownBody;
-Dropdown.Item = DropdownSelectItem;
+DropdownSelect.Label = DropdownLabel;
+DropdownSelect.Trigger = DropdownSelectTrigger;
+DropdownSelect.Body = DropdownSelectBody;
+DropdownSelect.Item = DropdownSelectItem;
 
-export default Dropdown;
+export default DropdownSelect;
