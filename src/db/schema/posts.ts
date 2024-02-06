@@ -17,9 +17,7 @@ export const postsSchema = mysqlTable("posts", {
   status: mysqlEnum("status", ["draft", "published", "archived"])
     .default("draft")
     .notNull(),
-
-  // todo: to be added later
-  // topic_id: int("topic_id").notNull(),
+  topic_id: int("topic_id").notNull(),
 });
 
 export type Post = typeof postsSchema.$inferSelect;
