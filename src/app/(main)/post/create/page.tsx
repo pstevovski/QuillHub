@@ -1,14 +1,9 @@
 "use client";
 
-import DropdownAction from "@/components/Dropdown/Action/DropdownAction";
-import DropdownSelect from "@/components/Dropdown/Select/DropdownSelect";
-import { DropdownSelectClickedItem } from "@/components/Dropdown/Select/DropdownSelectItem";
-import FormFieldErrorMessage from "@/components/Form/FormFieldErrorMessage";
 import FormTextInput from "@/components/Form/FormTextInput";
 import { PostsNew } from "@/db/schema/posts";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
-import { useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 
 // Assets
@@ -45,31 +40,6 @@ export default function PostCreate() {
     resolver: zodResolver(PostCreateSchema),
   });
 
-  // Dropdown Selection
-  const [selection, setSelection] = useState<DropdownSelectClickedItem[]>([]);
-  const handleDropdownSelection = (selectedItem: DropdownSelectClickedItem) => {
-    // single select
-    // setSelection([item]);
-
-    // multi select
-    const selectionCopy = [...selection];
-    const selectedItemIndex = selectionCopy.findIndex(
-      (item) => item.value === selectedItem.value
-    );
-
-    if (selectedItemIndex >= 0) {
-      selectionCopy.splice(selectedItemIndex, 1);
-    } else {
-      selectionCopy.push(selectedItem);
-    }
-
-    setSelection(selectionCopy);
-  };
-
-  useEffect(() => {
-    console.log("SELECTION", selection);
-  }, [selection]);
-
   const handlePostCreate: SubmitHandler<PostsNew> = async (values) => {
     console.log("creating blog post...", values);
   };
@@ -93,12 +63,6 @@ export default function PostCreate() {
       </p>
 
       <form onSubmit={handleSubmit(handlePostCreate)}>
-        <span {...register("views")} onClick={() => setValue("views", 123456)}>
-          views testing
-        </span>
-
-        <button>Submit</button>
-
         <FormTextInput
           label="Title"
           register={register("title")}
@@ -107,36 +71,6 @@ export default function PostCreate() {
           autoComplete="title"
           modifierClass="max-w-lg"
         />
-
-        <DropdownSelect
-          selection={selection}
-          handleSelection={handleDropdownSelection}
-        >
-          <DropdownSelect.Label>Testing Selection</DropdownSelect.Label>
-          <DropdownSelect.Trigger
-            loading={false}
-            disabled={false}
-            placeholderText="Testing Select"
-          />
-          <DropdownSelect.Body>
-            <DropdownSelect.Item value="value_1">Value #1</DropdownSelect.Item>
-            <DropdownSelect.Item value="value_2">Value #2</DropdownSelect.Item>
-            <DropdownSelect.Item value="value_3">Value #3</DropdownSelect.Item>
-          </DropdownSelect.Body>
-        </DropdownSelect>
-        <FormFieldErrorMessage error={errors.title} />
-
-        <DropdownAction>
-          <DropdownAction.Trigger loading={false} disabled={false} />
-          <DropdownAction.Body>
-            <DropdownAction.Item
-              value="value_4"
-              handleClickedActionItem={(item) => alert(item.text)}
-            >
-              Value #4
-            </DropdownAction.Item>
-          </DropdownAction.Body>
-        </DropdownAction>
       </form>
     </div>
   );
