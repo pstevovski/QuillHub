@@ -48,8 +48,9 @@ const PostCreateSchema = z.object({
     }, `Maximum image file size is ${MAX_IMAGE_SIZE}MB.`)
     .refine((file) => {
       if (!file) return false;
+
       // Check if the file type is supportewd
-      return SUPPORTED_IMAGE_TYPES.includes(file.type);
+      return SUPPORTED_IMAGE_TYPES.some((type) => type === file.type);
     }, "Selected image file type is not supported"),
   topic_id: z.number({
     required_error: "Please select a topic for the blog post",
@@ -177,7 +178,26 @@ export default function PostCreate() {
           <FormFieldErrorMessage error={errors.topic_id} />
         </DropdownSelect>
 
+        {/* BUG: */}
+        {/* <div className="relative">
+          <input
+            type="file"
+            {...register("cover_photo_url")}
+            placeholder="Select cover photo..."
+            className="block my-4"
+          />
+          <FormFieldErrorMessage error={errors.cover_photo_url} />
+        </div> */}
         {/* Todo: Add file upload for "Cover Photo" field */}
+
+        <textarea
+          {...register("content")}
+          placeholder="Blog Post Content..."
+          rows={12}
+          cols={12}
+          className="border rounded-md max-w-lg w-full p-4 my-4 text-slate-400 placeholder:text-slate-400 focus:outline-none"
+        ></textarea>
+        <FormFieldErrorMessage error={errors.content} />
         {/* Todo: Add Textarea for "Content" field, change with WYSIWIG later */}
 
         <Button type="submit">Create Post</Button>
