@@ -2,6 +2,11 @@
 
 import FormTextInput from "@/components/Form/FormTextInput";
 import { PostsNew } from "@/db/schema/posts";
+import {
+  MAX_IMAGE_SIZE,
+  SUPPORTED_IMAGE_TYPES,
+  convertFileSize,
+} from "@/utils/convertFileSize";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { SubmitHandler, useForm } from "react-hook-form";
@@ -11,25 +16,34 @@ import { FaArrowLeftLong as GoBackIcon } from "react-icons/fa6";
 import { z } from "zod";
 
 const PostCreateSchema = z.object({
-  title: z
-    .string({
-      required_error: "Please provide the title for your blog post",
-    })
-    .min(5),
-  content: z.string({
-    required_error: "Please provide the content for your blog post",
+  title: z.string({
+    required_error: "Please enter the title for the blog post",
   }),
-  status: z.string({
-    required_error: "Please select the status of the blog post",
+  content: z.string({
+    required_error: "Please enter the content of the blog post",
+  }),
+  status: z.enum(["Draft", "Published"]).default("Draft"),
+  cover_photo: z
+    .custom<File>()
+    .refine((file) => !file, "Cover photo is required.")
+    .refine((file) => {
+      // Check the file size
+      return MAX_IMAGE_SIZE > convertFileSize(file.size);
+    }, `Maximum image file size is ${MAX_IMAGE_SIZE}MB.`)
+    .refine((file) => {
+      // Check if the file type is supportewd
+      return SUPPORTED_IMAGE_TYPES.includes(file.type);
+    }, "Selected image file type is not supported"),
+  topic_id: z.number({
+    required_error: "Please select a topic for the blog post",
   }),
 });
 
 export default function PostCreate() {
   const {
     register,
-    setValue,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm<PostsNew>({
     defaultValues: {
       title: "",
