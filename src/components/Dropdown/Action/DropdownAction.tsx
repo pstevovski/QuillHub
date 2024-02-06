@@ -3,8 +3,9 @@
 // Utilities & Hooks
 import cn from "@/utils/classnames";
 import { useState } from "react";
+
+// Components
 import DropdownActionContext from "./DropdownActionContext";
-import DropdownLabel from "../DropdownLabel";
 import DropdownActionItem from "./DropdownActionItem";
 import DropdownActionBody from "./DropdownActionBody";
 import DropdownActionTrigger from "./DropdownActionTrigger";
@@ -32,7 +33,6 @@ function DropdownAction({ children, modifierClass = "" }: DropdownActionProps) {
   );
 }
 
-DropdownAction.Label = DropdownLabel;
 DropdownAction.Trigger = DropdownActionTrigger;
 DropdownAction.Body = DropdownActionBody;
 DropdownAction.Item = DropdownActionItem;

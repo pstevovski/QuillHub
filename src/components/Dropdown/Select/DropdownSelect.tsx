@@ -6,7 +6,6 @@ import { useState } from "react";
 
 // Components
 import DropdownSelectContext from "./DropdownSelectContext";
-import DropdownLabel from "../DropdownLabel";
 import DropdownSelectBody from "./DropdownSelectBody";
 import DropdownSelectItem, {
   type DropdownSelectClickedItem,
@@ -45,7 +44,6 @@ function DropdownSelect({
   );
 }
 
-DropdownSelect.Label = DropdownLabel;
 DropdownSelect.Trigger = DropdownSelectTrigger;
 DropdownSelect.Body = DropdownSelectBody;
 DropdownSelect.Item = DropdownSelectItem;
