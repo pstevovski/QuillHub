@@ -11,6 +11,7 @@ import DropdownSelectItem, {
   type DropdownSelectClickedItem,
 } from "./DropdownSelectItem";
 import DropdownSelectTrigger from "./DropdownSelectTrigger";
+import DropdownSelectSearch from "./DropdownSelectSearch";
 
 interface DropdownSelectProps {
   children: React.ReactNode;
@@ -47,5 +48,6 @@ function DropdownSelect({
 DropdownSelect.Trigger = DropdownSelectTrigger;
 DropdownSelect.Body = DropdownSelectBody;
 DropdownSelect.Item = DropdownSelectItem;
+DropdownSelect.Search = DropdownSelectSearch;
 
 export default DropdownSelect;
