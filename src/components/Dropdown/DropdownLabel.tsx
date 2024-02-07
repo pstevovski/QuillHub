@@ -12,7 +12,7 @@ export default function DropdownLabel({
   return (
     <div
       className={cn(
-        "relative w-full bg-red-200 text-slate-400 text-sm mb-2",
+        "relative w-full text-slate-400 text-sm mb-2",
         modifierClass
       )}
     >

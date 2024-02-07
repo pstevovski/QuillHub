@@ -6,6 +6,9 @@ import DropdownSelect from "@/components/Dropdown/Select/DropdownSelect";
 import { DropdownSelectClickedItem } from "@/components/Dropdown/Select/DropdownSelectItem";
 import FormFieldErrorMessage from "@/components/Form/FormFieldErrorMessage";
 import FormTextInput from "@/components/Form/FormTextInput";
+import FormUpload from "@/components/Form/FormUpload";
+import FormLabel from "@/components/Form/FormLabel";
+import FormDescription from "@/components/Form/FormDescription";
 import { PostsNew } from "@/db/schema/posts";
 import {
   MAX_IMAGE_SIZE,
@@ -27,31 +30,31 @@ const PostCreateSchema = z.object({
       required_error: "Please enter the title for the blog post",
     })
     .min(5, "Please enter a title that is at least 5 characters long"),
-  content: z.string({
-    required_error: "Please enter the content of the blog post",
-  }),
-  status: z
-    .enum(["draft", "published"], {
-      required_error: "Please select the status of the blog post",
+  content: z
+    .string({
+      required_error: "Blog Post content is required",
     })
-    .default("draft"),
-  cover_photo: z
-    .custom<File>()
-    .refine((file) => {
-      if (!file) return false;
-      return true;
-    }, "Cover photo is required.")
-    .refine((file) => {
-      if (!file) return false;
-      // Check the file size
-      return MAX_IMAGE_SIZE > convertFileSize(file.size);
-    }, `Maximum image file size is ${MAX_IMAGE_SIZE}MB.`)
-    .refine((file) => {
-      if (!file) return false;
-
-      // Check if the file type is supportewd
-      return SUPPORTED_IMAGE_TYPES.some((type) => type === file.type);
-    }, "Selected image file type is not supported"),
+    .min(1, "Please enter the content of your blog post"),
+  status: z.enum(["draft", "published"], {
+    required_error: "Please select the status of the blog post",
+  }),
+  cover_photo_url: z
+    .custom<FileList>()
+    .refine((files) => {
+      return Array.from(files ?? []).length !== 0;
+    }, "Cover photo is required")
+    .refine((files) => {
+      return Array.from(files ?? []).every((file) => {
+        return SUPPORTED_IMAGE_TYPES.some(
+          (imageType) => imageType === file.type
+        );
+      });
+    }, "Selected file type is not supported")
+    .refine((files) => {
+      return Array.from(files ?? []).every((file) => {
+        return convertFileSize(file.size) <= MAX_IMAGE_SIZE;
+      });
+    }, `Maximum cover photo image size is ${MAX_IMAGE_SIZE}MB`),
   topic_id: z.number({
     required_error: "Please select a topic for the blog post",
   }),
@@ -65,10 +68,10 @@ export default function PostCreate() {
     formState: { errors },
   } = useForm<PostsNew>({
     defaultValues: {
-      title: "",
       cover_photo_url: null,
+      title: "",
       content: "",
-      status: "draft",
+      status: undefined,
       topic_id: undefined,
     },
     resolver: zodResolver(PostCreateSchema),
@@ -77,9 +80,7 @@ export default function PostCreate() {
   /*================================
     BLOG POST STATUS
   =================================*/
-  const [status, setStatus] = useState<DropdownSelectClickedItem[]>([
-    { text: "Draft", value: "draft" },
-  ]);
+  const [status, setStatus] = useState<DropdownSelectClickedItem[]>([]);
   const handleStatusSelection = (selectedStatus: DropdownSelectClickedItem) => {
     // Updates the inner selection state of the dropdown component
     setStatus([selectedStatus]);
@@ -145,7 +146,7 @@ export default function PostCreate() {
             loading={false}
             disabled={false}
             placeholderText="Select Status"
-            modifierClass={errors.status ? "border-red-600" : ""}
+            modifierClass={errors.status ? "border-red-500" : ""}
           />
           <DropdownSelect.Body>
             <DropdownSelect.Item value="draft">Draft</DropdownSelect.Item>
@@ -166,7 +167,7 @@ export default function PostCreate() {
             loading={false}
             disabled={false}
             placeholderText="Select Topic"
-            modifierClass={errors.topic_id ? "border-red-600" : ""}
+            modifierClass={errors.topic_id ? "border-red-500" : ""}
           />
           <DropdownSelect.Body>
             <DropdownSelect.Item value="1">Topic #1</DropdownSelect.Item>
@@ -178,17 +179,23 @@ export default function PostCreate() {
           <FormFieldErrorMessage error={errors.topic_id} />
         </DropdownSelect>
 
-        {/* BUG: */}
-        {/* <div className="relative">
-          <input
-            type="file"
-            {...register("cover_photo_url")}
-            placeholder="Select cover photo..."
-            className="block my-4"
-          />
-          <FormFieldErrorMessage error={errors.cover_photo_url} />
-        </div> */}
-        {/* Todo: Add file upload for "Cover Photo" field */}
+        {/* COVER PHOTO */}
+        <FormLabel htmlFor="cover_photo_url">Cover Photo</FormLabel>
+        <FormUpload
+          id="cover_photo_url"
+          register={register("cover_photo_url")}
+          accept={SUPPORTED_IMAGE_TYPES.join(",")}
+        />
+        <FormDescription modifierClass="my-1">
+          <span className="text-xs">
+            Supported file types include:{" "}
+            {SUPPORTED_IMAGE_TYPES.join("").split("image/").join(" .")}
+          </span>
+          <span className="block text-red-400 text-xs font-medium">
+            Maximum file size: 5MB.
+          </span>
+        </FormDescription>
+        <FormFieldErrorMessage error={errors.cover_photo_url} />
 
         <textarea
           {...register("content")}
