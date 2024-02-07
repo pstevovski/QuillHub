@@ -23,6 +23,7 @@ import { SubmitHandler, useForm } from "react-hook-form";
 // Assets
 import { FaArrowLeftLong as GoBackIcon } from "react-icons/fa6";
 import { z } from "zod";
+import FormUploadPreview from "@/components/Form/FormUploadPreview";
 
 const PostCreateSchema = z.object({
   title: z
@@ -64,6 +65,7 @@ export default function PostCreate() {
   const {
     register,
     handleSubmit,
+    watch,
     setValue,
     formState: { errors },
   } = useForm<PostsNew>({
@@ -76,6 +78,7 @@ export default function PostCreate() {
     },
     resolver: zodResolver(PostCreateSchema),
   });
+  const watchCoverPhoto = watch("cover_photo_url");
 
   /*================================
     BLOG POST STATUS
@@ -195,6 +198,7 @@ export default function PostCreate() {
             Maximum file size: 5MB.
           </span>
         </FormDescription>
+        <FormUploadPreview fileToPreview={watchCoverPhoto} />
         <FormFieldErrorMessage error={errors.cover_photo_url} />
 
         <textarea
