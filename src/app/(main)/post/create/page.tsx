@@ -23,6 +23,7 @@ import { SubmitHandler, useForm } from "react-hook-form";
 // Assets
 import { FaArrowLeftLong as GoBackIcon } from "react-icons/fa6";
 import { z } from "zod";
+import Tiptap from "@/components/WYSIWYG/TipTap";
 
 const PostCreateSchema = z.object({
   title: z
@@ -203,6 +204,8 @@ export default function PostCreate() {
           handleClearSelection={() => setValue("cover_photo", null)}
         />
         <FormFieldErrorMessage error={errors.cover_photo} />
+
+        <Tiptap content="" onChange={(text) => setValue("content", text)} />
 
         <textarea
           {...register("content")}
