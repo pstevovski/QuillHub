@@ -66,7 +66,7 @@ export default function PostCreate() {
     handleSubmit,
     watch,
     setValue,
-    formState: { errors },
+    formState: { errors, isDirty },
   } = useForm<PostsNew>({
     defaultValues: {
       cover_photo: null,
@@ -142,6 +142,7 @@ export default function PostCreate() {
         <DropdownSelect
           selection={status}
           handleSelection={handleStatusSelection}
+          modifierClass="mb-6"
         >
           <DropdownLabel>Status</DropdownLabel>
           <DropdownSelect.Trigger
@@ -163,6 +164,7 @@ export default function PostCreate() {
         <DropdownSelect
           selection={topic}
           handleSelection={handleTopicSelection}
+          modifierClass="mb-6"
         >
           <DropdownLabel>Topic</DropdownLabel>
           <DropdownSelect.Trigger
@@ -210,9 +212,10 @@ export default function PostCreate() {
           className="border rounded-md max-w-lg w-full p-4 my-4 text-slate-400 placeholder:text-slate-400 focus:outline-none"
         ></textarea>
         <FormFieldErrorMessage error={errors.content} />
-        {/* Todo: Add Textarea for "Content" field, change with WYSIWIG later */}
 
-        <Button type="submit">Create Post</Button>
+        <Button type="submit" disabled={!isDirty}>
+          Create Post
+        </Button>
       </form>
     </div>
   );
