@@ -23,7 +23,6 @@ import { SubmitHandler, useForm } from "react-hook-form";
 // Assets
 import { FaArrowLeftLong as GoBackIcon } from "react-icons/fa6";
 import { z } from "zod";
-import FormUploadPreview from "@/components/Form/FormUploadPreview";
 
 const PostCreateSchema = z.object({
   title: z
@@ -39,7 +38,7 @@ const PostCreateSchema = z.object({
   status: z.enum(["draft", "published"], {
     required_error: "Please select the status of the blog post",
   }),
-  cover_photo_url: z
+  cover_photo: z
     .custom<FileList>()
     .refine((files) => {
       return Array.from(files ?? []).length !== 0;
@@ -70,7 +69,7 @@ export default function PostCreate() {
     formState: { errors },
   } = useForm<PostsNew>({
     defaultValues: {
-      cover_photo_url: null,
+      cover_photo: null,
       title: "",
       content: "",
       status: undefined,
@@ -78,7 +77,7 @@ export default function PostCreate() {
     },
     resolver: zodResolver(PostCreateSchema),
   });
-  const watchCoverPhoto = watch("cover_photo_url");
+  const watchCoverPhoto = watch("cover_photo");
 
   /*================================
     BLOG POST STATUS
@@ -183,13 +182,8 @@ export default function PostCreate() {
         </DropdownSelect>
 
         {/* COVER PHOTO */}
-        <FormLabel htmlFor="cover_photo_url">Cover Photo</FormLabel>
-        <FormUpload
-          id="cover_photo_url"
-          register={register("cover_photo_url")}
-          accept={SUPPORTED_IMAGE_TYPES.join(",")}
-        />
-        <FormDescription modifierClass="my-1">
+        <FormLabel htmlFor="cover_photo">Cover Photo</FormLabel>
+        <FormDescription modifierClass="mb-4">
           <span className="text-xs">
             Supported file types include:{" "}
             {SUPPORTED_IMAGE_TYPES.join("").split("image/").join(" .")}
@@ -198,8 +192,15 @@ export default function PostCreate() {
             Maximum file size: 5MB.
           </span>
         </FormDescription>
-        <FormUploadPreview fileToPreview={watchCoverPhoto} />
-        <FormFieldErrorMessage error={errors.cover_photo_url} />
+        <FormUpload
+          id="cover_photo"
+          register={register("cover_photo")}
+          accept={SUPPORTED_IMAGE_TYPES.join(",")}
+          selectedFile={watchCoverPhoto?.[0] as any}
+          hasPreview
+          handleClearSelection={() => setValue("cover_photo", null)}
+        />
+        <FormFieldErrorMessage error={errors.cover_photo} />
 
         <textarea
           {...register("content")}
