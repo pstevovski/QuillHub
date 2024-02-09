@@ -13,7 +13,7 @@ export const postsSchema = mysqlTable("posts", {
   likes: int("likes").notNull().default(0),
   views: int("views").notNull().default(0),
   content: text("content").notNull(),
-  cover_photo: varchar("cover_photo_url", { length: 512 }),
+  cover_photo: varchar("cover_photo", { length: 512 }),
   status: mysqlEnum("status", ["draft", "published", "archived"])
     .default("draft")
     .notNull(),

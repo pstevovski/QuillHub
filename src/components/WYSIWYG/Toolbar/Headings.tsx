@@ -52,7 +52,7 @@ export default function ToolbarHeadings({ editor }: TipTapComponentProps) {
         defaultValue="paragraph"
         value={selectedValue}
       >
-        <SelectTrigger className="max-w-[200px] [&>span>span]:text-lg [&>span>span]:text-slate-500 outline-none focus:ring-0 focus:ring-transparent">
+        <SelectTrigger className="max-w-[200px] [&>span>span]:text-md [&>span>span]:text-slate-500 outline-none focus:ring-0 focus:ring-transparent">
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
