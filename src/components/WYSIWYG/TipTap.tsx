@@ -10,6 +10,7 @@ import Placeholder from "@tiptap/extension-placeholder";
 import Underline from "@tiptap/extension-underline";
 import TextAlign from "@tiptap/extension-text-align";
 import Typography from "@tiptap/extension-typography";
+import LinkExtension from "@tiptap/extension-link";
 
 // interface TipTapEditorProps {
 //   content: string;
@@ -72,6 +73,11 @@ const Tiptap = ({
         types: ["heading", "paragraph"],
       }),
       Typography.configure(),
+      LinkExtension.configure({
+        HTMLAttributes: {
+          class: "text-sky-500 underline",
+        },
+      }),
     ],
     content,
     editorProps: {
