@@ -5,14 +5,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/ui/select";
-import { Editor } from "@tiptap/react";
 import { useEffect, useState } from "react";
+import { TipTapComponentProps } from "../TipTapToolbar";
 
 type Levels = 1 | 2 | 3 | 4 | 5 | 6;
 type Headings = `heading-${Levels}`;
 type TextType = Headings | "paragraph";
 
-export default function ToolbarHeadings({ editor }: { editor: Editor | null }) {
+export default function ToolbarHeadings({ editor }: TipTapComponentProps) {
   if (!editor) return null;
 
   const [selectedValue, setSelectedValue] = useState<TextType>("paragraph");

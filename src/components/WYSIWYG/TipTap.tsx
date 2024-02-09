@@ -79,6 +79,9 @@ const Tiptap = ({
       attributes: {
         class: "rounded-md border border-slate-200 text-slate-600 p-3",
       },
+      handleKeyDown: (view, event) => {
+        console.log("VIEW & EVENT", { view, event });
+      },
     },
     onUpdate({ editor }) {
       onChange(editor.getHTML());

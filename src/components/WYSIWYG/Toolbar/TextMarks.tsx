@@ -1,8 +1,8 @@
 import { Toggle } from "@/ui/toggle";
-import { Editor } from "@tiptap/react";
 import { Bold, Italic, Strikethrough, Underline } from "lucide-react";
+import { TipTapComponentProps } from "../TipTapToolbar";
 
-export default function TextMarks({ editor }: { editor: Editor | null }) {
+export default function TextMarks({ editor }: TipTapComponentProps) {
   if (!editor) return null;
 
   return (

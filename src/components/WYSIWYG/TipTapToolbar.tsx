@@ -21,11 +21,11 @@ import ToolbarHeadings from "./Toolbar/Headings";
 import TextMarks from "./Toolbar/TextMarks";
 import { Separator } from "@/ui/separator";
 
-interface TipTapToolbarProps {
+export interface TipTapComponentProps {
   editor: Editor | null;
 }
 
-export default function TipTapToolbar({ editor }: TipTapToolbarProps) {
+export default function TipTapToolbar({ editor }: TipTapComponentProps) {
   // Do not render anything if the editor instance is not available yet
   if (!editor) return null;
 
