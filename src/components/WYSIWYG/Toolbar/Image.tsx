@@ -25,6 +25,8 @@ import {
   FormMessage,
 } from "@/ui/form";
 import { Input } from "@/ui/input";
+import { toast } from "sonner";
+import handleErrorMessage from "@/utils/handleErrorMessage";
 
 const ImageFormSchema = z.object({
   url: z
@@ -52,11 +54,22 @@ export default function Image({ editor }: TipTapComponentProps) {
   });
 
   const handleAttachImage = (image: ImageUpload) => {
-    // todo: implement functionality
-    // should upload the image to the server (uploadthing)
-    // that will generate a URL that will be returned back
-    // will be included as part of the image that is added to the editor
+    // todo: implement functionality to connect with
+    // UploadThing by making use of the `useUploadThing` hook
+    // Docs: https://docs.uploadthing.com/api-reference/react#useuploadthing
     console.log("image upload", image);
+    try {
+      editor.commands.setImage({
+        src: image.url,
+        title: image.title,
+        alt: image.alt,
+      });
+
+      // Close the dialog box
+      setIsMenuOpen(false);
+    } catch (error) {
+      toast.error(handleErrorMessage(error));
+    }
   };
 
   return (

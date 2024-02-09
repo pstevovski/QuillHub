@@ -81,7 +81,7 @@ const Tiptap = ({
       }),
       ImageExtension.configure({
         HTMLAttributes: {
-          class: "max-w-[450px] max-h-[450px] w-full h-full",
+          class: "my-8",
         },
       }),
     ],
