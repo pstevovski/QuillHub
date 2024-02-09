@@ -9,6 +9,7 @@ import TextAlignment from "./Toolbar/TextAlignment";
 import Lists from "./Toolbar/Lists";
 import GeneralPurpose from "./Toolbar/GeneralPurpose";
 import History from "./Toolbar/History";
+import Link from "./Toolbar/Link";
 
 export interface TipTapComponentProps {
   editor: Editor | null;
@@ -21,6 +22,8 @@ export default function TipTapToolbar({ editor }: TipTapComponentProps) {
   return (
     <div className="flex flex-wrap items-center gap-1 p-2 border rounded-md border-input bg-transparent my-2">
       <ToolbarHeadings editor={editor} />
+      <History editor={editor} />
+      <Separator orientation="vertical" className="h-[24px] mx-2" />
       <TextMarks editor={editor} />
       <Separator orientation="vertical" className="h-[24px] mx-2" />
       <TextAlignment editor={editor} />
@@ -29,9 +32,8 @@ export default function TipTapToolbar({ editor }: TipTapComponentProps) {
       <Separator orientation="vertical" className="h-[24px] mx-2" />
       <GeneralPurpose editor={editor} />
       <Separator orientation="vertical" className="h-[24px] mx-2" />
-      <History editor={editor} />
+      <Link editor={editor} />
 
-      {/* TODO: Add Link extension together with custom dialog box for handling the URL and target*/}
       {/* TODO: Add Color extension together with custom trigger for color input selection */}
       {/* TODO: 
           Add Image extension together with custom functionality for handling image upload / drop from outside
