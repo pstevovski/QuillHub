@@ -4,22 +4,12 @@ import { type Editor } from "@tiptap/react";
 
 // Assets
 import {
-  Heading1,
-  Heading2,
-  Heading3,
-  Heading4,
-  Heading5,
-  Heading6,
-  Bold,
   List,
   ListOrdered,
   Quote,
   Undo2,
   Redo2,
-  Italic,
-  Strikethrough,
   SeparatorHorizontal,
-  Underline,
   AlignLeft,
   AlignCenter,
   AlignRight,
@@ -27,6 +17,9 @@ import {
   Code as CodeInline,
   Code2 as CodeBlock,
 } from "lucide-react";
+import ToolbarHeadings from "./Toolbar/Headings";
+import TextMarks from "./Toolbar/TextMarks";
+import { Separator } from "@/ui/separator";
 
 interface TipTapToolbarProps {
   editor: Editor | null;
@@ -38,69 +31,11 @@ export default function TipTapToolbar({ editor }: TipTapToolbarProps) {
 
   return (
     <div className="border rounded-md border-input bg-transparent">
-      <Toggle
-        size="lg"
-        pressed={editor.isActive("heading", { level: 1 })}
-        onPressedChange={() => {
-          editor.chain().focus().toggleHeading({ level: 1 }).run();
-        }}
-      >
-        <Heading1 />
-      </Toggle>
-      <Toggle
-        size="lg"
-        pressed={editor.isActive("heading", { level: 2 })}
-        onPressedChange={() => {
-          editor.chain().focus().toggleHeading({ level: 2 }).run();
-        }}
-      >
-        <Heading2 />
-      </Toggle>
-      <Toggle
-        size="lg"
-        pressed={editor.isActive("heading", { level: 3 })}
-        onPressedChange={() => {
-          editor.chain().focus().toggleHeading({ level: 3 }).run();
-        }}
-      >
-        <Heading3 />
-      </Toggle>
-      <Toggle
-        size="lg"
-        pressed={editor.isActive("heading", { level: 4 })}
-        onPressedChange={() => {
-          editor.chain().focus().toggleHeading({ level: 4 }).run();
-        }}
-      >
-        <Heading4 />
-      </Toggle>
-      <Toggle
-        size="lg"
-        pressed={editor.isActive("heading", { level: 5 })}
-        onPressedChange={() => {
-          editor.chain().focus().toggleHeading({ level: 5 }).run();
-        }}
-      >
-        <Heading5 />
-      </Toggle>
-      <Toggle
-        size="lg"
-        pressed={editor.isActive("heading", { level: 6 })}
-        onPressedChange={() => {
-          editor.chain().focus().toggleHeading({ level: 6 }).run();
-        }}
-      >
-        <Heading6 />
-      </Toggle>
-      <Toggle
-        size="lg"
-        pressed={editor.isActive("bold")}
-        onPressedChange={() => {
-          editor.chain().focus().toggleBold().run();
-        }}
-      >
-        <Bold />
-      </Toggle>
+      <div className="flex items-center gap-1">
+        <ToolbarHeadings editor={editor} />
+        <TextMarks editor={editor} />
+        <Separator orientation="vertical" className="h-[24px]" />
+      </div>
 
       <Toggle
         size="lg"
@@ -147,25 +82,7 @@ export default function TipTapToolbar({ editor }: TipTapToolbarProps) {
       >
         <Redo2 />
       </Toggle>
-      <Toggle
-        size="lg"
-        pressed={editor.isActive("italic")}
-        onPressedChange={() => {
-          editor.chain().focus().toggleItalic().run();
-        }}
-      >
-        <Italic />
-      </Toggle>
 
-      <Toggle
-        size="lg"
-        pressed={editor.isActive("strike")}
-        onPressedChange={() => {
-          editor.chain().focus().toggleStrike().run();
-        }}
-      >
-        <Strikethrough />
-      </Toggle>
       <Toggle
         size="lg"
         pressed={editor.isActive("horizontalRule")}
@@ -174,15 +91,6 @@ export default function TipTapToolbar({ editor }: TipTapToolbarProps) {
         }}
       >
         <SeparatorHorizontal />
-      </Toggle>
-      <Toggle
-        size="lg"
-        pressed={editor.isActive("underline")}
-        onPressedChange={() => {
-          editor.chain().focus().toggleUnderline().run();
-        }}
-      >
-        <Underline />
       </Toggle>
 
       <Toggle
