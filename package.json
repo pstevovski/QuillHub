@@ -23,6 +23,7 @@
     "@radix-ui/react-toggle": "^1.0.3",
     "@radix-ui/react-tooltip": "^1.0.7",
     "@tiptap/extension-character-count": "^2.2.2",
+    "@tiptap/extension-image": "^2.2.2",
     "@tiptap/extension-link": "^2.2.2",
     "@tiptap/extension-placeholder": "^2.2.2",
     "@tiptap/extension-text-align": "^2.2.2",
