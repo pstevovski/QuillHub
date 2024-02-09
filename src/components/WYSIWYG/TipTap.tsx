@@ -11,6 +11,7 @@ import Underline from "@tiptap/extension-underline";
 import TextAlign from "@tiptap/extension-text-align";
 import Typography from "@tiptap/extension-typography";
 import LinkExtension from "@tiptap/extension-link";
+import ImageExtension from "@tiptap/extension-image";
 
 // interface TipTapEditorProps {
 //   content: string;
@@ -76,6 +77,11 @@ const Tiptap = ({
       LinkExtension.configure({
         HTMLAttributes: {
           class: "text-sky-500 underline",
+        },
+      }),
+      ImageExtension.configure({
+        HTMLAttributes: {
+          class: "max-w-[450px] max-h-[450px] w-full h-full",
         },
       }),
     ],

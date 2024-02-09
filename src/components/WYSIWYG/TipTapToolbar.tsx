@@ -10,6 +10,7 @@ import Lists from "./Toolbar/Lists";
 import GeneralPurpose from "./Toolbar/GeneralPurpose";
 import History from "./Toolbar/History";
 import Link from "./Toolbar/Link";
+import Image from "./Toolbar/Image";
 
 export interface TipTapComponentProps {
   editor: Editor | null;
@@ -33,6 +34,7 @@ export default function TipTapToolbar({ editor }: TipTapComponentProps) {
       <GeneralPurpose editor={editor} />
       <Separator orientation="vertical" className="h-[24px] mx-2" />
       <Link editor={editor} />
+      <Image editor={editor} />
 
       {/* TODO: Add Color extension together with custom trigger for color input selection */}
       {/* TODO: 
