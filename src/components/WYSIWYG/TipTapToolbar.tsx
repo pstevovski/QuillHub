@@ -10,16 +10,13 @@ import {
   Undo2,
   Redo2,
   SeparatorHorizontal,
-  AlignLeft,
-  AlignCenter,
-  AlignRight,
-  AlignJustify,
   Code as CodeInline,
   Code2 as CodeBlock,
 } from "lucide-react";
 import ToolbarHeadings from "./Toolbar/Headings";
 import TextMarks from "./Toolbar/TextMarks";
 import { Separator } from "@/ui/separator";
+import TextAlignment from "./Toolbar/TextAlignment";
 
 export interface TipTapComponentProps {
   editor: Editor | null;
@@ -34,7 +31,9 @@ export default function TipTapToolbar({ editor }: TipTapComponentProps) {
       <div className="flex items-center gap-1">
         <ToolbarHeadings editor={editor} />
         <TextMarks editor={editor} />
-        <Separator orientation="vertical" className="h-[24px]" />
+        <Separator orientation="vertical" className="h-[24px] mx-2" />
+        <TextAlignment editor={editor} />
+        <Separator orientation="vertical" className="h-[24px] mx-2" />
       </div>
 
       <Toggle
@@ -111,44 +110,6 @@ export default function TipTapToolbar({ editor }: TipTapComponentProps) {
         }}
       >
         <CodeBlock />
-      </Toggle>
-
-      {/* TODO: Convert this to dropdown menu */}
-      <Toggle
-        size="lg"
-        pressed={editor.isActive({ textAlign: "left" })}
-        onPressedChange={() => {
-          editor.chain().focus().setTextAlign("left").run();
-        }}
-      >
-        <AlignLeft />
-      </Toggle>
-      <Toggle
-        size="lg"
-        pressed={editor.isActive({ textAlign: "center" })}
-        onPressedChange={() => {
-          editor.chain().focus().setTextAlign("center").run();
-        }}
-      >
-        <AlignCenter />
-      </Toggle>
-      <Toggle
-        size="lg"
-        pressed={editor.isActive({ textAlign: "right" })}
-        onPressedChange={() => {
-          editor.chain().focus().setTextAlign("right").run();
-        }}
-      >
-        <AlignRight />
-      </Toggle>
-      <Toggle
-        size="lg"
-        pressed={editor.isActive({ textAlign: "justify" })}
-        onPressedChange={() => {
-          editor.chain().focus().setTextAlign("justify").run();
-        }}
-      >
-        <AlignJustify />
       </Toggle>
 
       {/* TODO: Add Link extension together with custom dialog box for handling the URL and target*/}
