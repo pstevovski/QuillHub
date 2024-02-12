@@ -24,6 +24,7 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { FaArrowLeftLong as GoBackIcon } from "react-icons/fa6";
 import { z } from "zod";
 import Tiptap from "@/components/WYSIWYG/TipTap";
+import { UploadFileResponse } from "uploadthing/client";
 
 const PostCreateSchema = z.object({
   title: z
@@ -105,6 +106,18 @@ export default function PostCreate() {
 
     // Updates the value to be sent in the form
     setValue("topic_id", parseInt(selectedTopic.value as string));
+  };
+
+  /*===============================
+    ATTACHED CONTENT IMAGES
+  ================================*/
+  const [contentImages, setContentImages] = useState<
+    UploadFileResponse<unknown>[]
+  >([]);
+  const handleContentImages = (image: UploadFileResponse<unknown>) => {
+    const contentImagesCopy = [...contentImages];
+    contentImagesCopy.push(image);
+    setContentImages(contentImagesCopy);
   };
 
   const handlePostCreate: SubmitHandler<PostsNew> = async (values) => {
@@ -205,18 +218,14 @@ export default function PostCreate() {
         />
         <FormFieldErrorMessage error={errors.cover_photo} />
 
-        <Tiptap content="" onChange={(text) => setValue("content", text)} />
-
-        <textarea
-          {...register("content")}
-          placeholder="Blog Post Content..."
-          rows={12}
-          cols={12}
-          className="border rounded-md max-w-lg w-full p-4 my-4 text-slate-400 placeholder:text-slate-400 focus:outline-none"
-        ></textarea>
+        <Tiptap
+          defaultContent=""
+          handleEditorUpdate={(text) => setValue("content", text)}
+          handleAttachedImage={handleContentImages}
+        />
         <FormFieldErrorMessage error={errors.content} />
 
-        <Button type="submit" disabled={!isDirty}>
+        <Button type="submit" disabled={!isDirty} modifierClass="mt-10">
           Create Post
         </Button>
       </form>
