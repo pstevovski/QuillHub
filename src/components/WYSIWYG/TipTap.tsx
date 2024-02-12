@@ -1,8 +1,7 @@
 "use client";
 
-import { useEditor, EditorContent } from "@tiptap/react";
+import { useEditor, EditorContent, Editor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import TipTapToolbar from "./TipTapToolbar";
 
 // Extensions
 import CharacterCount from "@tiptap/extension-character-count";
@@ -12,20 +11,35 @@ import TextAlign from "@tiptap/extension-text-align";
 import Typography from "@tiptap/extension-typography";
 import LinkExtension from "@tiptap/extension-link";
 import ImageExtension from "@tiptap/extension-image";
+import ToolbarHeadings from "./Toolbar/Headings";
+import { Separator } from "@/ui/separator";
+import TextMarks from "./Toolbar/TextMarks";
+import TextAlignment from "./Toolbar/TextAlignment";
+import Lists from "./Toolbar/Lists";
+import GeneralPurpose from "./Toolbar/GeneralPurpose";
+import Link from "./Toolbar/Link";
+import Image from "./Toolbar/Image";
+import History from "./Toolbar/History";
+import { UploadFileResponse } from "uploadthing/client";
 
-// interface TipTapEditorProps {
-//   content: string;
-//   placeholder?: string;
-//   handleOnEditorUpdate: (richText: string) => void;
-// }
+interface TipTapEditorProps {
+  defaultContent: string | undefined;
+  placeholder?: string;
+  handleAttachedImage?: (uploadedImage: UploadFileResponse<unknown>) => void;
+  handleEditorUpdate: (richText: string) => void;
+}
+
+export interface TipTapExtensionComponentProps {
+  editor: Editor;
+  handleAttachedImage?: (uploadedImage: UploadFileResponse<unknown>) => void;
+}
 
 const Tiptap = ({
-  content,
-  onChange,
-}: {
-  content: string;
-  onChange: (richText: string) => void;
-}) => {
+  defaultContent,
+  placeholder = "Write your blog post...",
+  handleEditorUpdate,
+  handleAttachedImage,
+}: TipTapEditorProps) => {
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
@@ -67,7 +81,7 @@ const Tiptap = ({
       }),
       CharacterCount.configure(),
       Placeholder.configure({
-        placeholder: "Write your blog post...",
+        placeholder: placeholder,
       }),
       Underline.configure(),
       TextAlign.configure({
@@ -85,19 +99,15 @@ const Tiptap = ({
         },
       }),
     ],
-    content,
+    content: defaultContent,
     editorProps: {
       handleDrop: () => alert("yo you dropped something"),
       attributes: {
         class: "rounded-md border border-slate-200 text-slate-600 p-3",
       },
-      handleKeyDown: (view, event) => {
-        console.log("VIEW & EVENT", { view, event });
-      },
     },
     onUpdate({ editor }) {
-      onChange(editor.getHTML());
-      console.log("EDITOR UPDATE", editor.getHTML());
+      handleEditorUpdate(editor.getHTML());
     },
   });
 
@@ -105,7 +115,30 @@ const Tiptap = ({
 
   return (
     <div className="flex flex-col justify-stretch">
-      <TipTapToolbar editor={editor} />
+      <div className="flex flex-wrap items-center gap-1 p-2 border rounded-md border-input bg-transparent my-2">
+        <ToolbarHeadings editor={editor} />
+        <History editor={editor} />
+        <Separator orientation="vertical" className="h-[24px] mx-2" />
+        <TextMarks editor={editor} />
+        <Separator orientation="vertical" className="h-[24px] mx-2" />
+        <TextAlignment editor={editor} />
+        <Separator orientation="vertical" className="h-[24px] mx-2" />
+        <Lists editor={editor} />
+        <Separator orientation="vertical" className="h-[24px] mx-2" />
+        <GeneralPurpose editor={editor} />
+        <Separator orientation="vertical" className="h-[24px] mx-2" />
+        <Link editor={editor} />
+        <Image editor={editor} handleAttachedImage={handleAttachedImage} />
+
+        {/* TODO: Add Color extension together with custom trigger for color input selection */}
+        {/* TODO: 
+          Add Image extension together with custom functionality for handling image upload / drop from outside
+        - https://www.codemzy.com/blog/tiptap-drag-drop-image
+      */}
+        {/* TODO: Add Youtube extension (??) */}
+        {/* TODO: Add shortcuts info icon that will open a dialog (modal) listing all of the shortcuts available */}
+      </div>
+
       <EditorContent editor={editor} spellCheck={false} />
 
       <span className="text-sm text-slate-400 flex justify-end">
