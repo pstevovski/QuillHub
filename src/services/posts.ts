@@ -7,6 +7,7 @@ interface BlogNewPostPayload {
   title: string;
   status: "draft" | "published";
   content: string;
+  cover_photo: string;
   content_images: UploadFileResponse<unknown>[];
 }
 
@@ -14,12 +15,19 @@ class BlogPosts {
   /**
    * Create a new blog post
    */
-  async create({ title, content, status, content_images }: BlogNewPostPayload) {
+  async create({
+    title,
+    content,
+    status,
+    content_images,
+    cover_photo,
+  }: BlogNewPostPayload) {
     try {
       const newPost = await db.insert(postsSchema).values({
         title,
         status,
         content,
+        cover_photo,
         likes: 0,
         views: 0,
       });
