@@ -8,6 +8,13 @@
       "when": 1707750206729,
       "tag": "0000_blushing_piledriver",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1707751744894,
+      "tag": "0001_daily_forge",
+      "breakpoints": true
     }
   ]
 }
