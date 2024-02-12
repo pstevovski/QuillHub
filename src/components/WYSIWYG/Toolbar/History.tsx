@@ -1,10 +1,8 @@
 import { Toggle } from "@/ui/toggle";
-import { TipTapComponentProps } from "../TipTapToolbar";
 import { Undo2, Redo2 } from "lucide-react";
+import { TipTapExtensionComponentProps } from "../TipTap";
 
-export default function History({ editor }: TipTapComponentProps) {
-  if (!editor) return null;
-
+export default function History({ editor }: TipTapExtensionComponentProps) {
   return (
     <>
       <Toggle

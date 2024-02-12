@@ -1,5 +1,4 @@
 import { Toggle } from "@/ui/toggle";
-import { TipTapComponentProps } from "../TipTapToolbar";
 
 // Icons
 import { Link as LinkIcon } from "lucide-react";
@@ -29,6 +28,7 @@ import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { Checkbox } from "@/ui/checkbox";
+import { TipTapExtensionComponentProps } from "../TipTap";
 
 const LinkFormSchema = z.object({
   url: z
@@ -37,9 +37,7 @@ const LinkFormSchema = z.object({
   new_tab: z.boolean(),
 });
 
-export default function Link({ editor }: TipTapComponentProps) {
-  if (!editor) return null;
-
+export default function Link({ editor }: TipTapExtensionComponentProps) {
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
 
   const form = useForm<z.infer<typeof LinkFormSchema>>({

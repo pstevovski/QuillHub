@@ -1,10 +1,10 @@
 import { Toggle } from "@/ui/toggle";
-import { TipTapComponentProps } from "../TipTapToolbar";
 import { AlignLeft, AlignCenter, AlignRight, AlignJustify } from "lucide-react";
+import { TipTapExtensionComponentProps } from "../TipTap";
 
-export default function TextAlignment({ editor }: TipTapComponentProps) {
-  if (!editor) return null;
-
+export default function TextAlignment({
+  editor,
+}: TipTapExtensionComponentProps) {
   return (
     <>
       <Toggle

@@ -6,15 +6,15 @@ import {
   SelectValue,
 } from "@/ui/select";
 import { useEffect, useState } from "react";
-import { TipTapComponentProps } from "../TipTapToolbar";
+import { TipTapExtensionComponentProps } from "../TipTap";
 
 type Levels = 1 | 2 | 3 | 4 | 5 | 6;
 type Headings = `heading-${Levels}`;
 type TextType = Headings | "paragraph";
 
-export default function ToolbarHeadings({ editor }: TipTapComponentProps) {
-  if (!editor) return null;
-
+export default function ToolbarHeadings({
+  editor,
+}: TipTapExtensionComponentProps) {
   const [selectedValue, setSelectedValue] = useState<TextType>("paragraph");
   const handleSelectedValue = (value: TextType) => {
     // Split the received string based on "-", so we can

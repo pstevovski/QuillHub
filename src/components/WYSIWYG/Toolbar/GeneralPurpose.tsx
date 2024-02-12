@@ -1,15 +1,15 @@
 import { Toggle } from "@/ui/toggle";
-import { TipTapComponentProps } from "../TipTapToolbar";
 import {
   Code as CodeInline,
   Code2 as CodeBlock,
   Quote,
   SeparatorHorizontal,
 } from "lucide-react";
+import { TipTapExtensionComponentProps } from "../TipTap";
 
-export default function GeneralPurpose({ editor }: TipTapComponentProps) {
-  if (!editor) return null;
-
+export default function GeneralPurpose({
+  editor,
+}: TipTapExtensionComponentProps) {
   return (
     <>
       <Toggle

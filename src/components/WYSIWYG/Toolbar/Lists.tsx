@@ -1,10 +1,8 @@
 import { Toggle } from "@/ui/toggle";
-import { TipTapComponentProps } from "../TipTapToolbar";
 import { List, ListOrdered } from "lucide-react";
+import { TipTapExtensionComponentProps } from "../TipTap";
 
-export default function Lists({ editor }: TipTapComponentProps) {
-  if (!editor) return null;
-
+export default function Lists({ editor }: TipTapExtensionComponentProps) {
   return (
     <>
       <Toggle
