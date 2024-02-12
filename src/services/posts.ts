@@ -88,6 +88,7 @@ class BlogPosts {
       await db.delete(postsSchema).where(eq(postsSchema.id, blogPostID));
 
       // todo: add API endpoint for this
+      // todo: handle deleting of the cover photo too, will need to store its key somewhere
     } catch (error) {
       console.log(`Failed deleting blog post: ${handleErrorMessage(error)}`);
       throw new Error("Failed deleting blog post!");
