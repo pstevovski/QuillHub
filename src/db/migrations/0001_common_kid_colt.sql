@@ -1,1 +1,0 @@
-ALTER TABLE `posts` RENAME COLUMN `text` TO `content`;

@@ -1,10 +1,18 @@
+CREATE TABLE `posts_images` (
+	`id` bigint AUTO_INCREMENT NOT NULL,
+	`key` varchar(512) NOT NULL,
+	`url` varchar(512) NOT NULL,
+	`name` varchar(512) NOT NULL,
+	`post_id` bigint,
+	CONSTRAINT `posts_images_id` PRIMARY KEY(`id`)
+);
+--> statement-breakpoint
 CREATE TABLE `posts` (
-	`id` serial AUTO_INCREMENT NOT NULL,
+	`id` bigint AUTO_INCREMENT NOT NULL,
 	`title` varchar(255) NOT NULL,
 	`likes` int NOT NULL DEFAULT 0,
 	`views` int NOT NULL DEFAULT 0,
-	`text` text NOT NULL,
-	`cover_photo_url` varchar(512),
+	`content` text NOT NULL,
 	`status` enum('draft','published','archived') NOT NULL DEFAULT 'draft',
 	CONSTRAINT `posts_id` PRIMARY KEY(`id`)
 );
@@ -42,4 +50,5 @@ CREATE TABLE `users` (
 	CONSTRAINT `users_email_unique` UNIQUE(`email`)
 );
 --> statement-breakpoint
+ALTER TABLE `posts_images` ADD CONSTRAINT `posts_images_post_id_posts_id_fk` FOREIGN KEY (`post_id`) REFERENCES `posts`(`id`) ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE `users` ADD CONSTRAINT `users_role_id_roles_id_fk` FOREIGN KEY (`role_id`) REFERENCES `roles`(`id`) ON DELETE no action ON UPDATE no action;
