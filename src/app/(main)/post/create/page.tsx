@@ -6,15 +6,7 @@ import DropdownSelect from "@/components/Dropdown/Select/DropdownSelect";
 import { DropdownSelectClickedItem } from "@/components/Dropdown/Select/DropdownSelectItem";
 import FormFieldErrorMessage from "@/components/Form/FormFieldErrorMessage";
 import FormTextInput from "@/components/Form/FormTextInput";
-import FormUpload from "@/components/Form/FormUpload";
-import FormLabel from "@/components/Form/FormLabel";
-import FormDescription from "@/components/Form/FormDescription";
 import { PostsNew } from "@/db/schema/posts";
-import {
-  MAX_IMAGE_SIZE,
-  SUPPORTED_IMAGE_TYPES,
-  convertFileSize,
-} from "@/utils/convertFileSize";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { useState } from "react";
@@ -22,42 +14,14 @@ import { SubmitHandler, useForm } from "react-hook-form";
 
 // Assets
 import { FaArrowLeftLong as GoBackIcon } from "react-icons/fa6";
-import { z } from "zod";
 import Tiptap from "@/components/WYSIWYG/TipTap";
 import { UploadFileResponse } from "uploadthing/client";
-
-const PostCreateSchema = z.object({
-  title: z
-    .string({
-      required_error: "Please enter the title for the blog post",
-    })
-    .min(5, "Please enter a title that is at least 5 characters long"),
-  content: z
-    .string({
-      required_error: "Blog Post content is required",
-    })
-    .min(1, "Please enter the content of your blog post"),
-  status: z.enum(["draft", "published"], {
-    required_error: "Please select the status of the blog post",
-  }),
-  cover_photo: z
-    .custom<FileList>()
-    .refine((files) => {
-      return Array.from(files ?? []).length !== 0;
-    }, "Cover photo is required")
-    .refine((files) => {
-      return Array.from(files ?? []).every((file) => {
-        return SUPPORTED_IMAGE_TYPES.some(
-          (imageType) => imageType === file.type
-        );
-      });
-    }, "Selected file type is not supported")
-    .refine((files) => {
-      return Array.from(files ?? []).every((file) => {
-        return convertFileSize(file.size) <= MAX_IMAGE_SIZE;
-      });
-    }, `Maximum cover photo image size is ${MAX_IMAGE_SIZE}MB`),
-});
+import { toast } from "sonner";
+import handleErrorMessage from "@/utils/handleErrorMessage";
+import fetchHandler from "@/utils/fetchHandler";
+import { BlogNewPostSchema } from "@/zod/blog-posts";
+import { UploadButton } from "@/components/UploadThing";
+import { Label } from "@/ui/label";
 
 export default function PostCreate() {
   const {
@@ -68,14 +32,16 @@ export default function PostCreate() {
     formState: { errors, isDirty },
   } = useForm<PostsNew>({
     defaultValues: {
-      cover_photo: null,
       title: "",
       content: "",
       status: undefined,
+      cover_photo: undefined,
     },
-    resolver: zodResolver(PostCreateSchema),
+    resolver: zodResolver(BlogNewPostSchema),
   });
   const watchCoverPhoto = watch("cover_photo");
+  const [isUploadingCoverPhoto, setIsUploadingCoverPhoto] =
+    useState<boolean>(false);
 
   /*================================
     BLOG POST STATUS
@@ -117,7 +83,16 @@ export default function PostCreate() {
   };
 
   const handlePostCreate: SubmitHandler<PostsNew> = async (values) => {
-    console.log("creating blog post...", values);
+    try {
+      const { message } = await fetchHandler("POST", "blog/new", {
+        ...values,
+        content_images: contentImages,
+      });
+
+      toast.success(message);
+    } catch (error) {
+      toast.error(handleErrorMessage(error));
+    }
   };
 
   return (
@@ -139,6 +114,36 @@ export default function PostCreate() {
       </p>
 
       <form onSubmit={handleSubmit(handlePostCreate)}>
+        <div className="flex flex-col items-start mb-6">
+          <Label className="text-sm text-slate-400">Cover Photo</Label>
+          <p className="text-xs text-slate-400 mb-4">
+            Upload a cover photo for your blog post
+          </p>
+          <UploadButton
+            endpoint="blogPostCoverPhoto"
+            onUploadBegin={() => setIsUploadingCoverPhoto(true)}
+            onClientUploadComplete={(response) => {
+              setValue("cover_photo", response[0].url);
+              setIsUploadingCoverPhoto(false);
+            }}
+            onUploadError={() => {
+              toast.error("Failed uploading cover photo. Please try again!");
+              setIsUploadingCoverPhoto(false);
+            }}
+            appearance={{
+              button: ({ isUploading }) =>
+                `bg-teal-400 hover:bg-teal-500 duration-300 ${
+                  isUploading ? "bg-slate-200 cursor-not-allowed" : ""
+                }`,
+              allowedContent: "w-full text-slate-400 font-medium",
+            }}
+          />
+          {watchCoverPhoto ? (
+            <img width="300" height="300" src={watchCoverPhoto} />
+          ) : null}
+          <FormFieldErrorMessage error={errors.cover_photo} />
+        </div>
+
         <FormTextInput
           label="Title"
           register={register("title")}
@@ -193,27 +198,6 @@ export default function PostCreate() {
           <FormFieldErrorMessage error={errors.topic_id} />
         </DropdownSelect> */}
 
-        {/* COVER PHOTO */}
-        <FormLabel htmlFor="cover_photo">Cover Photo</FormLabel>
-        <FormDescription modifierClass="mb-4">
-          <span className="text-xs">
-            Supported file types include:{" "}
-            {SUPPORTED_IMAGE_TYPES.join("").split("image/").join(" .")}
-          </span>
-          <span className="block text-red-400 text-xs font-medium">
-            Maximum file size: 5MB.
-          </span>
-        </FormDescription>
-        <FormUpload
-          id="cover_photo"
-          register={register("cover_photo")}
-          accept={SUPPORTED_IMAGE_TYPES.join(",")}
-          selectedFile={watchCoverPhoto?.[0] as any}
-          hasPreview
-          handleClearSelection={() => setValue("cover_photo", null)}
-        />
-        <FormFieldErrorMessage error={errors.cover_photo} />
-
         <Tiptap
           defaultContent=""
           handleEditorUpdate={(text) => setValue("content", text)}
@@ -221,7 +205,11 @@ export default function PostCreate() {
         />
         <FormFieldErrorMessage error={errors.content} />
 
-        <Button type="submit" disabled={!isDirty} modifierClass="mt-10">
+        <Button
+          type="submit"
+          disabled={!isDirty || isUploadingCoverPhoto}
+          modifierClass="mt-10"
+        >
           Create Post
         </Button>
       </form>
