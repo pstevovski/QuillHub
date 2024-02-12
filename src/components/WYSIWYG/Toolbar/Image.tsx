@@ -1,5 +1,4 @@
 import { Image as ImageIcon } from "lucide-react";
-import { TipTapComponentProps } from "../TipTapToolbar";
 import { Toggle } from "@/ui/toggle";
 import { useState } from "react";
 import {
@@ -27,6 +26,9 @@ import {
 import { Input } from "@/ui/input";
 import { toast } from "sonner";
 import handleErrorMessage from "@/utils/handleErrorMessage";
+import { UploadButton } from "@/components/UploadThing";
+import { TipTapExtensionComponentProps } from "../TipTap";
+import { UploadFileResponse } from "uploadthing/client";
 
 const ImageFormSchema = z.object({
   url: z
@@ -39,10 +41,15 @@ const ImageFormSchema = z.object({
 });
 type ImageUpload = z.infer<typeof ImageFormSchema>;
 
-export default function Image({ editor }: TipTapComponentProps) {
-  if (!editor) return null;
-
+export default function Image({
+  editor,
+  handleAttachedImage,
+}: TipTapExtensionComponentProps) {
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
+
+  const [isUploadingImage, setIsUploadingImage] = useState<boolean>(false);
+  const [uploadedImage, setUploadedImage] =
+    useState<UploadFileResponse<unknown> | null>(null);
 
   const form = useForm<ImageUpload>({
     resolver: zodResolver(ImageFormSchema),
@@ -53,17 +60,24 @@ export default function Image({ editor }: TipTapComponentProps) {
     },
   });
 
-  const handleAttachImage = (image: ImageUpload) => {
-    // todo: implement functionality to connect with
-    // UploadThing by making use of the `useUploadThing` hook
-    // Docs: https://docs.uploadthing.com/api-reference/react#useuploadthing
-    console.log("image upload", image);
+  const handleAttachImageCancel = () => {
+    setIsMenuOpen(false);
+
+    // todo: trigger API call to delete the image that was just uploaded
+    // if (uploadedImage) {}
+  };
+
+  const handleAttachImage = (image: any) => {
     try {
       editor.commands.setImage({
         src: image.url,
         title: image.title,
         alt: image.alt,
       });
+
+      // Update form where the editor is being used to
+      // include the attached files in the payload
+      if (uploadedImage && handleAttachedImage) handleAttachedImage(image);
 
       // Close the dialog box
       setIsMenuOpen(false);
@@ -82,8 +96,6 @@ export default function Image({ editor }: TipTapComponentProps) {
             </AlertDialogTitle>
             <AlertDialogDescription className="text-sm">
               Select the image that you'd like to be part of your blog post.{" "}
-              <br />
-              You can also drag and drop an image directly in the text editor.
             </AlertDialogDescription>
           </AlertDialogHeader>
 
@@ -94,6 +106,35 @@ export default function Image({ editor }: TipTapComponentProps) {
                 form.handleSubmit(handleAttachImage)(event);
               }}
             >
+              <div className="flex justify-start">
+                <UploadButton
+                  endpoint="blogPostAttchedImage"
+                  onUploadBegin={() => setIsUploadingImage(true)}
+                  onClientUploadComplete={(response) => {
+                    setUploadedImage(response[0]);
+                    setIsUploadingImage(false);
+                    form.setValue("url", response[0].url);
+                  }}
+                  onUploadError={() => {
+                    toast.error(
+                      "Failed uploading selected image. Please try again!"
+                    );
+                    setIsUploadingImage(false);
+                  }}
+                  appearance={{
+                    button: ({ isUploading }) =>
+                      `bg-teal-400 hover:bg-teal-500 duration-300 ${
+                        isUploading ? "bg-slate-200 cursor-not-allowed" : ""
+                      }`,
+                    allowedContent: "w-full text-slate-400 font-medium",
+                  }}
+                />
+              </div>
+
+              <h5 className="text-slate-400 my-4 text-sm">
+                Or provide a direct URL to the image:
+              </h5>
+
               <FormField
                 control={form.control}
                 name="url"
@@ -150,7 +191,7 @@ export default function Image({ editor }: TipTapComponentProps) {
                       />
                     </FormControl>
                     <FormDescription className="text-slate-400 text-xs">
-                      This is optional
+                      Alternative text that will be used as a fallback
                     </FormDescription>
                     <FormMessage className="text-xs" />
                   </FormItem>
@@ -160,13 +201,14 @@ export default function Image({ editor }: TipTapComponentProps) {
               <AlertDialogFooter>
                 <AlertDialogCancel
                   type="button"
-                  onClick={() => setIsMenuOpen(false)}
+                  onClick={handleAttachImageCancel}
                 >
                   Cancel
                 </AlertDialogCancel>
                 <AlertDialogAction
                   type="submit"
-                  className="bg-teal-400 hover:bg-teal-500"
+                  disabled={!form.formState.isDirty || isUploadingImage}
+                  className={`bg-teal-400 hover:bg-teal-500 disabled:bg-slate-400 disabled:cursor-not-allowed`}
                 >
                   Attach Image
                 </AlertDialogAction>
