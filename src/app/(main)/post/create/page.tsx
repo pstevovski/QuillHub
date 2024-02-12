@@ -57,9 +57,6 @@ const PostCreateSchema = z.object({
         return convertFileSize(file.size) <= MAX_IMAGE_SIZE;
       });
     }, `Maximum cover photo image size is ${MAX_IMAGE_SIZE}MB`),
-  topic_id: z.number({
-    required_error: "Please select a topic for the blog post",
-  }),
 });
 
 export default function PostCreate() {
@@ -75,7 +72,6 @@ export default function PostCreate() {
       title: "",
       content: "",
       status: undefined,
-      topic_id: undefined,
     },
     resolver: zodResolver(PostCreateSchema),
   });
@@ -95,18 +91,18 @@ export default function PostCreate() {
   };
 
   /*================================
-    BLOG POST TOPIC
+    BLOG POST TOPICS
 
-    Note: Currently using fake data.
+    To be implemented
   =================================*/
-  const [topic, setTopic] = useState<DropdownSelectClickedItem[]>([]);
-  const handleTopicSelection = (selectedTopic: DropdownSelectClickedItem) => {
-    // Updates the inner selection state of the dropdown component
-    setTopic([selectedTopic]);
+  // const [topic, setTopic] = useState<DropdownSelectClickedItem[]>([]);
+  // const handleTopicSelection = (selectedTopic: DropdownSelectClickedItem) => {
+  //   // Updates the inner selection state of the dropdown component
+  //   setTopic([selectedTopic]);
 
-    // Updates the value to be sent in the form
-    setValue("topic_id", parseInt(selectedTopic.value as string));
-  };
+  //   // Updates the value to be sent in the form
+  //   setValue("topic_id", parseInt(selectedTopic.value as string));
+  // };
 
   /*===============================
     ATTACHED CONTENT IMAGES
@@ -175,7 +171,7 @@ export default function PostCreate() {
         </DropdownSelect>
 
         {/* TOPIC */}
-        <DropdownSelect
+        {/* <DropdownSelect
           selection={topic}
           handleSelection={handleTopicSelection}
           modifierClass="mb-6"
@@ -195,7 +191,7 @@ export default function PostCreate() {
             <DropdownSelect.Item value="5">Topic #5</DropdownSelect.Item>
           </DropdownSelect.Body>
           <FormFieldErrorMessage error={errors.topic_id} />
-        </DropdownSelect>
+        </DropdownSelect> */}
 
         {/* COVER PHOTO */}
         <FormLabel htmlFor="cover_photo">Cover Photo</FormLabel>
