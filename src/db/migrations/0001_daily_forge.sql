@@ -1,1 +1,0 @@
-ALTER TABLE `posts` ADD `cover_photo` varchar(512) NOT NULL;

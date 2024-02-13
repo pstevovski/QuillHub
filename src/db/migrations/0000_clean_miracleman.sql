@@ -1,19 +1,19 @@
 CREATE TABLE `posts_images` (
 	`id` bigint AUTO_INCREMENT NOT NULL,
-	`key` varchar(512) NOT NULL,
-	`url` varchar(512) NOT NULL,
-	`name` varchar(512) NOT NULL,
 	`post_id` bigint,
+	`key` varchar(512) NOT NULL,
 	CONSTRAINT `posts_images_id` PRIMARY KEY(`id`)
 );
 --> statement-breakpoint
 CREATE TABLE `posts` (
 	`id` bigint AUTO_INCREMENT NOT NULL,
 	`title` varchar(255) NOT NULL,
-	`likes` int NOT NULL DEFAULT 0,
-	`views` int NOT NULL DEFAULT 0,
 	`content` text NOT NULL,
 	`status` enum('draft','published','archived') NOT NULL DEFAULT 'draft',
+	`cover_photo` varchar(512) NOT NULL,
+	`likes` int NOT NULL DEFAULT 0,
+	`views` int NOT NULL DEFAULT 0,
+	`created_at` timestamp(6) DEFAULT (now()),
 	CONSTRAINT `posts_id` PRIMARY KEY(`id`)
 );
 --> statement-breakpoint
