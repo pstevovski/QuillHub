@@ -3,11 +3,10 @@ import handleErrorMessage from "@/utils/handleErrorMessage";
 import { BlogNewPostSchema } from "@/zod/blog-posts";
 import { NextResponse } from "next/server";
 
-
 /**
- * 
+ *
  * Create a new blog post
- * 
+ *
  */
 export async function POST(request: Request) {
   try {
