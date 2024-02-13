@@ -164,20 +164,14 @@ class BlogPosts {
         // Extract the unique file keys for each of the uploaded images
         const fileKeys = attachedImages.map((image) => image.key);
 
-        fetch("https://uploadthing.com/api/deleteFile", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "X-Uploadthing-Api-Key": process.env.UPLOADTHING_SECRET || "",
-          },
-          body: JSON.stringify({ fileKeys }),
-        });
-
         // Remove the uploaded image URLs (including the cover photo)
         // associated with the blog post from the database
         await db
           .delete(postsImagesSchema)
           .where(eq(postsImagesSchema.post_id, blogPostID));
+
+        // Delete images from Uploadthing servers after deleting them from database
+        await this.deleteImagesFromUploadthing(fileKeys);
       }
 
       // Remove the blog post from the database
