@@ -84,7 +84,7 @@ export default function PostCreate() {
 
   const handlePostCreate: SubmitHandler<PostsNew> = async (values) => {
     try {
-      const { message } = await fetchHandler("POST", "blog/new", {
+      const { message } = await fetchHandler("POST", "blog", {
         ...values,
         content_images: contentImages,
       });

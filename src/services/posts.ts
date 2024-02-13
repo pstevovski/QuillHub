@@ -71,7 +71,7 @@ class BlogPosts {
 
       // If there are any attached images, remove them from UploadThing's servers
       if (attachedImages.length > 0) {
-        // Extract the file keys
+        // Extract the unique file keys for each of the uploaded images
         const fileKeys = attachedImages.map((image) => image.key);
 
         fetch("https://uploadthing.com/api/deleteFile", {
