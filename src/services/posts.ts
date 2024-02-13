@@ -82,13 +82,16 @@ class BlogPosts {
           },
           body: JSON.stringify({ fileKeys }),
         });
+
+        // Remove the uploaded image URLs (including the cover photo)
+        // associated with the blog post from the database
+        await db
+          .delete(postsImagesSchema)
+          .where(eq(postsImagesSchema.post_id, blogPostID));
       }
 
-      // Remove blog post from the database
+      // Remove the blog post from the database
       await db.delete(postsSchema).where(eq(postsSchema.id, blogPostID));
-
-      // todo: add API endpoint for this
-      // todo: handle deleting of the cover photo too, will need to store its key somewhere
     } catch (error) {
       console.log(`Failed deleting blog post: ${handleErrorMessage(error)}`);
       throw new Error("Failed deleting blog post!");
