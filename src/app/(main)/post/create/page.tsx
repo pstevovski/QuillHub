@@ -70,36 +70,34 @@ export default function PostCreate() {
   //   setValue("topic_id", parseInt(selectedTopic.value as string));
   // };
 
-  /*===============================
-    ATTACHED CONTENT IMAGES
-  ================================*/
-  const [contentImages, setContentImages] = useState<
-    UploadFileResponse<unknown>[]
-  >([]);
-  const handleContentImages = (image: UploadFileResponse<unknown>) => {
-    const contentImagesCopy = [...contentImages];
-    contentImagesCopy.push(image);
-    setContentImages(contentImagesCopy);
-  };
-
   /*================================
     COVER PHOTO
   ==================================*/
   const handleUploadCoverPhoto = (response: UploadFileResponse<unknown>[]) => {
     setValue("cover_photo", response[0].url);
     setIsUploadingCoverPhoto(false);
-
-    // Add the cover photo to the list of attached images
-    const contentImagesCopy = [...contentImages];
-    contentImagesCopy.push(response[0]);
-    setContentImages(contentImagesCopy);
+    handleUploadedImagesKeys(response[0].key);
   };
 
+  /*===============================
+    ATTACHED CONTENT IMAGES
+  ================================*/
+  const [uploadedImagesKeys, setUploadedImagesKeys] = useState<string[]>([]);
+
+  const handleUploadedImagesKeys = (imageKey: string) => {
+    const contentImagesCopy = [...uploadedImagesKeys];
+    contentImagesCopy.push(imageKey);
+    setUploadedImagesKeys(contentImagesCopy);
+  };
+
+  /*===============================
+    SEND API REQUEST
+  ================================*/
   const handlePostCreate: SubmitHandler<PostsNew> = async (values) => {
     try {
       const { message } = await fetchHandler("POST", "blog", {
         ...values,
-        content_images: contentImages,
+        content_images: uploadedImagesKeys,
       });
 
       toast.success(message);
@@ -211,7 +209,7 @@ export default function PostCreate() {
         <Tiptap
           defaultContent=""
           handleEditorUpdate={(text) => setValue("content", text)}
-          handleAttachedImage={handleContentImages}
+          handleUploadedImageKey={handleUploadedImagesKeys}
         />
         <FormFieldErrorMessage error={errors.content} />
 
