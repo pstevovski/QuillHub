@@ -43,7 +43,7 @@ type ImageUpload = z.infer<typeof ImageFormSchema>;
 
 export default function Image({
   editor,
-  handleAttachedImage,
+  handleUploadedImageKey,
 }: TipTapExtensionComponentProps) {
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
 
@@ -77,8 +77,8 @@ export default function Image({
 
       // Update form where the editor is being used to
       // include the attached files in the payload
-      if (uploadedImage && handleAttachedImage) {
-        handleAttachedImage(uploadedImage.key);
+      if (uploadedImage && handleUploadedImageKey) {
+        handleUploadedImageKey(uploadedImage.key);
       }
 
       // Close the dialog box

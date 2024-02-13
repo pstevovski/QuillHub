@@ -24,20 +24,20 @@ import History from "./Toolbar/History";
 interface TipTapEditorProps {
   defaultContent: string | undefined;
   placeholder?: string;
-  handleAttachedImage?: (uploadedImageKey: string) => void;
+  handleUploadedImageKey?: (uploadedImageKey: string) => void;
   handleEditorUpdate: (richText: string) => void;
 }
 
 export interface TipTapExtensionComponentProps {
   editor: Editor;
-  handleAttachedImage?: (uploadedImageKey: string) => void;
+  handleUploadedImageKey?: (uploadedImageKey: string) => void;
 }
 
 const Tiptap = ({
   defaultContent,
   placeholder = "Write your blog post...",
   handleEditorUpdate,
-  handleAttachedImage,
+  handleUploadedImageKey,
 }: TipTapEditorProps) => {
   const editor = useEditor({
     extensions: [
@@ -128,7 +128,10 @@ const Tiptap = ({
         <GeneralPurpose editor={editor} />
         <Separator orientation="vertical" className="h-[24px] mx-2" />
         <Link editor={editor} />
-        <Image editor={editor} handleAttachedImage={handleAttachedImage} />
+        <Image
+          editor={editor}
+          handleUploadedImageKey={handleUploadedImageKey}
+        />
         <Separator className="my-2" />
 
         {/* TODO: Add Color extension together with custom trigger for color input selection */}
