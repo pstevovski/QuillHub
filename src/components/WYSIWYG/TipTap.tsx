@@ -20,18 +20,17 @@ import GeneralPurpose from "./Toolbar/GeneralPurpose";
 import Link from "./Toolbar/Link";
 import Image from "./Toolbar/Image";
 import History from "./Toolbar/History";
-import { UploadFileResponse } from "uploadthing/client";
 
 interface TipTapEditorProps {
   defaultContent: string | undefined;
   placeholder?: string;
-  handleAttachedImage?: (uploadedImage: UploadFileResponse<unknown>) => void;
+  handleAttachedImage?: (uploadedImageKey: string) => void;
   handleEditorUpdate: (richText: string) => void;
 }
 
 export interface TipTapExtensionComponentProps {
   editor: Editor;
-  handleAttachedImage?: (uploadedImage: UploadFileResponse<unknown>) => void;
+  handleAttachedImage?: (uploadedImageKey: string) => void;
 }
 
 const Tiptap = ({

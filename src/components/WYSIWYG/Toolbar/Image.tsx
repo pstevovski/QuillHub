@@ -77,12 +77,9 @@ export default function Image({
 
       // Update form where the editor is being used to
       // include the attached files in the payload
-      if (uploadedImage && handleAttachedImage)
-        handleAttachedImage({
-          ...image,
-          key: uploadedImage.key,
-          name: uploadedImage.name,
-        });
+      if (uploadedImage && handleAttachedImage) {
+        handleAttachedImage(uploadedImage.key);
+      }
 
       // Close the dialog box
       setIsMenuOpen(false);
