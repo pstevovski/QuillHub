@@ -82,6 +82,19 @@ export default function PostCreate() {
     setContentImages(contentImagesCopy);
   };
 
+  /*================================
+    COVER PHOTO
+  ==================================*/
+  const handleUploadCoverPhoto = (response: UploadFileResponse<unknown>[]) => {
+    setValue("cover_photo", response[0].url);
+    setIsUploadingCoverPhoto(false);
+
+    // Add the cover photo to the list of attached images
+    const contentImagesCopy = [...contentImages];
+    contentImagesCopy.push(response[0]);
+    setContentImages(contentImagesCopy);
+  };
+
   const handlePostCreate: SubmitHandler<PostsNew> = async (values) => {
     try {
       const { message } = await fetchHandler("POST", "blog", {
@@ -122,10 +135,7 @@ export default function PostCreate() {
           <UploadButton
             endpoint="blogPostCoverPhoto"
             onUploadBegin={() => setIsUploadingCoverPhoto(true)}
-            onClientUploadComplete={(response) => {
-              setValue("cover_photo", response[0].url);
-              setIsUploadingCoverPhoto(false);
-            }}
+            onClientUploadComplete={handleUploadCoverPhoto}
             onUploadError={() => {
               toast.error("Failed uploading cover photo. Please try again!");
               setIsUploadingCoverPhoto(false);
