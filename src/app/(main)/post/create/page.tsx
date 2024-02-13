@@ -76,18 +76,29 @@ export default function PostCreate() {
   const handleUploadCoverPhoto = (response: UploadFileResponse<unknown>[]) => {
     setValue("cover_photo", response[0].url);
     setIsUploadingCoverPhoto(false);
-    handleUploadedImagesKeys(response[0].key);
+    handleUploadedCoverImagesKeys(response[0].key);
   };
 
   /*===============================
-    ATTACHED CONTENT IMAGES
+    UPLOADED IMAGES
   ================================*/
-  const [uploadedImagesKeys, setUploadedImagesKeys] = useState<string[]>([]);
+  const [uploadedContentImagesKeys, setUploadedContentImagesKeys] = useState<
+    string[]
+  >([]);
+  const [uploadedCoverImagesKeys, setUploadedCoverImagesKeys] = useState<
+    string[]
+  >([]);
 
-  const handleUploadedImagesKeys = (imageKey: string) => {
-    const contentImagesCopy = [...uploadedImagesKeys];
-    contentImagesCopy.push(imageKey);
-    setUploadedImagesKeys(contentImagesCopy);
+  const handleUploadedContentImagesKeys = (imageKey: string) => {
+    const copyContentImages = [...uploadedContentImagesKeys];
+    copyContentImages.push(imageKey);
+    setUploadedContentImagesKeys(copyContentImages);
+  };
+
+  const handleUploadedCoverImagesKeys = (imageKey: string) => {
+    const copyCoverImages = [...uploadedCoverImagesKeys];
+    copyCoverImages.push(imageKey);
+    setUploadedCoverImagesKeys(copyCoverImages);
   };
 
   /*===============================
@@ -97,7 +108,8 @@ export default function PostCreate() {
     try {
       const { message } = await fetchHandler("POST", "blog", {
         ...values,
-        content_images: uploadedImagesKeys,
+        uploaded_content_images_keys: uploadedContentImagesKeys,
+        uploaded_cover_images_keys: uploadedCoverImagesKeys,
       });
 
       toast.success(message);
@@ -209,7 +221,7 @@ export default function PostCreate() {
         <Tiptap
           defaultContent=""
           handleEditorUpdate={(text) => setValue("content", text)}
-          handleUploadedImageKey={handleUploadedImagesKeys}
+          handleUploadedImageKey={handleUploadedContentImagesKeys}
         />
         <FormFieldErrorMessage error={errors.content} />
 
