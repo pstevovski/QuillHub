@@ -9,7 +9,7 @@ import FormTextInput from "@/components/Form/FormTextInput";
 import { PostsNew } from "@/db/schema/posts";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 
 // Assets
@@ -112,8 +112,8 @@ export default function PostCreate() {
 
       const { message } = await fetchHandler("POST", "blog", {
         ...values,
-        uploaded_content_images_keys: [uniqueContentImageKeys],
-        uploaded_cover_images_keys: [uniqueCoverImageKeys],
+        uploaded_content_images_keys: uniqueContentImageKeys,
+        uploaded_cover_images_keys: uniqueCoverImageKeys,
       });
 
       toast.success(message);
@@ -121,6 +121,24 @@ export default function PostCreate() {
       toast.error(handleErrorMessage(error));
     }
   };
+
+  // Remove the new images that were uploaded by the user
+  // while they were creating / editing the blog post, but
+  // decided to leave the page instead of submitting the form
+  // TODO: Show an alert dialog to the users if they are sure
+  // they want to leave the page if the form has updated values
+  useEffect(() => {
+    return () => {
+      // Filter out duplicate image keys (e.g. from "undo" actions)
+      const uniqueContentImageKeys = [...new Set(uploadedContentImagesKeys)];
+      const uniqueCoverImageKeys = [...new Set(uploadedCoverImagesKeys)];
+      const imageKeys = [...uniqueContentImageKeys, ...uniqueCoverImageKeys];
+
+      if (imageKeys.length) {
+        fetchHandler("DELETE", "uploadthing/delete", { keys: imageKeys });
+      }
+    };
+  }, [uploadedCoverImagesKeys, uploadedContentImagesKeys]);
 
   return (
     <div>
