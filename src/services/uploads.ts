@@ -44,6 +44,9 @@ class Upload {
    *
    */
   async deleteImagesFromUploadthing(imageKeys: string[]) {
+    // Prevent sending any unnecessary API requests if there are no keys
+    if (!imageKeys.length) return;
+
     try {
       await fetch("https://uploadthing.com/api/deleteFile", {
         method: "POST",
