@@ -1,6 +1,6 @@
 import { Image as ImageIcon } from "lucide-react";
 import { Toggle } from "@/ui/toggle";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   AlertDialog,
   AlertDialogContent,
@@ -60,13 +60,6 @@ export default function Image({
     },
   });
 
-  const handleAttachImageCancel = () => {
-    setIsMenuOpen(false);
-
-    // todo: trigger API call to delete the image that was just uploaded
-    // if (uploadedImage) {}
-  };
-
   const handleAttachImage = (image: any) => {
     try {
       editor.commands.setImage({
@@ -75,18 +68,23 @@ export default function Image({
         alt: image.alt,
       });
 
-      // Update form where the editor is being used to
-      // include the attached files in the payload
-      if (uploadedImage && handleUploadedImageKey) {
-        handleUploadedImageKey(uploadedImage.key);
-      }
-
       // Close the dialog box
       setIsMenuOpen(false);
     } catch (error) {
       toast.error(handleErrorMessage(error));
     }
   };
+
+  // Update the list of uploaded image keys
+  useEffect(() => {
+    if (!uploadedImage || !handleUploadedImageKey) return;
+    handleUploadedImageKey(uploadedImage.key);
+  }, [uploadedImage]);
+
+  // Reset the form when the menu gets closed
+  useEffect(() => {
+    if (form.formState.isDirty && isMenuOpen === false) form.reset();
+  }, [isMenuOpen]);
 
   return (
     <>
@@ -203,7 +201,7 @@ export default function Image({
               <AlertDialogFooter>
                 <AlertDialogCancel
                   type="button"
-                  onClick={handleAttachImageCancel}
+                  onClick={() => setIsMenuOpen(false)}
                 >
                   Cancel
                 </AlertDialogCancel>
