@@ -63,20 +63,21 @@ class BlogPosts {
       await db.insert(postsImagesSchema).values(uploadedImagesKeys);
 
       console.log("Blog post successfully created!");
-      console.log("");
-      console.log("");
 
       // Delete images that were uploaded while user was creating the blog post
       // but ended up not being used in the final version of the post
       console.log(
         "Deleting unused images that are uploaded to Uploadthing servers..."
       );
+
       UploadService.deleteImagesFromUploadthing(
         uploadedCoverImages.imagesToBeRemoved
-      ); // Cover images
+      );
+
       UploadService.deleteImagesFromUploadthing(
         uploadedContentImages.imagesToBeRemoved
-      ); // Content images
+      );
+
       console.log(
         "Unused images successfully deleted from Uploadthing servers!"
       );
