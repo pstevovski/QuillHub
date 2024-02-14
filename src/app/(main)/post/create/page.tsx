@@ -106,10 +106,14 @@ export default function PostCreate() {
   ================================*/
   const handlePostCreate: SubmitHandler<PostsNew> = async (values) => {
     try {
+      // Filter out duplicate image keys (e.g. from "undo" actions)
+      const uniqueContentImageKeys = [...new Set(uploadedContentImagesKeys)];
+      const uniqueCoverImageKeys = [...new Set(uploadedCoverImagesKeys)];
+
       const { message } = await fetchHandler("POST", "blog", {
         ...values,
-        uploaded_content_images_keys: uploadedContentImagesKeys,
-        uploaded_cover_images_keys: uploadedCoverImagesKeys,
+        uploaded_content_images_keys: [uniqueContentImageKeys],
+        uploaded_cover_images_keys: [uniqueCoverImageKeys],
       });
 
       toast.success(message);
