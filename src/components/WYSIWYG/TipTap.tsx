@@ -21,10 +21,13 @@ import Link from "./Toolbar/Link";
 import Image from "./Toolbar/Image";
 import History from "./Toolbar/History";
 
+/** The specific base URL that Uploadthing uses for the uploaded files */
+const UPLOADTHING_UPLOADED_IMAGE_BASE_URL = "https://utfs.io/f/";
+
 interface TipTapEditorProps {
   defaultContent: string | undefined;
   placeholder?: string;
-  handleUploadedImageKey?: (uploadedImageKey: string) => void;
+  handleUploadedImageKey: (uploadedImageKey: string) => void;
   handleEditorUpdate: (richText: string) => void;
 }
 
@@ -106,8 +109,35 @@ const Tiptap = ({
           "rounded-md rounded-tl-none rounded-tr-none border border-t-0 border-slate-200 text-slate-600 p-3 min-h-[500px]",
       },
     },
-    onUpdate({ editor }) {
+    onUpdate({ editor, transaction }) {
       handleEditorUpdate(editor.getHTML());
+
+      // Triggered before an action occurs in the editor
+      // In this specific scenario its the "Delete" action
+      transaction.before.forEach((node) => {
+        // Ignore removal of non-image nodes
+        if (node.type.name !== "image") return;
+
+        // Ignore nodes that do not have a valid "src" attribute
+        if (!node.attrs.src) return;
+
+        // Ignore image nodes whose "src" attribute does not start with the same base URL as Uploadthing
+        // prettier-ignore
+        if (!node.attrs.src.startsWith(UPLOADTHING_UPLOADED_IMAGE_BASE_URL)) return;
+
+        // Extract the unique key of the uploaded image
+        // Note: Uploadthing service always uses the unique key as a slug to the specific image
+        // therefor we target the first element right after we split based on the base URL
+        const imageKey = node.attrs.src.split(
+          UPLOADTHING_UPLOADED_IMAGE_BASE_URL
+        )[1];
+
+        // If there's no image key to work with - dont do anything
+        if (!imageKey) return;
+
+        // Add the deleted image key to the list of keys that should be handled
+        handleUploadedImageKey(imageKey);
+      });
     },
   });
 
