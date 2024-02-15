@@ -5,6 +5,7 @@ import { postsImagesSchema, postsSchema } from "@/db/schema/posts";
 import handleErrorMessage from "@/utils/handleErrorMessage";
 import { eq } from "drizzle-orm";
 import UploadService from "./uploads";
+import TokenService from "./token";
 
 interface BlogNewPostPayload {
   title: string;
@@ -28,6 +29,11 @@ class BlogPosts {
     cover_photo,
   }: BlogNewPostPayload) {
     try {
+      // Extract the currently logged in user's ID
+      const userToken = await TokenService.decodeToken();
+
+      if (!userToken) throw new Error("Unauthenticated!");
+
       const newPost = await db.insert(postsSchema).values({
         title,
         status,
@@ -35,6 +41,7 @@ class BlogPosts {
         cover_photo,
         likes: 0,
         views: 0,
+        created_by: userToken.id as number,
       });
 
       // Extract the keys for those cover and content images
@@ -60,7 +67,11 @@ class BlogPosts {
           post_id: newPost[0].insertId,
         };
       });
-      await db.insert(postsImagesSchema).values(uploadedImagesKeys);
+
+      // todo: move this to separate method
+      if (uploadedImagesKeys.length > 0) {
+        await db.insert(postsImagesSchema).values(uploadedImagesKeys);
+      }
 
       console.log("Blog post successfully created!");
 
