@@ -103,7 +103,6 @@ const Tiptap = ({
     ],
     content: defaultContent,
     editorProps: {
-      handleDrop: () => alert("yo you dropped something"),
       attributes: {
         class:
           "rounded-md rounded-tl-none rounded-tr-none border border-t-0 border-slate-200 text-slate-600 p-3 min-h-[500px]",
@@ -144,7 +143,7 @@ const Tiptap = ({
   if (!editor) return null;
 
   return (
-    <div className="flex flex-col justify-stretch my-4">
+    <div className="flex flex-col justify-stretch my-2">
       <div className="flex flex-wrap items-center gap-1 p-2 border border-b-0 rounded-md rounded-bl-none rounded-br-none bg-transparent">
         <ToolbarHeadings editor={editor} />
         <History editor={editor} />
