@@ -1,9 +1,14 @@
 import "dotenv/config";
 
-import db from "@/db/connection";
-import { postsImagesSchema, postsSchema } from "@/db/schema/posts";
+// Utilities
 import handleErrorMessage from "@/utils/handleErrorMessage";
+
+// Drizzle
+import db from "@/db/connection";
 import { eq } from "drizzle-orm";
+import { postsImagesSchema, postsSchema } from "@/db/schema/posts";
+
+// Services
 import UploadService from "./uploads";
 import TokenService from "./token";
 
@@ -16,7 +21,51 @@ interface BlogNewPostPayload {
   uploaded_cover_images_keys: string[];
 }
 
+interface BlogPostSaveImageKeys {
+  post_id: number;
+  cover_image_keys: string[];
+  content_image_keys: string[];
+}
+
 class BlogPosts {
+  /**
+   *
+   * Filter out all duplicate uploaded image keys,
+   * merge both 'cover' and 'content' key arrays into one array,
+   * map over the merged array and add the ID of the post to which the image key corresponds to
+   * before saving the "post" / "image key" pairings inn the database
+   *
+   */
+  private async saveBlogPostImageKeys(postImageKeys: BlogPostSaveImageKeys) {
+    try {
+      // Filter out duplicates and merge the keys into a single array
+      const uniqueCoverImageKeys = [...new Set(postImageKeys.cover_image_keys)];
+      const uniqueContentImageKeys = [
+        ...new Set(postImageKeys.content_image_keys),
+      ];
+      const uniqueKeys = [...uniqueCoverImageKeys, ...uniqueContentImageKeys];
+
+      // Include the ID of the post to which the uploaded image key belongs
+      const postKeyPairs = uniqueKeys.map((imageKey) => {
+        return {
+          key: imageKey,
+          post_id: postImageKeys.post_id,
+        };
+      });
+
+      // Do not save anything to the database if there are no keys to be saved
+      if (!postKeyPairs.length) return;
+
+      await db.insert(postsImagesSchema).values(postKeyPairs);
+      console.log(
+        "Blog post 'cover' and 'content' image keys saved to database"
+      );
+    } catch (error) {
+      console.log("Failed saving the keys of the uploaded images to database.");
+      throw new Error(handleErrorMessage(error));
+    }
+  }
+
   /**
    * Create a new blog post
    */
@@ -55,25 +104,14 @@ class BlogPosts {
         uploaded_content_images_keys,
         content
       );
-
-      // Map the keys of those images that will be saved in the database
-      // to include the ID of the newly created post
-      const uploadedImagesKeys = [
-        ...uploadedCoverImages.imagesToBeSaved,
-        ...uploadedContentImages.imagesToBeSaved,
-      ].map((imageKey) => {
-        return {
-          key: imageKey,
-          post_id: newPost[0].insertId,
-        };
-      });
-
-      // todo: move this to separate method
-      if (uploadedImagesKeys.length > 0) {
-        await db.insert(postsImagesSchema).values(uploadedImagesKeys);
-      }
-
       console.log("Blog post successfully created!");
+
+      // Save the pairings between the image keys and the newly created post
+      await this.saveBlogPostImageKeys({
+        post_id: newPost[0].insertId,
+        content_image_keys: uploadedContentImages.imagesToBeSaved,
+        cover_image_keys: uploadedCoverImages.imagesToBeSaved,
+      });
 
       // Delete images that were uploaded while user was creating the blog post
       // but ended up not being used in the final version of the post
