@@ -5,15 +5,8 @@
     {
       "idx": 0,
       "version": "5",
-      "when": 1708010355428,
-      "tag": "0000_cooing_zodiak",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "5",
-      "when": 1708010390187,
-      "tag": "0001_omniscient_trauma",
+      "when": 1708010880901,
+      "tag": "0000_puzzling_shard",
       "breakpoints": true
     }
   ]

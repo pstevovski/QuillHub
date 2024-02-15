@@ -1,1 +1,0 @@
-ALTER TABLE `topics` ADD `label` varchar(32) NOT NULL;

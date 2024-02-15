@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "id": "55a2cdd3-55aa-4406-b763-447e8f31c94e",
+  "id": "04dc5e76-2b51-451e-a777-87602b5080e8",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "posts_images": {
@@ -178,6 +178,13 @@
           "notNull": true,
           "autoincrement": false
         },
+        "label": {
+          "name": "label",
+          "type": "varchar(32)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
         "created_by": {
           "name": "created_by",
           "type": "bigint",
@@ -226,6 +233,70 @@
           ]
         }
       }
+    },
+    "topics_blog_posts": {
+      "name": "topics_blog_posts",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "post_id": {
+          "name": "post_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "topic_id": {
+          "name": "topic_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "topics_blog_posts_post_id_posts_id_fk": {
+          "name": "topics_blog_posts_post_id_posts_id_fk",
+          "tableFrom": "topics_blog_posts",
+          "tableTo": "posts",
+          "columnsFrom": [
+            "post_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "topics_blog_posts_topic_id_topics_id_fk": {
+          "name": "topics_blog_posts_topic_id_topics_id_fk",
+          "tableFrom": "topics_blog_posts",
+          "tableTo": "topics",
+          "columnsFrom": [
+            "topic_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "topics_blog_posts_id": {
+          "name": "topics_blog_posts_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {}
     },
     "roles": {
       "name": "roles",
