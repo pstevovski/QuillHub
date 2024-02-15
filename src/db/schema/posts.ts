@@ -7,6 +7,7 @@ import {
   timestamp,
   varchar,
 } from "drizzle-orm/mysql-core";
+import { users } from "./users";
 
 /*====================================
   TABLE: POSTS
@@ -21,8 +22,11 @@ export const postsSchema = mysqlTable("posts", {
   cover_photo: varchar("cover_photo", { length: 512 }).notNull(),
   likes: int("likes").notNull().default(0),
   views: int("views").notNull().default(0),
+  created_by: bigint("created_by", { mode: "number" })
+    .references(() => users.id)
+    .notNull(),
   created_at: timestamp("created_at", { mode: "date", fsp: 6 }).defaultNow(),
-
+  updated_at: timestamp("updated_at", { mode: "date", fsp: 6 }).defaultNow(),
   // Todo: This will be implemented with a bridge table resulting in many-to-many relationship
   // topic_id: int("topic_id").notNull(),
 });

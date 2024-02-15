@@ -2,7 +2,6 @@ import { sql } from "drizzle-orm";
 import {
   mysqlEnum,
   mysqlTable,
-  serial,
   varchar,
   timestamp,
   bigint,
@@ -13,7 +12,7 @@ import {
   TABLE: USERS
 ============================================*/
 export const users = mysqlTable("users", {
-  id: serial("id").primaryKey(),
+  id: bigint("id", { mode: "number" }).primaryKey().autoincrement(),
   email: varchar("email", { length: 255 }).notNull().unique(),
   first_name: varchar("first_name", { length: 255 }).notNull(),
   last_name: varchar("last_name", { length: 255 }).notNull(),
@@ -43,7 +42,7 @@ export type UserNew = typeof users.$inferInsert;
   TABLE: ROLES
 ============================================*/
 export const roles = mysqlTable("roles", {
-  id: serial("id").primaryKey(),
+  id: bigint("id", { mode: "number" }).primaryKey().autoincrement(),
   name: varchar("name", { length: 30 }).notNull().unique(),
   label: varchar("label", { length: 30 }).notNull(),
   description: varchar("description", { length: 255 })
@@ -59,7 +58,7 @@ export type RoleNew = typeof roles.$inferInsert;
   TABLE: USER PASSWORD RESET REQUESTS
 ============================================*/
 export const userPasswordResets = mysqlTable("user_password_resets", {
-  id: serial("id").primaryKey(),
+  id: bigint("id", { mode: "number" }).primaryKey().autoincrement(),
   email: varchar("email", { length: 255 }).notNull(),
   token: varchar("token", { length: 512 }).notNull().unique(),
 });
