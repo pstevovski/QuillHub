@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "id": "b1676d55-ca3f-48db-afa1-8cd81f706cfe",
+  "id": "e182c7b6-e426-490a-82fc-c136e362c5d2",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "posts_images": {
@@ -110,17 +110,47 @@
           "autoincrement": false,
           "default": 0
         },
+        "created_by": {
+          "name": "created_by",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
         "created_at": {
           "name": "created_at",
-          "type": "timestamp(6)",
+          "type": "timestamp",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false,
+          "default": "(now())"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "onUpdate": true,
           "default": "(now())"
         }
       },
       "indexes": {},
-      "foreignKeys": {},
+      "foreignKeys": {
+        "posts_created_by_users_id_fk": {
+          "name": "posts_created_by_users_id_fk",
+          "tableFrom": "posts",
+          "tableTo": "users",
+          "columnsFrom": [
+            "created_by"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {
         "posts_id": {
           "name": "posts_id",
@@ -136,7 +166,7 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "serial",
+          "type": "bigint",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": true
@@ -196,7 +226,7 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "serial",
+          "type": "bigint",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": true
@@ -240,7 +270,7 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "serial",
+          "type": "bigint",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": true
@@ -299,7 +329,7 @@
         },
         "role_id": {
           "name": "role_id",
-          "type": "bigint unsigned",
+          "type": "bigint",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,

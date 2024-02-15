@@ -5,22 +5,8 @@
     {
       "idx": 0,
       "version": "5",
-      "when": 1707833836459,
-      "tag": "0000_clean_miracleman",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "5",
-      "when": 1707996341171,
-      "tag": "0001_lowly_gargoyle",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "5",
-      "when": 1707996426114,
-      "tag": "0002_moaning_professor_monster",
+      "when": 1708003607449,
+      "tag": "0000_cheerful_nick_fury",
       "breakpoints": true
     }
   ]
