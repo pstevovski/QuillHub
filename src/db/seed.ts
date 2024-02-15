@@ -2,6 +2,7 @@ import { hashUserPassword } from "@/utils/bcrypt";
 import { users, roles } from "./schema/users";
 import db from "./connection";
 import { postsSchema } from "./schema/posts";
+import { schemaTopics } from "./schema/topics";
 
 /** Seeds the database with mock users */
 async function seedUsers() {
@@ -99,6 +100,33 @@ async function seedPosts() {
   }
 }
 
+/** Seeds the database with mock topics */
+async function seedTopics() {
+  try {
+    await db.insert(schemaTopics).values([
+      {
+        name: "javascript",
+        label: "JavaScript",
+        created_by: 1,
+      },
+      {
+        name: "nextjs",
+        label: "NextJS",
+        created_by: 1,
+      },
+      {
+        name: "react",
+        label: "React",
+        created_by: 2,
+      },
+    ]);
+  } catch (error: any) {
+    console.log("Failed seeding topics...");
+    console.log("Error: ", error.message);
+    process.exit(1);
+  }
+}
+
 /** Populate the database with mock data for development purposes */
 async function seedDatabase() {
   try {
@@ -108,6 +136,7 @@ async function seedDatabase() {
       await seedRoles(),
       await seedUsers(),
       await seedPosts(),
+      await seedTopics(),
     ]);
     console.log("Seeding database completed!");
     console.timeEnd("Elapsed Time: ");
