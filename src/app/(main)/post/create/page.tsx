@@ -9,7 +9,7 @@ import FormTextInput from "@/components/Form/FormTextInput";
 import { PostsNew } from "@/db/schema/posts";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 
 // Assets
@@ -22,6 +22,7 @@ import fetchHandler from "@/utils/fetchHandler";
 import { BlogNewPostSchema } from "@/zod/blog-posts";
 import { UploadButton } from "@/components/UploadThing";
 import { Label } from "@/ui/label";
+import useDeleteUploadedImages from "@/app/(main)/post/hooks/useDeleteUploadedImages";
 
 export default function PostCreate() {
   const {
@@ -53,7 +54,9 @@ export default function PostCreate() {
 
     // Updates the value to be sent in the form
     // todo: figure a way to autocast the selected value to the defined schema
-    setValue("status", selectedStatus.value as "draft" | "published");
+    setValue("status", selectedStatus.value as "draft" | "published", {
+      shouldDirty: true,
+    });
   };
 
   /*================================
@@ -74,7 +77,7 @@ export default function PostCreate() {
     COVER PHOTO
   ==================================*/
   const handleUploadCoverPhoto = (response: UploadFileResponse<unknown>[]) => {
-    setValue("cover_photo", response[0].url);
+    setValue("cover_photo", response[0].url, { shouldDirty: true });
     setIsUploadingCoverPhoto(false);
     handleUploadedCoverImagesKeys(response[0].key);
   };
@@ -122,23 +125,12 @@ export default function PostCreate() {
     }
   };
 
-  // Remove the new images that were uploaded by the user
-  // while they were creating / editing the blog post, but
-  // decided to leave the page instead of submitting the form
-  // TODO: Show an alert dialog to the users if they are sure
-  // they want to leave the page if the form has updated values
-  useEffect(() => {
-    return () => {
-      // Filter out duplicate image keys (e.g. from "undo" actions)
-      const uniqueContentImageKeys = [...new Set(uploadedContentImagesKeys)];
-      const uniqueCoverImageKeys = [...new Set(uploadedCoverImagesKeys)];
-      const imageKeys = [...uniqueContentImageKeys, ...uniqueCoverImageKeys];
-
-      if (imageKeys.length) {
-        fetchHandler("DELETE", "uploadthing/delete", { keys: imageKeys });
-      }
-    };
-  }, [uploadedCoverImagesKeys, uploadedContentImagesKeys]);
+  // If the form values were changed ask user for confirmation before leaving the page
+  useDeleteUploadedImages(
+    isDirty,
+    uploadedContentImagesKeys,
+    uploadedCoverImagesKeys
+  );
 
   return (
     <div>
@@ -242,7 +234,9 @@ export default function PostCreate() {
 
         <Tiptap
           defaultContent=""
-          handleEditorUpdate={(text) => setValue("content", text)}
+          handleEditorUpdate={(text) =>
+            setValue("content", text, { shouldDirty: true })
+          }
           handleUploadedImageKey={handleUploadedContentImagesKeys}
         />
         <FormFieldErrorMessage error={errors.content} />
