@@ -1,5 +1,4 @@
 import BlogPostsService from "@/services/posts";
-import TokenService from "@/services/token";
 import handleErrorMessage from "@/utils/handleErrorMessage";
 import { BlogNewPostSchema } from "@/zod/blog-posts";
 import { NextResponse } from "next/server";
@@ -18,20 +17,14 @@ export async function POST(request: Request) {
       status: blogPostPayload.status,
     });
 
-    // Extract the ID of the currently logged in user
-    const decodedToken = await TokenService.decodeToken();
-
-    if (!validatePayload || !decodedToken) {
+    if (!validatePayload) {
       return Response.json(
         { error: "Invalid values provided!" },
         { status: 422 }
       );
     }
 
-    await BlogPostsService.create({
-      ...blogPostPayload,
-      user_id: decodedToken.id,
-    });
+    await BlogPostsService.create(blogPostPayload);
 
     return NextResponse.json(
       { message: "Blog post created!" },
