@@ -71,6 +71,7 @@ async function seedPosts() {
         views: 0,
         cover_photo: "",
         status: "draft",
+        created_by: 1,
       },
       {
         title: "Example Seeded Post #2 - Published",
@@ -79,6 +80,7 @@ async function seedPosts() {
         views: 0,
         cover_photo: "",
         status: "published",
+        created_by: 1,
       },
       {
         title: "Example Seeded Post #3 - Archived",
@@ -87,6 +89,7 @@ async function seedPosts() {
         views: 0,
         cover_photo: "",
         status: "archived",
+        created_by: 1,
       },
     ]);
   } catch (error: any) {
