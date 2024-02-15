@@ -30,7 +30,7 @@ export default function PostCreate() {
     handleSubmit,
     watch,
     setValue,
-    formState: { errors, isDirty },
+    formState: { errors, isDirty, isSubmitting },
   } = useForm<PostsNew>({
     defaultValues: {
       title: "",
@@ -234,10 +234,11 @@ export default function PostCreate() {
 
         <Button
           type="submit"
-          disabled={!isDirty || isUploadingCoverPhoto}
-          modifierClass="mt-10"
+          isLoading={isSubmitting}
+          disabled={!isDirty || isUploadingCoverPhoto || isSubmitting}
+          modifierClass="my-10"
         >
-          Create Post
+          {isSubmitting ? "Creating..." : "Create Blog Post"}
         </Button>
       </form>
     </div>
