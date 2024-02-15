@@ -26,7 +26,7 @@ export const users = mysqlTable("users", {
   theme: mysqlEnum("theme", ["light", "dark", "system"])
     .default("light")
     .notNull(),
-  role_id: bigint("role_id", { mode: "number", unsigned: true }) // FK
+  role_id: bigint("role_id", { mode: "number" }) // FK
     .notNull()
     .default(1)
     .references(() => roles.id),
