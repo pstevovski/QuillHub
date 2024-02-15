@@ -6,7 +6,7 @@ export default function TextAlignment({
   editor,
 }: TipTapExtensionComponentProps) {
   return (
-    <>
+    <div>
       <Toggle
         size="sm"
         pressed={editor.isActive({ textAlign: "left" })}
@@ -43,6 +43,6 @@ export default function TextAlignment({
       >
         <AlignJustify className="text-slate-600 w-[16px] h-[16px]" />
       </Toggle>
-    </>
+    </div>
   );
 }

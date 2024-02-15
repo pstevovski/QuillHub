@@ -46,7 +46,7 @@ export default function ToolbarHeadings({
   }, [editor.isActive("heading")]);
 
   return (
-    <>
+    <div>
       <Select
         onValueChange={(value: TextType) => handleSelectedValue(value)}
         defaultValue="paragraph"
@@ -120,6 +120,6 @@ export default function ToolbarHeadings({
           </SelectItem>
         </SelectContent>
       </Select>
-    </>
+    </div>
   );
 }

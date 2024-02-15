@@ -4,7 +4,7 @@ import { TipTapExtensionComponentProps } from "../TipTap";
 
 export default function History({ editor }: TipTapExtensionComponentProps) {
   return (
-    <>
+    <div>
       <Toggle
         size="sm"
         pressed={editor.isActive("undo")}
@@ -23,6 +23,6 @@ export default function History({ editor }: TipTapExtensionComponentProps) {
       >
         <Redo2 className="text-slate-600 w-[16px] h-[16px]" />
       </Toggle>
-    </>
+    </div>
   );
 }

@@ -11,7 +11,7 @@ export default function GeneralPurpose({
   editor,
 }: TipTapExtensionComponentProps) {
   return (
-    <>
+    <div>
       <Toggle
         size="sm"
         pressed={editor.isActive("blockquote")}
@@ -49,6 +49,6 @@ export default function GeneralPurpose({
       >
         <CodeBlock className="text-slate-600 w-[16px] h-[16px]" />
       </Toggle>
-    </>
+    </div>
   );
 }

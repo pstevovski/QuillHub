@@ -70,7 +70,7 @@ export default function Link({ editor }: TipTapExtensionComponentProps) {
   };
 
   return (
-    <>
+    <div>
       <AlertDialog open={isMenuOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -159,6 +159,6 @@ export default function Link({ editor }: TipTapExtensionComponentProps) {
       >
         <LinkIcon className="text-slate-600 w-[16px] h-[16px]" />
       </Toggle>
-    </>
+    </div>
   );
 }

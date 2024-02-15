@@ -105,7 +105,7 @@ const Tiptap = ({
     editorProps: {
       attributes: {
         class:
-          "rounded-md rounded-tl-none rounded-tr-none border border-t-0 border-slate-200 text-slate-600 p-3 min-h-[500px]",
+          "rounded-md rounded-tl-none rounded-tr-none border border-t-0 border-slate-200 text-slate-600 p-3 min-h-[500px] focus-visible:outline-none",
       },
     },
     onUpdate({ editor, transaction }) {

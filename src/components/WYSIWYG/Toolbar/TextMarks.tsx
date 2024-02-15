@@ -4,7 +4,7 @@ import { TipTapExtensionComponentProps } from "../TipTap";
 
 export default function TextMarks({ editor }: TipTapExtensionComponentProps) {
   return (
-    <>
+    <div>
       <Toggle
         size="sm"
         pressed={editor.isActive("bold")}
@@ -43,6 +43,6 @@ export default function TextMarks({ editor }: TipTapExtensionComponentProps) {
       >
         <Underline className="text-slate-600 w-[16px] h-[16px]" />
       </Toggle>
-    </>
+    </div>
   );
 }

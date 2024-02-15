@@ -87,7 +87,7 @@ export default function Image({
   }, [isMenuOpen]);
 
   return (
-    <>
+    <div>
       <AlertDialog open={isMenuOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -225,6 +225,6 @@ export default function Image({
       >
         <ImageIcon className="text-slate-600 w-[16px] h-[16px]" />
       </Toggle>
-    </>
+    </div>
   );
 }
