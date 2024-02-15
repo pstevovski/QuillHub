@@ -22,7 +22,7 @@ import fetchHandler from "@/utils/fetchHandler";
 import { BlogNewPostSchema } from "@/zod/blog-posts";
 import { UploadButton } from "@/components/UploadThing";
 import { Label } from "@/ui/label";
-import useDeleteUploadedImages from "@/app/(main)/post/hooks/useDeleteUploadedImages";
+import useWarnForUnsavedChanges from "@/hooks/useWarnForUnsavedChanges";
 
 export default function PostCreate() {
   const {
@@ -109,14 +109,10 @@ export default function PostCreate() {
   ================================*/
   const handlePostCreate: SubmitHandler<PostsNew> = async (values) => {
     try {
-      // Filter out duplicate image keys (e.g. from "undo" actions)
-      const uniqueContentImageKeys = [...new Set(uploadedContentImagesKeys)];
-      const uniqueCoverImageKeys = [...new Set(uploadedCoverImagesKeys)];
-
       const { message } = await fetchHandler("POST", "blog", {
         ...values,
-        uploaded_content_images_keys: uniqueContentImageKeys,
-        uploaded_cover_images_keys: uniqueCoverImageKeys,
+        uploaded_content_images_keys: uploadedContentImagesKeys,
+        uploaded_cover_images_keys: uploadedCoverImagesKeys,
       });
 
       toast.success(message);
@@ -125,12 +121,7 @@ export default function PostCreate() {
     }
   };
 
-  // If the form values were changed ask user for confirmation before leaving the page
-  useDeleteUploadedImages(
-    isDirty,
-    uploadedContentImagesKeys,
-    uploadedCoverImagesKeys
-  );
+  useWarnForUnsavedChanges(isDirty);
 
   return (
     <div>
