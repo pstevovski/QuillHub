@@ -1,4 +1,4 @@
-const PROTECTED_ROUTES: string[] = [];
+const PROTECTED_ROUTES: string[] = ["/post/create"];
 
 /**
  * Utility function that checks if the route that

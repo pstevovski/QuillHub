@@ -40,7 +40,7 @@ export default async function Home({
         </p>
 
         <Link
-          href="/"
+          href="/post/create"
           className="w-48 rounded-md p-3 bg-teal-500 text-white font-medium text-md hover:shadow-xl duration-200"
         >
           Start Writing!
