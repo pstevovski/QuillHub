@@ -1,20 +1,23 @@
+import TopicsService from "@/services/topics";
 import handleErrorMessage from "@/utils/handleErrorMessage";
+import { VALIDATION_SCHEMA_TOPICS } from "@/zod/topics";
 import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
   try {
-    const topicPayload = await request.json();
+    const payload = await request.json();
+    const validateTopicPayload = VALIDATION_SCHEMA_TOPICS.safeParse({
+      name: payload.name,
+    });
 
-    // Based on the label text we generate the unique name
-    // If unique name already exists; throw error
-    // If the provided label has spaces (e.g. Web Development) then
-    // generated name will be "web-development"
-    const generateNameFromLabel: string = topicPayload.label
-      .split(" ")
-      .join("-")
-      .toLowerCase();
+    if (!validateTopicPayload.success) {
+      return NextResponse.json(
+        { error: "Invalid values provided!" },
+        { status: 422 }
+      );
+    }
 
-    console.log({ label: topicPayload.label, name: generateNameFromLabel });
+    await TopicsService.createTopic(payload.name);
 
     return NextResponse.json({ message: "Topic created!" }, { status: 200 });
   } catch (error) {
