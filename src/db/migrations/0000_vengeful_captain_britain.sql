@@ -16,6 +16,7 @@ CREATE TABLE `posts` (
 	`created_by` bigint NOT NULL,
 	`created_at` timestamp NOT NULL DEFAULT (now()),
 	`updated_at` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,
+	`topic_id` bigint,
 	CONSTRAINT `posts_id` PRIMARY KEY(`id`)
 );
 --> statement-breakpoint
@@ -23,17 +24,10 @@ CREATE TABLE `topics` (
 	`id` bigint AUTO_INCREMENT NOT NULL,
 	`name` varchar(32) NOT NULL,
 	`label` varchar(32) NOT NULL,
-	`created_by` bigint NOT NULL,
+	`created_by` bigint,
 	`created_at` timestamp NOT NULL DEFAULT (now()),
 	CONSTRAINT `topics_id` PRIMARY KEY(`id`),
 	CONSTRAINT `topics_name_unique` UNIQUE(`name`)
-);
---> statement-breakpoint
-CREATE TABLE `topics_blog_posts` (
-	`id` bigint AUTO_INCREMENT NOT NULL,
-	`post_id` bigint,
-	`topic_id` bigint,
-	CONSTRAINT `topics_blog_posts_id` PRIMARY KEY(`id`)
 );
 --> statement-breakpoint
 CREATE TABLE `roles` (
@@ -71,7 +65,6 @@ CREATE TABLE `users` (
 --> statement-breakpoint
 ALTER TABLE `posts_images` ADD CONSTRAINT `posts_images_post_id_posts_id_fk` FOREIGN KEY (`post_id`) REFERENCES `posts`(`id`) ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE `posts` ADD CONSTRAINT `posts_created_by_users_id_fk` FOREIGN KEY (`created_by`) REFERENCES `users`(`id`) ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE `topics` ADD CONSTRAINT `topics_created_by_users_id_fk` FOREIGN KEY (`created_by`) REFERENCES `users`(`id`) ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE `topics_blog_posts` ADD CONSTRAINT `topics_blog_posts_post_id_posts_id_fk` FOREIGN KEY (`post_id`) REFERENCES `posts`(`id`) ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE `topics_blog_posts` ADD CONSTRAINT `topics_blog_posts_topic_id_topics_id_fk` FOREIGN KEY (`topic_id`) REFERENCES `topics`(`id`) ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE `posts` ADD CONSTRAINT `posts_topic_id_topics_id_fk` FOREIGN KEY (`topic_id`) REFERENCES `topics`(`id`) ON DELETE set null ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE `topics` ADD CONSTRAINT `topics_created_by_users_id_fk` FOREIGN KEY (`created_by`) REFERENCES `users`(`id`) ON DELETE set null ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE `users` ADD CONSTRAINT `users_role_id_roles_id_fk` FOREIGN KEY (`role_id`) REFERENCES `roles`(`id`) ON DELETE no action ON UPDATE no action;
