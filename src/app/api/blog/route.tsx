@@ -17,7 +17,7 @@ export async function POST(request: Request) {
       status: blogPostPayload.status,
     });
 
-    if (!validatePayload) {
+    if (!validatePayload.success) {
       return Response.json(
         { error: "Invalid values provided!" },
         { status: 422 }
