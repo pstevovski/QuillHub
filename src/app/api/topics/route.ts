@@ -58,7 +58,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Unauthenticated" }, { status: 401 });
     }
 
-    await TopicsService.createTopic(tokenDetails.id as number, payload.name);
+    await TopicsService.create(tokenDetails.id as number, payload.name);
 
     return NextResponse.json({ message: "Topic created!" }, { status: 200 });
   } catch (error) {
