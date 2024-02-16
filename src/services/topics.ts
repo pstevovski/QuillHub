@@ -48,6 +48,23 @@ class Topics {
       throw new Error("Failed creating topic");
     }
   }
+
+  /**
+   *
+   * Delete the specifically targeted topic
+   *
+   * @param id The ID of the topic saved in the database
+   *
+   */
+  async deleteSpecific(id: number) {
+    try {
+      await db.delete(schemaTopics).where(eq(schemaTopics.id, id));
+      console.log(`Topic with id: ${id} was successfully deleted!`);
+    } catch (error) {
+      console.log("Failed deleting topic: ", handleErrorMessage(error));
+      throw new Error("Failed deleting topic!");
+    }
+  }
 }
 
 const TopicsService = new Topics();

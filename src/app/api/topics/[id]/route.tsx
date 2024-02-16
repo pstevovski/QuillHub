@@ -21,3 +21,21 @@ export async function GET(
     );
   }
 }
+
+export async function DELETE(
+  _request: Request,
+  { params }: { params: { id: number } }
+) {
+  try {
+    await TopicsService.deleteSpecific(params.id);
+    return NextResponse.json({
+      message: `Topic with ID ${params.id} was successfully deleted!`,
+    });
+  } catch (error) {
+    console.log("500 - Server Error: ", handleErrorMessage(error));
+    return NextResponse.json(
+      { error: "Server error - Something went wrong" },
+      { status: 500 }
+    );
+  }
+}
