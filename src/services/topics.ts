@@ -2,6 +2,7 @@ import handleErrorMessage from "@/utils/handleErrorMessage";
 import TokenService from "./token";
 import db from "@/db/connection";
 import { schemaTopics } from "@/db/schema/topics";
+import { eq } from "drizzle-orm";
 
 class Topics {
   private generateUniqueTopicSlug(name: string): string {
@@ -24,7 +25,27 @@ class Topics {
       console.log("Topic created successfully!");
     } catch (error) {
       console.log(`Failed creating topic: ${handleErrorMessage(error)}`);
-      throw new Error("Failed creating topic!");
+      throw new Error("Failed creating topic");
+    }
+  }
+
+  async getSpecifc(id: number) {
+    try {
+      const targetedTopic = await db
+        .select()
+        .from(schemaTopics)
+        .where(eq(schemaTopics.id, id));
+
+      if (!targetedTopic || !targetedTopic[0]) {
+        throw new Error("Topic does not exist!");
+      }
+
+      return targetedTopic[0];
+    } catch (error) {
+      console.log(
+        `Failed getting topic with id ${id}: ${handleErrorMessage(error)}`
+      );
+      throw new Error("Failed getting the targeted topic");
     }
   }
 }
