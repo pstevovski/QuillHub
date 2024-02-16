@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "id": "ae8606c7-a3f0-45b8-8137-0ce1196a5177",
+  "id": "ef8d48cb-7159-46cc-a794-1eddeebb602c",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "posts_images": {
@@ -198,8 +198,8 @@
           "notNull": true,
           "autoincrement": false
         },
-        "label": {
-          "name": "label",
+        "slug": {
+          "name": "slug",
           "type": "varchar(32)",
           "primaryKey": false,
           "notNull": true,
@@ -246,10 +246,10 @@
         }
       },
       "uniqueConstraints": {
-        "topics_name_unique": {
-          "name": "topics_name_unique",
+        "topics_slug_unique": {
+          "name": "topics_slug_unique",
           "columns": [
-            "name"
+            "slug"
           ]
         }
       }

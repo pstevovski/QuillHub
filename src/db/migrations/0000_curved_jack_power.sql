@@ -23,11 +23,11 @@ CREATE TABLE `posts` (
 CREATE TABLE `topics` (
 	`id` bigint AUTO_INCREMENT NOT NULL,
 	`name` varchar(32) NOT NULL,
-	`label` varchar(32) NOT NULL,
+	`slug` varchar(32) NOT NULL,
 	`created_by` bigint,
 	`created_at` timestamp NOT NULL DEFAULT (now()),
 	CONSTRAINT `topics_id` PRIMARY KEY(`id`),
-	CONSTRAINT `topics_name_unique` UNIQUE(`name`)
+	CONSTRAINT `topics_slug_unique` UNIQUE(`slug`)
 );
 --> statement-breakpoint
 CREATE TABLE `roles` (

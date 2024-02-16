@@ -108,18 +108,18 @@ async function seedTopics() {
   try {
     await db.insert(schemaTopics).values([
       {
-        name: "javascript",
-        label: "JavaScript",
+        slug: "javascript",
+        name: "JavaScript",
         created_by: 1,
       },
       {
-        name: "nextjs",
-        label: "NextJS",
+        slug: "nextjs",
+        name: "NextJS",
         created_by: 1,
       },
       {
-        name: "react",
-        label: "React",
+        slug: "react",
+        name: "React",
         created_by: 2,
       },
     ]);
