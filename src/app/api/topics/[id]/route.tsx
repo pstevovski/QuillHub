@@ -8,6 +8,11 @@ export async function GET(
 ) {
   try {
     const topic = await TopicsService.getSpecifc(params.id);
+
+    if (!topic) {
+      return NextResponse.json({ error: "Topic not found!" }, { status: 404 });
+    }
+
     return NextResponse.json(topic, { status: 200 });
   } catch (error) {
     return NextResponse.json(
