@@ -1,7 +1,10 @@
 import TokenService from "@/services/token";
 import TopicsService from "@/services/topics";
 import handleErrorMessage from "@/utils/handleErrorMessage";
-import { VALIDATION_SCHEMA_TOPICS } from "@/zod/topics";
+import {
+  VALIDATION_SCHEMA_TOPICS,
+  VALIDATION_SCHEMA_TOPICS_BULK_DELETE,
+} from "@/zod/topics";
 import { NextResponse } from "next/server";
 
 /**
@@ -61,6 +64,40 @@ export async function POST(request: Request) {
   } catch (error) {
     return NextResponse.json(
       { error: handleErrorMessage(error) },
+      { status: 500 }
+    );
+  }
+}
+
+/**
+ *
+ * Delete multiple topics at once
+ *
+ */
+export async function DELETE(request: Request) {
+  try {
+    const payload = await request.json();
+    const isPayloadValid = VALIDATION_SCHEMA_TOPICS_BULK_DELETE.safeParse({
+      ids: payload.ids,
+    });
+
+    if (!isPayloadValid.success) {
+      return NextResponse.json({ error: "Invalid values!" }, { status: 422 });
+    }
+
+    await TopicsService.deleteBulk(payload.ids);
+
+    return NextResponse.json(
+      { message: `Successfully deleted ${payload.ids.length} topics!` },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.log(
+      "500 - Server Error - Something went wrong!",
+      handleErrorMessage(error)
+    );
+    return NextResponse.json(
+      { error: "Something went wrong!" },
       { status: 500 }
     );
   }

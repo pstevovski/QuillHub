@@ -1,7 +1,7 @@
 import handleErrorMessage from "@/utils/handleErrorMessage";
 import db from "@/db/connection";
 import { schemaTopics } from "@/db/schema/topics";
-import { eq } from "drizzle-orm";
+import { eq, inArray } from "drizzle-orm";
 
 class Topics {
   private generateUniqueTopicSlug(name: string): string {
@@ -63,6 +63,23 @@ class Topics {
     } catch (error) {
       console.log("Failed deleting topic: ", handleErrorMessage(error));
       throw new Error("Failed deleting topic!");
+    }
+  }
+
+  /**
+   *
+   * Delete multiple selected topics at once
+   *
+   * @param ids The IDs of the topics that were selected for deletion
+   *
+   */
+  async deleteBulk(ids: number[]) {
+    try {
+      await db.delete(schemaTopics).where(inArray(schemaTopics.id, ids));
+      console.log(`Successfully removed ${ids.length} topics!`);
+    } catch (error) {
+      console.log("Failed bulk topics deletion: ", handleErrorMessage(error));
+      throw new Error("Failed bulk topics deletion!");
     }
   }
 }
