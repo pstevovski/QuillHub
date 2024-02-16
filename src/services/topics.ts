@@ -3,7 +3,9 @@ import db from "@/db/connection";
 import { schemaTopics } from "@/db/schema/topics";
 import { eq, inArray } from "drizzle-orm";
 import TokenService from "./token";
+import { ApiErrorMessage } from "@/app/api/handleApiError";
 
+// TODO: To be moved out of here
 enum UserRoles {
   BASIC = 1,
   ADMIN = 2,
@@ -19,8 +21,10 @@ class Topics {
       const topics = await db.select().from(schemaTopics);
       return topics;
     } catch (error) {
-      console.log(`Failed getting topics: ${handleErrorMessage(error)}`);
-      throw new Error("Failed getting topics");
+      console.log(
+        `TOPICS - Failed getting existing topics: ${handleErrorMessage(error)}`
+      );
+      throw new Error(handleErrorMessage(error));
     }
   }
 
@@ -31,12 +35,16 @@ class Topics {
         .from(schemaTopics)
         .where(eq(schemaTopics.id, id));
 
+      if (!targetedTopic[0]) throw new Error(ApiErrorMessage.NOT_FOUND);
+
       return targetedTopic[0];
     } catch (error) {
       console.log(
-        `Failed getting topic with id ${id}: ${handleErrorMessage(error)}`
+        `TOPICS - Failed getting topic with ID ${id}: ${handleErrorMessage(
+          error
+        )}`
       );
-      throw new Error("Failed getting the targeted topic");
+      throw new Error(handleErrorMessage(error));
     }
   }
 
@@ -48,10 +56,12 @@ class Topics {
         created_by: userId,
       });
 
-      console.log("Topic created successfully!");
+      console.log("TOPICS - Topic created successfully!");
     } catch (error) {
-      console.log(`Failed creating topic: ${handleErrorMessage(error)}`);
-      throw new Error("Failed creating topic");
+      console.log(
+        `TOPICS - Failed creating topic: ${handleErrorMessage(error)}`
+      );
+      throw new Error(handleErrorMessage(error));
     }
   }
 
@@ -67,14 +77,17 @@ class Topics {
         .from(schemaTopics)
         .where(eq(schemaTopics.id, id));
 
-      if (!targetedTopic[0]) return null;
+      // If topic does not exist
+      if (!targetedTopic[0]) {
+        throw new Error(ApiErrorMessage.NOT_FOUND);
+      }
 
       // Only allow the user that created the topic (or an admin) to update it
       if (
         targetedTopic[0].created_by !== userID ||
         roleID !== UserRoles.ADMIN
       ) {
-        throw new Error("Unauthorized to update this topic!");
+        throw new Error(ApiErrorMessage.UNAUTHORIZED);
       }
 
       // Update the name of the topic
@@ -82,10 +95,14 @@ class Topics {
         .update(schemaTopics)
         .set({ name })
         .where(eq(schemaTopics.id, id));
-      console.log(`Successfully updated the name of topic with ID ${id}.`);
+      console.log(
+        `TOPICS - Successfully updated the name of topic with ID ${id}.`
+      );
     } catch (error) {
       console.log(
-        `Failed updating topic with ID ${id}: ${handleErrorMessage(error)}`
+        `TOPICS - Failed updating topic with ID ${id}: ${handleErrorMessage(
+          error
+        )}`
       );
       throw new Error(handleErrorMessage(error));
     }
@@ -100,11 +117,14 @@ class Topics {
    */
   async deleteSpecific(id: number) {
     try {
+      // TODO: Check for topic existance first (?)
       await db.delete(schemaTopics).where(eq(schemaTopics.id, id));
-      console.log(`Topic with id: ${id} was successfully deleted!`);
+      console.log(`TOPICS - Successfully updated topic with ID ${id}`);
     } catch (error) {
-      console.log("Failed deleting topic: ", handleErrorMessage(error));
-      throw new Error("Failed deleting topic!");
+      console.log(
+        `TOPICS - Failed deleting topic: ${handleErrorMessage(error)}`
+      );
+      throw new Error(handleErrorMessage(error));
     }
   }
 
@@ -118,10 +138,12 @@ class Topics {
   async deleteBulk(ids: number[]) {
     try {
       await db.delete(schemaTopics).where(inArray(schemaTopics.id, ids));
-      console.log(`Successfully removed ${ids.length} topics!`);
+      console.log(`TOPICS - Successfully removed ${ids.length} topics!`);
     } catch (error) {
-      console.log("Failed bulk topics deletion: ", handleErrorMessage(error));
-      throw new Error("Failed bulk topics deletion!");
+      console.log(
+        `TOPICS - Failed bulk topics deletion: ${handleErrorMessage(error)}`
+      );
+      throw new Error(handleErrorMessage(error));
     }
   }
 }

@@ -1,7 +1,8 @@
 import TopicsService from "@/services/topics";
-import handleErrorMessage from "@/utils/handleErrorMessage";
 import { VALIDATION_SCHEMA_TOPICS } from "@/zod/topics";
 import { NextResponse } from "next/server";
+import { handleApiErrorResponse } from "../../handleApiError";
+import { handlePayloadValidation } from "../../handlePayloadValidation";
 
 /**
  *
@@ -14,17 +15,9 @@ export async function GET(
 ) {
   try {
     const topic = await TopicsService.getSpecifc(params.id);
-
-    if (!topic) {
-      return NextResponse.json({ error: "Topic not found!" }, { status: 404 });
-    }
-
     return NextResponse.json(topic, { status: 200 });
   } catch (error) {
-    return NextResponse.json(
-      { error: handleErrorMessage(error) },
-      { status: 500 }
-    );
+    return handleApiErrorResponse(error);
   }
 }
 
@@ -39,12 +32,11 @@ export async function PUT(
 ) {
   try {
     const payload = await request.json();
-    const isPayloadValid = VALIDATION_SCHEMA_TOPICS.safeParse({ ...payload });
 
-    if (!isPayloadValid.success) {
-      return NextResponse.json({ error: "Invalid values!" }, { status: 422 });
-    }
+    // Validate payload
+    await handlePayloadValidation(VALIDATION_SCHEMA_TOPICS, payload);
 
+    // Update the targeted topic's name
     await TopicsService.update(params.id, payload.name);
 
     return NextResponse.json(
@@ -52,11 +44,7 @@ export async function PUT(
       { status: 200 }
     );
   } catch (error) {
-    console.log("500 - Server Error: ", handleErrorMessage(error));
-    return NextResponse.json(
-      { error: "Server error - Something went wrong" },
-      { status: 500 }
-    );
+    return handleApiErrorResponse(error);
   }
 }
 
@@ -75,10 +63,6 @@ export async function DELETE(
       message: `Topic with ID ${params.id} was successfully deleted!`,
     });
   } catch (error) {
-    console.log("500 - Server Error: ", handleErrorMessage(error));
-    return NextResponse.json(
-      { error: "Server error - Something went wrong" },
-      { status: 500 }
-    );
+    return handleApiErrorResponse(error);
   }
 }
