@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "id": "e182c7b6-e426-490a-82fc-c136e362c5d2",
+  "id": "ef8d48cb-7159-46cc-a794-1eddeebb602c",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "posts_images": {
@@ -133,6 +133,13 @@
           "autoincrement": false,
           "onUpdate": true,
           "default": "(now())"
+        },
+        "topic_id": {
+          "name": "topic_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
         }
       },
       "indexes": {},
@@ -149,6 +156,19 @@
           ],
           "onDelete": "no action",
           "onUpdate": "no action"
+        },
+        "posts_topic_id_topics_id_fk": {
+          "name": "posts_topic_id_topics_id_fk",
+          "tableFrom": "posts",
+          "tableTo": "topics",
+          "columnsFrom": [
+            "topic_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {
@@ -160,6 +180,79 @@
         }
       },
       "uniqueConstraints": {}
+    },
+    "topics": {
+      "name": "topics",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(32)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "slug": {
+          "name": "slug",
+          "type": "varchar(32)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_by": {
+          "name": "created_by",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "topics_created_by_users_id_fk": {
+          "name": "topics_created_by_users_id_fk",
+          "tableFrom": "topics",
+          "tableTo": "users",
+          "columnsFrom": [
+            "created_by"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "topics_id": {
+          "name": "topics_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {
+        "topics_slug_unique": {
+          "name": "topics_slug_unique",
+          "columns": [
+            "slug"
+          ]
+        }
+      }
     },
     "roles": {
       "name": "roles",

@@ -8,6 +8,7 @@ import {
   varchar,
 } from "drizzle-orm/mysql-core";
 import { users } from "./users";
+import { schemaTopics } from "./topics";
 
 /*====================================
   TABLE: POSTS
@@ -30,8 +31,12 @@ export const postsSchema = mysqlTable("posts", {
     .notNull()
     .defaultNow()
     .onUpdateNow(),
-  // Todo: This will be implemented with a bridge table resulting in many-to-many relationship
-  // topic_id: int("topic_id").notNull(),
+  topic_id: bigint("topic_id", { mode: "number" }).references(
+    () => schemaTopics.id,
+    {
+      onDelete: "set null",
+    }
+  ),
 });
 
 export type Post = typeof postsSchema.$inferSelect;
