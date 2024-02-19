@@ -1,27 +1,16 @@
 import AuthService from "@/services/authentication";
-import handleErrorMessage from "@/utils/handleErrorMessage";
 import { AuthResetPasswordSchema } from "@/zod/auth";
+import { handlePayloadValidation } from "../../handlePayloadValidation";
+import { handleApiErrorResponse } from "../../handleApiError";
 
 export async function POST(request: Request) {
   try {
     const payload = await request.json();
 
-    // Check the received payload and if its not valid,
-    // throw an error and prevent saving the entry to the database
-    const validatePayload = AuthResetPasswordSchema.safeParse({
-      token: payload.token,
-      password: payload.password,
-      confirm_password: payload.confirm_password,
-    });
+    // Validate the received payload
+    await handlePayloadValidation(AuthResetPasswordSchema, payload);
 
-    if (!validatePayload.success) {
-      return Response.json(
-        { error: "Invalid values provided!" },
-        { status: 422 }
-      );
-    }
-
-    // Save the user in the database
+    // Update the password of the user
     await AuthService.resetPassword(payload.token, payload.password);
 
     return Response.json(
@@ -29,6 +18,6 @@ export async function POST(request: Request) {
       { status: 200 }
     );
   } catch (error) {
-    return Response.json({ error: handleErrorMessage(error) }, { status: 500 });
+    return handleApiErrorResponse(error);
   }
 }
