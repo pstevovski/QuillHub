@@ -3,22 +3,31 @@ import TokenService from "./token";
 import db from "@/db/connection";
 import { eq } from "drizzle-orm";
 import handleErrorMessage from "@/utils/handleErrorMessage";
-import { ApiErrorMessage } from "@/app/api/handleApiError";
 
 class Users {
   /** Gets the details of the currently logged in user */
-  async getCurrentUser(): Promise<User> {
+  async getCurrentUser(): Promise<Omit<User, "password"> | null> {
     try {
       // Decode the token saved as a cookie upon signin
-      const { user_id } = await TokenService.decodeToken();
+      const userToken = await TokenService.decodeToken();
+
+      if (!userToken) return null;
 
       // Get the user from the database or throw an error if user cannot be found
-      const user: User[] = await db
-        .select()
+      const user: Omit<User, "password">[] = await db
+        .select({
+          id: users.id,
+          email: users.email,
+          first_name: users.first_name,
+          last_name: users.last_name,
+          biography: users.biography,
+          profile_picture: users.profile_picture,
+          theme: users.theme,
+          role_id: users.role_id,
+          last_signin: users.last_signin,
+        })
         .from(users)
-        .where(eq(users.id, user_id));
-
-      if (!user || !user[0]) throw new Error(ApiErrorMessage.NOT_FOUND);
+        .where(eq(users.id, userToken.user_id));
 
       return user[0];
     } catch (error) {
