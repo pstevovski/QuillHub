@@ -6,7 +6,7 @@ import TokenService from "./token";
 import { ApiErrorMessage } from "@/app/api/handleApiError";
 
 // TODO: To be moved out of here
-enum UserRoles {
+export enum UserRoles {
   BASIC = 1,
   ADMIN = 2,
 }

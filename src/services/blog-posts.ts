@@ -12,6 +12,7 @@ import { postsImagesSchema, postsSchema } from "@/db/schema/posts";
 import UploadService from "./uploads";
 import TokenService from "./token";
 import { ApiErrorMessage } from "@/app/api/handleApiError";
+import { UserRoles } from "./topics";
 
 interface BlogNewPostPayload {
   title: string;
@@ -149,13 +150,32 @@ class BlogPosts {
    */
   async delete(blogPostID: number) {
     try {
+      const userDetails = await TokenService.decodeToken();
+      if (!userDetails) throw new Error(ApiErrorMessage.UNAUTHENTICATED);
+
+      // Find the matching blog post that should be deleted
+      const matchingBlogPost = await db
+        .select()
+        .from(postsSchema)
+        .where(eq(postsSchema.id, blogPostID));
+
+      // Throw if the blog post does not exist
+      if (!matchingBlogPost[0]) throw new Error(ApiErrorMessage.NOT_FOUND);
+
+      // Prevent deletion if user that didnt create the blog post tries to delete it
+      // Or if the user thats trying to delete the blog post is not an admin
+      if (
+        matchingBlogPost[0].created_by !== userDetails.id ||
+        userDetails.role_id !== UserRoles.ADMIN
+      ) {
+        throw new Error(ApiErrorMessage.UNAUTHORIZED);
+      }
+
       // Get all attached images keys that belong to the specific blog post
       const attachedImages = await db
         .select()
         .from(postsImagesSchema)
         .where(eq(postsImagesSchema.post_id, blogPostID));
-
-      // TODO: Only allow the deletion of a blog post by Admins or user that created it
 
       // If there are any attached images, remove them from UploadThing's servers
       if (attachedImages.length > 0) {

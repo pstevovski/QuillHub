@@ -1,4 +1,4 @@
-import BlogPostsService from "@/services/posts";
+import BlogPostsService from "@/services/blog-posts";
 import { VALIDATION_SCHEMA_BLOG_POSTS_NEW } from "@/zod/blog-posts";
 import { NextResponse } from "next/server";
 import { handlePayloadValidation } from "../handlePayloadValidation";
