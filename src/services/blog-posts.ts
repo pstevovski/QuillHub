@@ -80,14 +80,15 @@ class BlogPosts {
     cover_photo,
   }: BlogNewPostPayload) {
     try {
-      const { user_id } = await TokenService.decodeToken();
+      const userToken = await TokenService.decodeToken();
+      if (!userToken) throw new Error(ApiErrorMessage.UNAUTHENTICATED);
 
       const newPost = await db.insert(postsSchema).values({
         title,
         status,
         content,
         cover_photo,
-        created_by: user_id,
+        created_by: userToken.user_id,
       });
 
       // Extract the keys for those cover and content images
@@ -145,7 +146,8 @@ class BlogPosts {
    */
   async delete(blogPostID: number) {
     try {
-      const { user_id, role_id } = await TokenService.decodeToken();
+      const userToken = await TokenService.decodeToken();
+      if (!userToken) throw new Error(ApiErrorMessage.UNAUTHENTICATED);
 
       // Find the matching blog post that should be deleted
       const matchingBlogPost = await db
@@ -159,8 +161,8 @@ class BlogPosts {
       // Prevent deletion if user that didnt create the blog post tries to delete it
       // Or if the user thats trying to delete the blog post is not an admin
       if (
-        matchingBlogPost[0].created_by !== user_id ||
-        role_id !== UserRoles.ADMIN
+        matchingBlogPost[0].created_by !== userToken.user_id ||
+        userToken.role_id !== UserRoles.ADMIN
       ) {
         throw new Error(ApiErrorMessage.UNAUTHORIZED);
       }

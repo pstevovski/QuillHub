@@ -66,12 +66,14 @@ class Topics {
    */
   async create(name: string) {
     try {
-      const { user_id } = await TokenService.decodeToken();
+      // const { user_id } = await TokenService.decodeToken();
+      const userToken = await TokenService.decodeToken();
+      if (!userToken) throw new Error(ApiErrorMessage.UNAUTHENTICATED);
 
       await db.insert(schemaTopics).values({
         name: name,
         slug: this.generateUniqueTopicSlug(name),
-        created_by: user_id,
+        created_by: userToken.user_id,
       });
 
       console.log("TOPICS - Topic created successfully!");
@@ -101,12 +103,13 @@ class Topics {
       if (!targetedTopic[0]) throw new Error(ApiErrorMessage.NOT_FOUND);
 
       // Check for authorization before allowing deletion
-      const { user_id, role_id } = await TokenService.decodeToken();
+      const userToken = await TokenService.decodeToken();
+      if (!userToken) throw new Error(ApiErrorMessage.UNAUTHENTICATED);
 
       // Throw an error if user that didnt create the topic (or not an admin) tries to delete it
       if (
-        targetedTopic[0].created_by !== user_id ||
-        role_id !== UserRoles.ADMIN
+        targetedTopic[0].created_by !== userToken.user_id ||
+        userToken.role_id !== UserRoles.ADMIN
       ) {
         throw new Error(ApiErrorMessage.UNAUTHORIZED);
       }
@@ -138,13 +141,16 @@ class Topics {
       if (!targetedTopics.length) throw new Error(ApiErrorMessage.NOT_FOUND);
 
       // Check if the user that tries deleting the topics is the one that created them
-      const { user_id, role_id } = await TokenService.decodeToken();
+      const userToken = await TokenService.decodeToken();
+      if (!userToken) throw new Error(ApiErrorMessage.UNAUTHENTICATED);
 
       // If the user is not the one that created all of the targeted topics
       // and at the same time is not an admin, then prevent the delete action from happening
       if (
-        !targetedTopics.every((topic) => topic.created_by === user_id) &&
-        role_id !== UserRoles.ADMIN
+        !targetedTopics.every(
+          (topic) => topic.created_by === userToken.user_id
+        ) &&
+        userToken.role_id !== UserRoles.ADMIN
       ) {
         throw new Error(ApiErrorMessage.UNAUTHORIZED);
       }
