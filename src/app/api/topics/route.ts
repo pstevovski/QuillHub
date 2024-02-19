@@ -1,11 +1,12 @@
 import TokenService from "@/services/token";
 import TopicsService from "@/services/topics";
-import handleErrorMessage from "@/utils/handleErrorMessage";
 import {
   VALIDATION_SCHEMA_TOPICS,
   VALIDATION_SCHEMA_TOPICS_BULK_DELETE,
 } from "@/zod/topics";
 import { NextResponse } from "next/server";
+import { handleApiErrorResponse } from "../handleApiError";
+import { handlePayloadValidation } from "../handlePayloadValidation";
 
 /**
  *
@@ -15,17 +16,9 @@ import { NextResponse } from "next/server";
 export async function GET() {
   try {
     const topics = await TopicsService.getAll();
-
-    if (!topics || !topics.length) {
-      return NextResponse.json({ error: "No topics found!" }, { status: 404 });
-    }
-
     return NextResponse.json(topics, { status: 200 });
   } catch (error) {
-    return NextResponse.json(
-      { error: handleErrorMessage(error) },
-      { status: 500 }
-    );
+    return handleApiErrorResponse(error);
   }
 }
 
@@ -39,19 +32,11 @@ export async function POST(request: Request) {
     const payload = await request.json();
 
     // Check if the received payload passes validation schema
-    const isPayloadValid = VALIDATION_SCHEMA_TOPICS.safeParse({
-      name: payload.name,
-    });
-
-    if (!isPayloadValid.success) {
-      return NextResponse.json(
-        { error: "Invalid values provided!" },
-        { status: 422 }
-      );
-    }
+    await handlePayloadValidation(VALIDATION_SCHEMA_TOPICS, payload);
 
     // Get the ID of the currently logged in user
     // Note: This will become repetitive, find solution
+    // TODO: Remove this, handle within method
     const tokenDetails = await TokenService.decodeToken();
 
     if (!tokenDetails) {
@@ -62,10 +47,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ message: "Topic created!" }, { status: 200 });
   } catch (error) {
-    return NextResponse.json(
-      { error: handleErrorMessage(error) },
-      { status: 500 }
-    );
+    return handleApiErrorResponse(error);
   }
 }
 
@@ -77,13 +59,12 @@ export async function POST(request: Request) {
 export async function DELETE(request: Request) {
   try {
     const payload = await request.json();
-    const isPayloadValid = VALIDATION_SCHEMA_TOPICS_BULK_DELETE.safeParse({
-      ids: payload.ids,
-    });
 
-    if (!isPayloadValid.success) {
-      return NextResponse.json({ error: "Invalid values!" }, { status: 422 });
-    }
+    // Validate the payload
+    await handlePayloadValidation(
+      VALIDATION_SCHEMA_TOPICS_BULK_DELETE,
+      payload
+    );
 
     await TopicsService.deleteBulk(payload.ids);
 
@@ -92,13 +73,6 @@ export async function DELETE(request: Request) {
       { status: 200 }
     );
   } catch (error) {
-    console.log(
-      "500 - Server Error - Something went wrong!",
-      handleErrorMessage(error)
-    );
-    return NextResponse.json(
-      { error: "Something went wrong!" },
-      { status: 500 }
-    );
+    return handleApiErrorResponse(error);
   }
 }

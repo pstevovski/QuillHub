@@ -11,6 +11,7 @@ import { postsImagesSchema, postsSchema } from "@/db/schema/posts";
 // Services
 import UploadService from "./uploads";
 import TokenService from "./token";
+import { ApiErrorMessage } from "@/app/api/handleApiError";
 
 interface BlogNewPostPayload {
   title: string;
@@ -81,7 +82,7 @@ class BlogPosts {
       // Extract the currently logged in user's ID
       const userToken = await TokenService.decodeToken();
 
-      if (!userToken) throw new Error("Unauthenticated!");
+      if (!userToken) throw new Error(ApiErrorMessage.UNAUTHENTICATED);
 
       const newPost = await db.insert(postsSchema).values({
         title,
@@ -134,7 +135,7 @@ class BlogPosts {
       console.log(
         `Failed creating new blog post: ${handleErrorMessage(error)}`
       );
-      throw new Error("Failed creating new blog post!");
+      throw new Error(handleErrorMessage(error));
     }
   }
 
@@ -144,7 +145,6 @@ class BlogPosts {
    * via UploadThing
    *
    * @param id - The corresponding Blog Post ID
-   * @type integer
    *
    */
   async delete(blogPostID: number) {
@@ -154,6 +154,8 @@ class BlogPosts {
         .select()
         .from(postsImagesSchema)
         .where(eq(postsImagesSchema.post_id, blogPostID));
+
+      // TODO: Only allow the deletion of a blog post by Admins or user that created it
 
       // If there are any attached images, remove them from UploadThing's servers
       if (attachedImages.length > 0) {
@@ -174,7 +176,7 @@ class BlogPosts {
       await db.delete(postsSchema).where(eq(postsSchema.id, blogPostID));
     } catch (error) {
       console.log(`Failed deleting blog post: ${handleErrorMessage(error)}`);
-      throw new Error("Failed deleting blog post!");
+      throw new Error(handleErrorMessage(error));
     }
   }
 }

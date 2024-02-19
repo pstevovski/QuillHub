@@ -7,6 +7,7 @@ import handleErrorMessage from "@/utils/handleErrorMessage";
 import { eq } from "drizzle-orm";
 import EmailService, { EMAIL_TEMPLATES_PASSWORD_RESET } from "./email";
 import TokenService from "./token";
+import { ApiErrorMessage } from "@/app/api/handleApiError";
 
 /**
  * Service used for handling Authentication functionality
@@ -20,7 +21,9 @@ class Auth {
         .from(users)
         .where(eq(users.email, email));
 
-      if (!targetedUser.length) throw new Error("Invalid credentials!");
+      if (!targetedUser.length) {
+        throw new Error(ApiErrorMessage.INVALID_CREDENTIALS);
+      }
 
       // Check if the password that was provided matches the hashed password saved in the database
       const checkPasswordMatch = await compareUserPassword(
@@ -28,7 +31,9 @@ class Auth {
         targetedUser[0].password
       );
 
-      if (!checkPasswordMatch) throw new Error("Invalid credentials!");
+      if (!checkPasswordMatch) {
+        throw new Error(ApiErrorMessage.INVALID_CREDENTIALS);
+      }
 
       await TokenService.issueNewTokens(
         {
@@ -62,12 +67,7 @@ class Auth {
 
       // todo: Should be saved using some logging service
       console.error(`Failed creating new user: ${errorMessage}`);
-
-      if (errorMessage.toLowerCase().startsWith("duplicate entry")) {
-        throw new Error("User already exists!");
-      } else {
-        throw new Error("Failed creating new user!");
-      }
+      throw new Error(errorMessage);
     }
   }
 
@@ -89,7 +89,7 @@ class Auth {
     } catch (error) {
       const errorMessage: string = handleErrorMessage(error);
       console.log(`Failed sending password reset email: ${errorMessage}`);
-      throw new Error("Failed sending password reset email!");
+      throw new Error(errorMessage);
     }
   }
 
@@ -102,7 +102,9 @@ class Auth {
         .where(eq(userPasswordResets.token, token));
 
       // Throw an error if email cannot be found
-      if (!targetedEmail || !targetedEmail[0]) throw new Error("Invalid token");
+      if (!targetedEmail || !targetedEmail[0]) {
+        throw new Error(ApiErrorMessage.UNAUTHORIZED);
+      }
 
       // Find the targeted user based on the email
       const targetedUser = await db
@@ -112,7 +114,7 @@ class Auth {
 
       // Throw an error if no such user can be found
       if (!targetedUser || !targetedUser[0]) {
-        throw new Error("Account does not exist");
+        throw new Error(ApiErrorMessage.NOT_FOUND);
       }
 
       // Update the password for this user
@@ -133,7 +135,7 @@ class Auth {
     } catch (error) {
       const errorMessage: string = handleErrorMessage(error);
       console.log(`Failed resetting password: ${errorMessage}`);
-      throw new Error(`Failed resetting password: ${errorMessage}`);
+      throw new Error(errorMessage);
     }
   }
 

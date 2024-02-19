@@ -1,46 +1,29 @@
 // Utilities
 import { NextResponse } from "next/server";
-import { AuthSignInFields, AuthSignInSchema } from "@/zod/auth";
-import type { NextRequest } from "next/server";
-import handleErrorMessage from "@/utils/handleErrorMessage";
+import { AuthSignInSchema } from "@/zod/auth";
 import AuthService from "@/services/authentication";
+import { handleApiErrorResponse } from "../../handleApiError";
+import { handlePayloadValidation } from "../../handlePayloadValidation";
 
-export async function POST(request: NextRequest) {
-  const payload = (await request.json()) as AuthSignInFields;
-
-  const validatePayload = AuthSignInSchema.safeParse({
-    email: payload.email,
-    password: payload.password,
-    remember_me: payload.remember_me,
-  });
-
-  if (!validatePayload.success) {
-    return Response.json(
-      { error: "Please enter your email and password!" },
-      { status: 422 }
-    );
-  }
-
-  // Generate a new token that will be saved as HttpOnly cookie
+export async function POST(request: Request) {
   try {
+    const payload = await request.json();
+
+    // Validate the received payload
+    await handlePayloadValidation(AuthSignInSchema, payload);
+
+    // Sign in the user and issue tokens
     await AuthService.signIn(
       payload.email,
       payload.password,
       payload.remember_me
     );
 
-    return NextResponse.json(null, { status: 200 });
-  } catch (error) {
-    const errorMessage: string = handleErrorMessage(error);
-    const invalidCredentials = errorMessage
-      .toLowerCase()
-      .startsWith("invalid credentials");
-
-    return Response.json(
-      {
-        error: invalidCredentials ? errorMessage : "Something went wrong!",
-      },
-      { status: invalidCredentials ? 422 : 500 }
+    return NextResponse.json(
+      { message: "Successfully signed in!" },
+      { status: 200 }
     );
+  } catch (error) {
+    return handleApiErrorResponse(error);
   }
 }
