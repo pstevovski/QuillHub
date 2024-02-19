@@ -1,6 +1,6 @@
 import TokenService from "@/services/token";
-import handleErrorMessage from "@/utils/handleErrorMessage";
 import { NextRequest, NextResponse } from "next/server";
+import { handleApiErrorResponse } from "../../handleApiError";
 
 export async function POST(request: NextRequest) {
   try {
@@ -11,9 +11,6 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ token, expires }, { status: 200 });
   } catch (error) {
-    return NextResponse.json(
-      { error: handleErrorMessage(error) },
-      { status: 500 }
-    );
+    return handleApiErrorResponse(error);
   }
 }
