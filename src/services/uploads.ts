@@ -1,3 +1,5 @@
+import handleErrorMessage from "@/utils/handleErrorMessage";
+
 class Upload {
   /**
    *
@@ -61,7 +63,7 @@ class Upload {
         "Unused images successfully removed from Uploadthing servers."
       );
     } catch (error) {
-      throw new Error("Failed deleting unused images!");
+      throw new Error(handleErrorMessage(error));
     }
   }
 }
