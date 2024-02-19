@@ -10,16 +10,13 @@ class Users {
   async getCurrentUser(): Promise<User> {
     try {
       // Decode the token saved as a cookie upon signin
-      const userToken = await TokenService.decodeToken();
-      const userID = userToken?.id as number;
+      const { user_id } = await TokenService.decodeToken();
 
-      if (!userID) throw new Error(ApiErrorMessage.UNAUTHENTICATED);
-
-      // Get the user from the database
+      // Get the user from the database or throw an error if user cannot be found
       const user: User[] = await db
         .select()
         .from(users)
-        .where(eq(users.id, userID));
+        .where(eq(users.id, user_id));
 
       if (!user || !user[0]) throw new Error(ApiErrorMessage.NOT_FOUND);
 
