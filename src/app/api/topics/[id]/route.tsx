@@ -1,8 +1,6 @@
 import TopicsService from "@/services/topics";
-import { VALIDATION_SCHEMA_TOPICS } from "@/zod/topics";
 import { NextResponse } from "next/server";
 import { handleApiErrorResponse } from "../../handleApiError";
-import { handlePayloadValidation } from "../../handlePayloadValidation";
 
 /**
  *
@@ -16,33 +14,6 @@ export async function GET(
   try {
     const topic = await TopicsService.getSpecifc(params.id);
     return NextResponse.json(topic, { status: 200 });
-  } catch (error) {
-    return handleApiErrorResponse(error);
-  }
-}
-
-/**
- *
- * Update a specific topic based on ID
- *
- */
-export async function PUT(
-  request: Request,
-  { params }: { params: { id: number } }
-) {
-  try {
-    const payload = await request.json();
-
-    // Validate the received payload
-    await handlePayloadValidation(VALIDATION_SCHEMA_TOPICS, payload);
-
-    // Update the targeted topic's name
-    await TopicsService.update(params.id, payload.name);
-
-    return NextResponse.json(
-      { message: "Topic name updated" },
-      { status: 200 }
-    );
   } catch (error) {
     return handleApiErrorResponse(error);
   }
