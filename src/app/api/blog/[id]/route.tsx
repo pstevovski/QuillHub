@@ -1,6 +1,6 @@
 import BlogPostsService from "@/services/posts";
-import handleErrorMessage from "@/utils/handleErrorMessage";
 import { NextResponse } from "next/server";
+import { handleApiErrorResponse } from "../../handleApiError";
 
 /**
  *
@@ -18,9 +18,6 @@ export async function DELETE(
       { status: 200 }
     );
   } catch (error) {
-    return NextResponse.json(
-      { error: handleErrorMessage(error) },
-      { status: 500 }
-    );
+    return handleApiErrorResponse(error);
   }
 }

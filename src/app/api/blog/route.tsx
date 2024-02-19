@@ -1,7 +1,8 @@
 import BlogPostsService from "@/services/posts";
-import handleErrorMessage from "@/utils/handleErrorMessage";
 import { BlogNewPostSchema } from "@/zod/blog-posts";
 import { NextResponse } from "next/server";
+import { handlePayloadValidation } from "../handlePayloadValidation";
+import { handleApiErrorResponse } from "../handleApiError";
 
 /**
  *
@@ -11,19 +12,11 @@ import { NextResponse } from "next/server";
 export async function POST(request: Request) {
   try {
     const blogPostPayload = await request.json();
-    const validatePayload = BlogNewPostSchema.safeParse({
-      title: blogPostPayload.title,
-      content: blogPostPayload.content,
-      status: blogPostPayload.status,
-    });
 
-    if (!validatePayload.success) {
-      return Response.json(
-        { error: "Invalid values provided!" },
-        { status: 422 }
-      );
-    }
+    // Validate the received payload
+    await handlePayloadValidation(BlogNewPostSchema, blogPostPayload);
 
+    // Create the new blog post and save it in database
     await BlogPostsService.create(blogPostPayload);
 
     return NextResponse.json(
@@ -31,9 +24,6 @@ export async function POST(request: Request) {
       { status: 200 }
     );
   } catch (error) {
-    return NextResponse.json(
-      { error: handleErrorMessage(error) },
-      { status: 500 }
-    );
+    return handleApiErrorResponse(error);
   }
 }
