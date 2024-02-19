@@ -33,7 +33,7 @@ export async function PUT(
   try {
     const payload = await request.json();
 
-    // Validate payload
+    // Validate the received payload
     await handlePayloadValidation(VALIDATION_SCHEMA_TOPICS, payload);
 
     // Update the targeted topic's name
