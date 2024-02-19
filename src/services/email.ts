@@ -44,7 +44,7 @@ class Email {
     } catch (error) {
       const errorMessage: string = handleErrorMessage(error);
       console.log(`Failed sending email: ${errorMessage}`);
-      throw new Error("Failed sending email!");
+      throw new Error(errorMessage);
     }
   }
 }
