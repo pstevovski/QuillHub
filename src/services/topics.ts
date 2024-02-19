@@ -64,69 +64,20 @@ class Topics {
    * @param name The name of the topic
    *
    */
-  async create(userId: number, name: string) {
+  async create(name: string) {
     try {
+      const { user_id } = await TokenService.decodeToken();
+
       await db.insert(schemaTopics).values({
-        name,
+        name: name,
         slug: this.generateUniqueTopicSlug(name),
-        created_by: userId,
+        created_by: user_id,
       });
 
       console.log("TOPICS - Topic created successfully!");
     } catch (error) {
       console.log(
         `TOPICS - Failed creating topic: ${handleErrorMessage(error)}`
-      );
-      throw new Error(handleErrorMessage(error));
-    }
-  }
-
-  /**
-   *
-   * Update the name of an existing topic
-   *
-   * Note: This will be removed, topics will be unique and no changes can be made to them
-   *
-   */
-  async update(id: number, name: string) {
-    try {
-      const tokenDetails = await TokenService.decodeToken();
-      const userID = tokenDetails?.id || 0;
-      const roleID = tokenDetails?.role_id || 1;
-
-      // Find the targeted topic
-      const targetedTopic = await db
-        .select()
-        .from(schemaTopics)
-        .where(eq(schemaTopics.id, id));
-
-      // If topic does not exist
-      if (!targetedTopic[0]) {
-        throw new Error(ApiErrorMessage.NOT_FOUND);
-      }
-
-      // Only allow the user that created the topic (or an admin) to update it
-      if (
-        targetedTopic[0].created_by !== userID ||
-        roleID !== UserRoles.ADMIN
-      ) {
-        throw new Error(ApiErrorMessage.UNAUTHORIZED);
-      }
-
-      // Update the name of the topic
-      await db
-        .update(schemaTopics)
-        .set({ name })
-        .where(eq(schemaTopics.id, id));
-
-      console.log(
-        `TOPICS - Successfully updated the name of topic with ID ${id}.`
-      );
-    } catch (error) {
-      console.log(
-        `TOPICS - Failed updating topic with ID ${id}: ${handleErrorMessage(
-          error
-        )}`
       );
       throw new Error(handleErrorMessage(error));
     }
@@ -141,9 +92,27 @@ class Topics {
    */
   async deleteSpecific(id: number) {
     try {
-      // TODO: Check for topic existance first (?)
+      const targetedTopic = await db
+        .select()
+        .from(schemaTopics)
+        .where(eq(schemaTopics.id, id));
+
+      // Throw error if topic does not exist in the database
+      if (!targetedTopic[0]) throw new Error(ApiErrorMessage.NOT_FOUND);
+
+      // Check for authorization before allowing deletion
+      const { user_id, role_id } = await TokenService.decodeToken();
+
+      // Throw an error if user that didnt create the topic (or not an admin) tries to delete it
+      if (
+        targetedTopic[0].created_by !== user_id ||
+        role_id !== UserRoles.ADMIN
+      ) {
+        throw new Error(ApiErrorMessage.UNAUTHORIZED);
+      }
+
       await db.delete(schemaTopics).where(eq(schemaTopics.id, id));
-      console.log(`TOPICS - Successfully updated topic with ID ${id}`);
+      console.log(`TOPICS - Successfully deleted topic with ID ${id}`);
     } catch (error) {
       console.log(
         `TOPICS - Failed deleting topic: ${handleErrorMessage(error)}`
@@ -161,6 +130,25 @@ class Topics {
    */
   async deleteBulk(ids: number[]) {
     try {
+      const targetedTopics = await db
+        .select()
+        .from(schemaTopics)
+        .where(inArray(schemaTopics.id, ids));
+
+      if (!targetedTopics.length) throw new Error(ApiErrorMessage.NOT_FOUND);
+
+      // Check if the user that tries deleting the topics is the one that created them
+      const { user_id, role_id } = await TokenService.decodeToken();
+
+      // If the user is not the one that created all of the targeted topics
+      // and at the same time is not an admin, then prevent the delete action from happening
+      if (
+        !targetedTopics.every((topic) => topic.created_by === user_id) &&
+        role_id !== UserRoles.ADMIN
+      ) {
+        throw new Error(ApiErrorMessage.UNAUTHORIZED);
+      }
+
       await db.delete(schemaTopics).where(inArray(schemaTopics.id, ids));
       console.log(`TOPICS - Successfully removed ${ids.length} topics!`);
     } catch (error) {
