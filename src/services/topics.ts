@@ -4,12 +4,7 @@ import { schemaTopics } from "@/db/schema/topics";
 import { eq, inArray } from "drizzle-orm";
 import TokenService from "./token";
 import { ApiErrorMessage } from "@/app/api/handleApiError";
-
-// TODO: To be moved out of here
-export enum UserRoles {
-  BASIC = 1,
-  ADMIN = 2,
-}
+import { UserRoles } from "@/app/api/constants";
 
 class Topics {
   /** Construct a slug based on the name of the topic */
