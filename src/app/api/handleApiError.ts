@@ -2,6 +2,7 @@ import handleErrorMessage from "@/utils/handleErrorMessage";
 import { NextResponse } from "next/server";
 
 export enum ApiErrorMessage {
+  INVALID_CREDENTIALS = "Invalid Credentials!",
   BAD_REQUEST = "Bad Request",
   UNAUTHENTICATED = "Unauthenticated request",
   UNAUTHORIZED = "Unauthorized request",
@@ -25,7 +26,7 @@ export function handleApiErrorResponse(error: unknown): NextResponse {
   let statusCode: number = 500;
 
   switch (receivedMessage) {
-    case ApiErrorMessage.BAD_REQUEST:
+    case ApiErrorMessage.INVALID_CREDENTIALS || ApiErrorMessage.BAD_REQUEST:
       statusCode = 400;
       break;
     case ApiErrorMessage.UNAUTHENTICATED:
