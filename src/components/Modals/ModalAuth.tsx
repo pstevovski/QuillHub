@@ -12,13 +12,13 @@ import cn from "@/utils/classnames";
 // Schema
 import {
   AuthForgotPasswordFields,
-  AuthForgotPasswordSchema,
+  VALIDATION_SCHEMA_AUTH_FORGOT_PASSWORD,
   AuthResetPasswordFields,
-  AuthResetPasswordSchema,
+  VALIDATION_SCHEMA_AUTH_RESET_PASSWORD,
   AuthSignInFields,
-  AuthSignInSchema,
+  VALIDATION_SCHEMA_AUTH_SIGNIN,
   AuthSignUpFields,
-  AuthSignUpSchema,
+  VALIDATION_SCHEMA_AUTH_SIGNUP,
 } from "@/zod/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -100,7 +100,7 @@ function ModalAuthSignIn({
     formState: { errors, isSubmitting },
   } = useForm<AuthSignInFields>({
     defaultValues: { email: "", password: "", remember_me: false },
-    resolver: zodResolver(AuthSignInSchema),
+    resolver: zodResolver(VALIDATION_SCHEMA_AUTH_SIGNIN),
   });
 
   const handleSignIn: SubmitHandler<AuthSignInFields> = async (credentials) => {
@@ -220,7 +220,7 @@ function ModalAuthSignUp({
       password: "",
       confirm_password: "",
     },
-    resolver: zodResolver(AuthSignUpSchema),
+    resolver: zodResolver(VALIDATION_SCHEMA_AUTH_SIGNUP),
   });
 
   const handleSignUp: SubmitHandler<AuthSignUpFields> = async (newUser) => {
@@ -321,7 +321,7 @@ function ModalAuthPasswordForgot({
     formState: { isSubmitting, isSubmitSuccessful, errors },
   } = useForm<AuthForgotPasswordFields>({
     defaultValues: { email: "" },
-    resolver: zodResolver(AuthForgotPasswordSchema),
+    resolver: zodResolver(VALIDATION_SCHEMA_AUTH_FORGOT_PASSWORD),
   });
 
   const handleSendEmail: SubmitHandler<AuthForgotPasswordFields> = async (
@@ -392,7 +392,7 @@ function ModalAuthPasswordReset({
     formState: { errors, isSubmitting },
   } = useForm<AuthResetPasswordFields>({
     defaultValues: { token: token || "", password: "", confirm_password: "" },
-    resolver: zodResolver(AuthResetPasswordSchema),
+    resolver: zodResolver(VALIDATION_SCHEMA_AUTH_RESET_PASSWORD),
   });
 
   const handleResetPassword: SubmitHandler<AuthResetPasswordFields> = async (

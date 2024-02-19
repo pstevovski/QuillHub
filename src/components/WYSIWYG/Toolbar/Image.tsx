@@ -30,7 +30,7 @@ import { UploadButton } from "@/components/UploadThing";
 import { TipTapExtensionComponentProps } from "../TipTap";
 import { UploadFileResponse } from "uploadthing/client";
 
-const ImageFormSchema = z.object({
+const VALIDATION_SCHEMA_EDITOR_IMAGE = z.object({
   url: z
     .string()
     .url(
@@ -39,7 +39,7 @@ const ImageFormSchema = z.object({
   title: z.string().min(1, "Please provide a title for the image image"),
   alt: z.string().optional(),
 });
-type ImageUpload = z.infer<typeof ImageFormSchema>;
+type ImageUpload = z.infer<typeof VALIDATION_SCHEMA_EDITOR_IMAGE>;
 
 export default function Image({
   editor,
@@ -52,7 +52,7 @@ export default function Image({
     useState<UploadFileResponse<unknown> | null>(null);
 
   const form = useForm<ImageUpload>({
-    resolver: zodResolver(ImageFormSchema),
+    resolver: zodResolver(VALIDATION_SCHEMA_EDITOR_IMAGE),
     defaultValues: {
       url: "",
       title: "",

@@ -1,6 +1,6 @@
 // Utilities
 import { NextResponse } from "next/server";
-import { AuthSignInSchema } from "@/zod/auth";
+import { VALIDATION_SCHEMA_AUTH_SIGNIN } from "@/zod/auth";
 import AuthService from "@/services/authentication";
 import { handleApiErrorResponse } from "../../handleApiError";
 import { handlePayloadValidation } from "../../handlePayloadValidation";
@@ -10,7 +10,7 @@ export async function POST(request: Request) {
     const payload = await request.json();
 
     // Validate the received payload
-    await handlePayloadValidation(AuthSignInSchema, payload);
+    await handlePayloadValidation(VALIDATION_SCHEMA_AUTH_SIGNIN, payload);
 
     // Sign in the user and issue tokens
     await AuthService.signIn(

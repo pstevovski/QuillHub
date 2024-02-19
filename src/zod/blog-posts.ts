@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const BlogNewPostSchema = z.object({
+export const VALIDATION_SCHEMA_BLOG_POSTS_NEW = z.object({
   title: z
     .string({
       required_error: "Please enter the title for the blog post",

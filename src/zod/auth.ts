@@ -3,7 +3,7 @@ import { z } from "zod";
 /*====================================
   AUTHENTICATION: SIGN IN FORM
 =====================================*/
-export const AuthSignInSchema = z.object({
+export const VALIDATION_SCHEMA_AUTH_SIGNIN = z.object({
   email: z
     .string({ required_error: "Please enter your email address" })
     .email({ message: "Please enter a valid email address" }),
@@ -13,12 +13,12 @@ export const AuthSignInSchema = z.object({
   remember_me: z.boolean(),
 });
 
-export type AuthSignInFields = z.infer<typeof AuthSignInSchema>;
+export type AuthSignInFields = z.infer<typeof VALIDATION_SCHEMA_AUTH_SIGNIN>;
 
 /*====================================
   AUTHENTICATION: SIGN UP FORM
 =====================================*/
-export const AuthSignUpSchema = z
+export const VALIDATION_SCHEMA_AUTH_SIGNUP = z
   .object({
     email: z
       .string({ required_error: "Please enter your email address" })
@@ -44,23 +44,25 @@ export const AuthSignUpSchema = z
     }
   );
 
-export type AuthSignUpFields = z.infer<typeof AuthSignUpSchema>;
+export type AuthSignUpFields = z.infer<typeof VALIDATION_SCHEMA_AUTH_SIGNUP>;
 
 /*====================================
   AUTHENTICATION: FORGOT PASSWORD FORM
 =====================================*/
-export const AuthForgotPasswordSchema = z.object({
+export const VALIDATION_SCHEMA_AUTH_FORGOT_PASSWORD = z.object({
   email: z
     .string({ required_error: "Please enter your email address " })
     .email({ message: "Please enter a valid email address" }),
 });
 
-export type AuthForgotPasswordFields = z.infer<typeof AuthForgotPasswordSchema>;
+export type AuthForgotPasswordFields = z.infer<
+  typeof VALIDATION_SCHEMA_AUTH_FORGOT_PASSWORD
+>;
 
 /*====================================
   AUTHENTICATION: RESET PASSWORD FORM
 =====================================*/
-export const AuthResetPasswordSchema = z
+export const VALIDATION_SCHEMA_AUTH_RESET_PASSWORD = z
   .object({
     token: z.string({
       required_error: "Please provide a valid password reset token",
@@ -80,4 +82,6 @@ export const AuthResetPasswordSchema = z
     }
   );
 
-export type AuthResetPasswordFields = z.infer<typeof AuthResetPasswordSchema>;
+export type AuthResetPasswordFields = z.infer<
+  typeof VALIDATION_SCHEMA_AUTH_RESET_PASSWORD
+>;

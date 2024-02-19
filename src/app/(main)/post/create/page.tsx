@@ -19,7 +19,7 @@ import { UploadFileResponse } from "uploadthing/client";
 import { toast } from "sonner";
 import handleErrorMessage from "@/utils/handleErrorMessage";
 import fetchHandler from "@/utils/fetchHandler";
-import { BlogNewPostSchema } from "@/zod/blog-posts";
+import { VALIDATION_SCHEMA_BLOG_POSTS_NEW } from "@/zod/blog-posts";
 import { UploadButton } from "@/components/UploadThing";
 import { Label } from "@/ui/label";
 import useWarnForUnsavedChanges from "@/hooks/useWarnForUnsavedChanges";
@@ -38,7 +38,7 @@ export default function PostCreate() {
       status: undefined,
       cover_photo: undefined,
     },
-    resolver: zodResolver(BlogNewPostSchema),
+    resolver: zodResolver(VALIDATION_SCHEMA_BLOG_POSTS_NEW),
   });
   const watchCoverPhoto = watch("cover_photo");
   const [isUploadingCoverPhoto, setIsUploadingCoverPhoto] =

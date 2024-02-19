@@ -1,5 +1,5 @@
 import AuthService from "@/services/authentication";
-import { AuthResetPasswordSchema } from "@/zod/auth";
+import { VALIDATION_SCHEMA_AUTH_RESET_PASSWORD } from "@/zod/auth";
 import { handlePayloadValidation } from "../../handlePayloadValidation";
 import { handleApiErrorResponse } from "../../handleApiError";
 
@@ -8,7 +8,10 @@ export async function POST(request: Request) {
     const payload = await request.json();
 
     // Validate the received payload
-    await handlePayloadValidation(AuthResetPasswordSchema, payload);
+    await handlePayloadValidation(
+      VALIDATION_SCHEMA_AUTH_RESET_PASSWORD,
+      payload
+    );
 
     // Update the password of the user
     await AuthService.resetPassword(payload.token, payload.password);
