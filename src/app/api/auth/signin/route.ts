@@ -13,11 +13,11 @@ export async function POST(request: Request) {
     await handlePayloadValidation(VALIDATION_SCHEMA_AUTH_SIGNIN, payload);
 
     // Sign in the user and issue tokens
-    await AuthService.signIn(
-      payload.email,
-      payload.password,
-      payload.remember_me
-    );
+    await AuthService.signIn({
+      email: payload.email,
+      password: payload.password,
+      remember_me: payload.remember_me,
+    });
 
     return NextResponse.json(
       { message: "Successfully signed in!" },
