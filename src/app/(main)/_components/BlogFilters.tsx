@@ -43,7 +43,7 @@ const BLOG_SECTIONS: BlogSections[] = [
 export default function HomepageBlogFilters({
   userToken,
 }: {
-  userToken: JWTPayload | undefined;
+  userToken: JWTPayload | null;
 }) {
   const router = useRouter();
   const pathname = usePathname();
