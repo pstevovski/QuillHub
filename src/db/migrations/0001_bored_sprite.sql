@@ -1,0 +1,1 @@
+ALTER TABLE `topics` ADD CONSTRAINT `topics_name_unique` UNIQUE(`name`);

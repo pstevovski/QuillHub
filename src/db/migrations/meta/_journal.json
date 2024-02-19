@@ -8,6 +8,13 @@
       "when": 1708080153667,
       "tag": "0000_curved_jack_power",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1708349307918,
+      "tag": "0001_bored_sprite",
+      "breakpoints": true
     }
   ]
 }

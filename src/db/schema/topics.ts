@@ -3,7 +3,7 @@ import { users } from "./users";
 
 export const schemaTopics = mysqlTable("topics", {
   id: bigint("id", { mode: "number" }).primaryKey().autoincrement(),
-  name: varchar("name", { length: 32 }).notNull(),
+  name: varchar("name", { length: 32 }).unique().notNull(),
   slug: varchar("slug", { length: 32 }).unique().notNull(),
   created_by: bigint("created_by", { mode: "number" }).references(
     () => users.id,
