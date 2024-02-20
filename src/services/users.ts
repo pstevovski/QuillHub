@@ -1,20 +1,17 @@
-import { User, users } from "@/db/schema/users";
-import TokenService from "./token";
+import { UserNoPassword, users } from "@/db/schema/users";
 import db from "@/db/connection";
 import { eq } from "drizzle-orm";
 import handleErrorMessage from "@/utils/handleErrorMessage";
+import TokenService from "./token";
 
 class Users {
   /** Gets the details of the currently logged in user */
-  async getCurrentUser(): Promise<Omit<User, "password"> | null> {
+  async getCurrentUser(): Promise<UserNoPassword> {
     try {
-      // Decode the token saved as a cookie upon signin
-      const userToken = await TokenService.decodeToken();
-
-      if (!userToken) return null;
+      const { user_id } = await TokenService.decodeToken();
 
       // Get the user from the database or throw an error if user cannot be found
-      const user: Omit<User, "password">[] = await db
+      const user: UserNoPassword[] = await db
         .select({
           id: users.id,
           email: users.email,
@@ -27,7 +24,7 @@ class Users {
           last_signin: users.last_signin,
         })
         .from(users)
-        .where(eq(users.id, userToken.user_id));
+        .where(eq(users.id, user_id));
 
       return user[0];
     } catch (error) {
