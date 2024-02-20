@@ -42,6 +42,7 @@ import {
 import { Input } from "@/ui/input";
 import { Button } from "@/ui/button";
 import Loader from "@/components/Loaders/Loader";
+import TopicsMenu from "@/components/Topics/TopicsMenu";
 
 export default function PostCreate() {
   const form = useForm<PostsNew>({
@@ -235,6 +236,8 @@ export default function PostCreate() {
           />
 
           {/* TOPIC */}
+          <TopicsMenu />
+
           {/* <DropdownSelect
           selection={topic}
           handleSelection={handleTopicSelection}
