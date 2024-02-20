@@ -1,25 +1,39 @@
 "use client";
 
-import Button from "@/components/Buttons/Button";
+// Utilities & Hooks
+import { useState } from "react";
+import { toast } from "sonner";
+import Link from "next/link";
+import handleErrorMessage from "@/utils/handleErrorMessage";
+import fetchHandler from "@/utils/fetchHandler";
+import useWarnForUnsavedChanges from "@/hooks/useWarnForUnsavedChanges";
+
+// Form
 import FormFieldErrorMessage from "@/components/Form/FormFieldErrorMessage";
-import FormTextInput from "@/components/Form/FormTextInput";
 import { PostsNew } from "@/db/schema/posts";
 import { zodResolver } from "@hookform/resolvers/zod";
-import Link from "next/link";
-import { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
+import { VALIDATION_SCHEMA_BLOG_POSTS_NEW } from "@/zod/blog-posts";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/ui/form";
 
 // Assets
 import { FaArrowLeftLong as GoBackIcon } from "react-icons/fa6";
-import Tiptap from "@/components/WYSIWYG/TipTap";
+
+// Uploadthing
 import { UploadFileResponse } from "uploadthing/client";
-import { toast } from "sonner";
-import handleErrorMessage from "@/utils/handleErrorMessage";
-import fetchHandler from "@/utils/fetchHandler";
-import { VALIDATION_SCHEMA_BLOG_POSTS_NEW } from "@/zod/blog-posts";
 import { UploadButton } from "@/components/UploadThing";
+
+// Components
+import Button from "@/components/Buttons/Button";
+import Tiptap from "@/components/WYSIWYG/TipTap";
 import { Label } from "@/ui/label";
-import useWarnForUnsavedChanges from "@/hooks/useWarnForUnsavedChanges";
 import {
   Select,
   SelectContent,
@@ -27,15 +41,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/ui/select";
+import { Input } from "@/ui/input";
 
 export default function PostCreate() {
-  const {
-    register,
-    handleSubmit,
-    watch,
-    setValue,
-    formState: { errors, isDirty, isSubmitting },
-  } = useForm<PostsNew>({
+  const form = useForm<PostsNew>({
     defaultValues: {
       title: "",
       content: "",
@@ -44,7 +53,7 @@ export default function PostCreate() {
     },
     resolver: zodResolver(VALIDATION_SCHEMA_BLOG_POSTS_NEW),
   });
-  const watchCoverPhoto = watch("cover_photo");
+  const watchCoverPhoto = form.watch("cover_photo");
   const [isUploadingCoverPhoto, setIsUploadingCoverPhoto] =
     useState<boolean>(false);
 
@@ -66,7 +75,7 @@ export default function PostCreate() {
     COVER PHOTO
   ==================================*/
   const handleUploadCoverPhoto = (response: UploadFileResponse<unknown>[]) => {
-    setValue("cover_photo", response[0].url, { shouldDirty: true });
+    form.setValue("cover_photo", response[0].url, { shouldDirty: true });
     setIsUploadingCoverPhoto(false);
     handleUploadedCoverImagesKeys(response[0].key);
   };
@@ -110,7 +119,7 @@ export default function PostCreate() {
     }
   };
 
-  useWarnForUnsavedChanges(isDirty);
+  useWarnForUnsavedChanges(form.formState.isDirty);
 
   return (
     <div>
@@ -130,62 +139,75 @@ export default function PostCreate() {
         Unfold your imagination and make your stories come to life.
       </p>
 
-      <form onSubmit={handleSubmit(handlePostCreate)}>
-        <div className="flex flex-col items-start mb-6">
-          <Label className="text-sm text-slate-400">Cover Photo</Label>
-          <p className="text-xs text-slate-400 mb-4">
-            Upload a cover photo for your blog post
-          </p>
-          <UploadButton
-            endpoint="blogPostCoverPhoto"
-            onUploadBegin={() => setIsUploadingCoverPhoto(true)}
-            onClientUploadComplete={handleUploadCoverPhoto}
-            onUploadError={() => {
-              toast.error("Failed uploading cover photo. Please try again!");
-              setIsUploadingCoverPhoto(false);
-            }}
-            appearance={{
-              button: ({ isUploading }) =>
-                `bg-teal-400 hover:bg-teal-500 duration-300 ${
-                  isUploading ? "bg-slate-200 cursor-not-allowed" : ""
-                }`,
-              allowedContent: "w-full text-slate-400 font-medium",
-            }}
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(handlePostCreate)}>
+          <div className="flex flex-col items-start mb-6">
+            <Label className="text-sm text-slate-400">Cover Photo</Label>
+            <p className="text-xs text-slate-400 mb-4">
+              Upload a cover photo for your blog post
+            </p>
+            <UploadButton
+              endpoint="blogPostCoverPhoto"
+              onUploadBegin={() => setIsUploadingCoverPhoto(true)}
+              onClientUploadComplete={handleUploadCoverPhoto}
+              onUploadError={() => {
+                toast.error("Failed uploading cover photo. Please try again!");
+                setIsUploadingCoverPhoto(false);
+              }}
+              appearance={{
+                button: ({ isUploading }) =>
+                  `bg-teal-400 hover:bg-teal-500 duration-300 ${
+                    isUploading ? "bg-slate-200 cursor-not-allowed" : ""
+                  }`,
+                allowedContent: "w-full text-slate-400 font-medium",
+              }}
+            />
+            {watchCoverPhoto ? (
+              <img width="300" height="300" src={watchCoverPhoto} />
+            ) : null}
+            <FormFieldErrorMessage error={form.formState.errors.cover_photo} />
+          </div>
+
+          <FormField
+            control={form.control}
+            name="title"
+            render={({ field }) => (
+              <FormItem className="mb-4">
+                <FormLabel className="text-slate-400">Title</FormLabel>
+                <FormControl>
+                  <Input
+                    {...field}
+                    type="text"
+                    id="title"
+                    placeholder="e.g. Using NextJS 14"
+                    className="max-w-lg placeholder:text-slate-300"
+                  />
+                </FormControl>
+                <FormMessage className="text-xs" />
+              </FormItem>
+            )}
           />
-          {watchCoverPhoto ? (
-            <img width="300" height="300" src={watchCoverPhoto} />
-          ) : null}
-          <FormFieldErrorMessage error={errors.cover_photo} />
-        </div>
 
-        <FormTextInput
-          label="Title"
-          register={register("title")}
-          error={errors.title}
-          placeholder=""
-          autoComplete="title"
-          modifierClass="max-w-lg"
-        />
+          {/* STATUS */}
+          <Label className="text-sm text-slate-400">Status</Label>
+          <Select
+            onValueChange={(status) => {
+              form.setValue("status", status as "draft" | "published", {
+                shouldDirty: true,
+              });
+            }}
+          >
+            <SelectTrigger className="max-w-[200px] text-slate-400 mb-10">
+              <SelectValue placeholder="Select Status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="draft">Draft</SelectItem>
+              <SelectItem value="published">Published</SelectItem>
+            </SelectContent>
+          </Select>
 
-        {/* STATUS */}
-        <Select
-          onValueChange={(status) => {
-            setValue("status", status as "draft" | "published", {
-              shouldDirty: true,
-            });
-          }}
-        >
-          <SelectTrigger className="max-w-[200px] text-slate-400">
-            <SelectValue placeholder="Select Status" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="draft">Draft</SelectItem>
-            <SelectItem value="published">Published</SelectItem>
-          </SelectContent>
-        </Select>
-
-        {/* TOPIC */}
-        {/* <DropdownSelect
+          {/* TOPIC */}
+          {/* <DropdownSelect
           selection={topic}
           handleSelection={handleTopicSelection}
           modifierClass="mb-6"
@@ -207,24 +229,29 @@ export default function PostCreate() {
           <FormFieldErrorMessage error={errors.topic_id} />
         </DropdownSelect> */}
 
-        <Tiptap
-          defaultContent=""
-          handleEditorUpdate={(text) =>
-            setValue("content", text, { shouldDirty: true })
-          }
-          handleUploadedImageKey={handleUploadedContentImagesKeys}
-        />
-        <FormFieldErrorMessage error={errors.content} />
+          <Tiptap
+            defaultContent=""
+            handleEditorUpdate={(text) =>
+              form.setValue("content", text, { shouldDirty: true })
+            }
+            handleUploadedImageKey={handleUploadedContentImagesKeys}
+          />
+          <FormFieldErrorMessage error={form.formState.errors.content} />
 
-        <Button
-          type="submit"
-          isLoading={isSubmitting}
-          disabled={!isDirty || isUploadingCoverPhoto || isSubmitting}
-          modifierClass="my-10"
-        >
-          {isSubmitting ? "Creating..." : "Create Blog Post"}
-        </Button>
-      </form>
+          <Button
+            type="submit"
+            isLoading={form.formState.isSubmitting}
+            disabled={
+              !form.formState.isDirty ||
+              isUploadingCoverPhoto ||
+              form.formState.isSubmitting
+            }
+            modifierClass="my-10"
+          >
+            {form.formState.isSubmitting ? "Creating..." : "Create Blog Post"}
+          </Button>
+        </form>
+      </Form>
     </div>
   );
 }
