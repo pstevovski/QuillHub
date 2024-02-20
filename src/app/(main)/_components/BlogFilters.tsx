@@ -1,6 +1,6 @@
 "use client";
 
-import { User } from "@/db/schema/users";
+import type { UserNoPassword } from "@/db/schema/users";
 import cn from "@/utils/classnames";
 import { usePathname, useSearchParams, useRouter } from "next/navigation";
 import { useState } from "react";
@@ -40,7 +40,11 @@ const BLOG_SECTIONS: BlogSections[] = [
   },
 ];
 
-export default function HomepageBlogFilters({ user }: { user: User | null }) {
+export default function HomepageBlogFilters({
+  user,
+}: {
+  user: UserNoPassword | null;
+}) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();

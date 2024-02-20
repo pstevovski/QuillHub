@@ -35,7 +35,8 @@ export const users = mysqlTable("users", {
     .$type<Date | null>(),
 });
 
-export type User = Omit<typeof users.$inferSelect, "password">;
+export type User = typeof users.$inferSelect;
+export type UserNoPassword = Omit<typeof users.$inferSelect, "password">;
 export type UserNew = typeof users.$inferInsert;
 
 /*===========================================
