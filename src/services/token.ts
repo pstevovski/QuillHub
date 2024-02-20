@@ -4,6 +4,7 @@ import { cookies } from "next/headers";
 // Utilities
 import handleErrorMessage from "@/utils/handleErrorMessage";
 import { JWTPayload, SignJWT, decodeJwt, jwtVerify } from "jose";
+import { ApiErrorMessage } from "@/app/api/handleApiError";
 
 interface DecodedTokenDetails extends JWTPayload {
   user_id: number;
@@ -137,12 +138,11 @@ class Token {
   }
 
   /** Decodes the provided token containing some user-specific details */
-  async decodeToken(): Promise<DecodedTokenDetails | null> {
+  async decodeToken(): Promise<DecodedTokenDetails> {
     const token = cookies().get(this.ACCESS_TOKEN_NAME)?.value;
 
     // Throw an error if there's no valid access token value in the cookies
-    // Note: Look for better solution, this is not ideal
-    if (!token) return null;
+    if (!token) throw new Error(ApiErrorMessage.UNAUTHENTICATED);
 
     try {
       const decodedToken = decodeJwt(token);
