@@ -27,13 +27,18 @@ import { motion, AnimatePresence } from "framer-motion";
 import FormTextInput from "../Form/FormTextInput";
 import FormPasswordInput from "../Form/FormPasswordInput";
 import FormCheckbox from "../Form/FormCheckbox";
-import Tooltip from "../Tooltips/Tooltip";
 import Button from "../Buttons/Button";
 
 // Assets
 import { FaCircleInfo as InfoIcon } from "react-icons/fa6";
 import { IoClose as CloseIcon } from "react-icons/io5";
 import { FaArrowLeftLong as GoBackIcon } from "react-icons/fa6";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/ui/tooltip";
 
 type ModalAuthType =
   | "sign_in"
@@ -179,13 +184,22 @@ function ModalAuthSignIn({
             register={register("remember_me")}
           />
 
-          <Tooltip
-            text="Remain signed in for 30 days. Its best to use this option on a personal computer."
-            side="top"
-            sideOffset={12}
-          >
-            <InfoIcon className="text-slate-300 text-md mt-[2px]" />
-          </Tooltip>
+          <TooltipProvider delayDuration={100}>
+            <Tooltip>
+              <TooltipTrigger type="button">
+                <InfoIcon className="text-slate-300 text-md mt-[2px]" />
+              </TooltipTrigger>
+              <TooltipContent
+                sideOffset={8}
+                className="max-w-[250px] text-center text-slate-400 p-4"
+              >
+                <p>
+                  Remain signed in for 30 days. <br />
+                  Its best to use this option on a personal computer.
+                </p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
 
         <Button
