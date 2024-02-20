@@ -24,10 +24,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 // Components
 import { motion, AnimatePresence } from "framer-motion";
-import FormTextInput from "../Form/FormTextInput";
-import FormPasswordInput from "../Form/FormPasswordInput";
-import FormCheckbox from "../Form/FormCheckbox";
-import Button from "../Buttons/Button";
+import { Button } from "@/ui/button";
 
 // Assets
 import { FaCircleInfo as InfoIcon } from "react-icons/fa6";
@@ -39,6 +36,18 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/ui/tooltip";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/ui/form";
+import { Input } from "@/ui/input";
+import { Checkbox } from "@/ui/checkbox";
+import { Separator } from "@/ui/separator";
+import Loader from "../Loaders/Loader";
 
 type ModalAuthType =
   | "sign_in"
@@ -99,11 +108,7 @@ function ModalAuthSignIn({
   const searchParams = useSearchParams();
   const redirectUrl = searchParams.get("redirectUrl");
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm<AuthSignInFields>({
+  const form = useForm<AuthSignInFields>({
     defaultValues: { email: "", password: "", remember_me: false },
     resolver: zodResolver(VALIDATION_SCHEMA_AUTH_SIGNIN),
   });
@@ -152,67 +157,107 @@ function ModalAuthSignIn({
         </p>
       ) : null}
 
-      <form onSubmit={handleSubmit(handleSignIn)} autoComplete="off">
-        <FormTextInput
-          label="Email"
-          register={register("email")}
-          error={errors.email}
-          placeholder="your@email.com"
-          autoComplete="email"
-        />
-        <FormPasswordInput
-          label="Password"
-          register={register("password")}
-          error={errors.password}
-          autoComplete="current-password"
-        />
-
-        <button
-          type="button"
-          className="text-slate-400 text-sm hover:text-teal-500 duration-300 cursor-pointer mb-4"
-          onClick={() => handleModalAuthType("password_forgot")}
-        >
-          Forgot Password?
-        </button>
-
-        <hr className="border-none sticky w-full h-[1px] bg-gradient-to-r from-white via-slate-200 to-white mb-4" />
-
-        <div className="flex items-start">
-          <FormCheckbox
-            modifierClass="mb-8 mr-4"
-            text="Remember Me"
-            register={register("remember_me")}
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(handleSignIn)}>
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem className="mb-4">
+                <FormLabel className="text-slate-400">Email</FormLabel>
+                <FormControl>
+                  <Input
+                    {...field}
+                    type="text"
+                    id="email"
+                    placeholder="your@email.com"
+                    className="placeholder:text-slate-300"
+                  />
+                </FormControl>
+                <FormMessage className="text-xs" />
+              </FormItem>
+            )}
           />
 
-          <TooltipProvider delayDuration={100}>
-            <Tooltip>
-              <TooltipTrigger type="button">
-                <InfoIcon className="text-slate-300 text-md mt-[2px]" />
-              </TooltipTrigger>
-              <TooltipContent
-                sideOffset={8}
-                className="max-w-[250px] text-center text-slate-400 p-4"
-              >
-                <p>
-                  Remain signed in for 30 days. <br />
-                  Its best to use this option on a personal computer.
-                </p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        </div>
+          <FormField
+            control={form.control}
+            name="password"
+            render={({ field }) => (
+              <FormItem className="mb-8">
+                <FormLabel className="text-slate-400">Password</FormLabel>
+                <FormControl>
+                  <Input
+                    {...field}
+                    type="password"
+                    id="password"
+                    placeholder="**********"
+                    className="placeholder:text-slate-300"
+                  />
+                </FormControl>
+                <FormMessage className="text-xs" />
+              </FormItem>
+            )}
+          />
 
-        <Button
-          type="submit"
-          variant="primary"
-          size="full"
-          modifierClass="mb-2"
-          disabled={isSubmitting}
-          isLoading={isSubmitting}
-        >
-          Sign In
-        </Button>
-      </form>
+          <FormField
+            control={form.control}
+            name="remember_me"
+            render={({ field }) => (
+              <FormItem className="flex flex-row items-start space-x-2 space-y-0 mb-6">
+                <FormControl>
+                  <Checkbox
+                    defaultChecked={field.value}
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                    className="border-slate-200 [&>span]:bg-teal-400 !checked:border-red-900"
+                  />
+                </FormControl>
+                <div className="space-y-1 leading-none">
+                  <FormLabel className="flex items-center text-slate-400 font-normal cursor-pointer">
+                    Remember me
+                    <TooltipProvider delayDuration={100}>
+                      <Tooltip>
+                        <TooltipTrigger type="button" className="ml-3">
+                          <InfoIcon className="text-slate-300 text-md mt-[2px]" />
+                        </TooltipTrigger>
+                        <TooltipContent
+                          sideOffset={8}
+                          className="max-w-[250px] text-center text-slate-400 p-4"
+                        >
+                          <p>
+                            Remain signed in for 30 days. <br />
+                            Its best to use this option on a personal computer.
+                          </p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </FormLabel>
+                </div>
+              </FormItem>
+            )}
+          />
+
+          <Separator className="mb-4" />
+
+          <button
+            type="button"
+            className="text-slate-400 text-xs hover:text-teal-500 duration-300 cursor-pointer mb-4"
+            onClick={() => handleModalAuthType("password_forgot")}
+          >
+            Forgot Password?
+          </button>
+
+          <Button
+            className="flex justify-center items-center w-full my-4 bg-teal-400 hover:bg-teal-500 text-md"
+            disabled={form.formState.isSubmitting}
+          >
+            Sign In
+            {form.formState.isSubmitting ? (
+              <Loader modifierClass="ml-3" />
+            ) : null}
+          </Button>
+        </form>
+      </Form>
     </motion.div>
   );
 }
@@ -222,11 +267,7 @@ function ModalAuthSignUp({
   handleModalClose,
 }: ModalAuthCommonProps) {
   const router = useRouter();
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm<AuthSignUpFields>({
+  const form = useForm<AuthSignUpFields>({
     defaultValues: {
       email: "",
       first_name: "",
@@ -278,50 +319,119 @@ function ModalAuthSignUp({
 
       <h3 className="text-2xl text-slate-600 font-semibold mb-4">Sign Up</h3>
 
-      <form onSubmit={handleSubmit(handleSignUp)} autoComplete="">
-        <FormTextInput
-          label="Email"
-          register={register("email")}
-          error={errors.email}
-          placeholder="your@email.com"
-          autoComplete="new-password"
-        />
-        <FormTextInput
-          label="First Name"
-          register={register("first_name")}
-          error={errors.first_name}
-          placeholder="John"
-          autoComplete="new-password"
-        />
-        <FormTextInput
-          label="Last Name"
-          register={register("last_name")}
-          error={errors.last_name}
-          placeholder="Doe"
-          autoComplete="new-password"
-        />
-        <FormPasswordInput
-          label="Password"
-          register={register("password")}
-          error={errors.password}
-        />
-        <FormPasswordInput
-          label="Confirm Password"
-          register={register("confirm_password")}
-          error={errors.confirm_password}
-        />
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(handleSignUp)}>
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem className="mb-4">
+                <FormLabel className="text-slate-400">Email</FormLabel>
+                <FormControl>
+                  <Input
+                    {...field}
+                    type="text"
+                    id="email"
+                    placeholder="your@email.com"
+                    className="placeholder:text-slate-300"
+                  />
+                </FormControl>
+                <FormMessage className="text-xs" />
+              </FormItem>
+            )}
+          />
 
-        <Button
-          type="submit"
-          variant="primary"
-          size="full"
-          modifierClass="mb-4"
-          isLoading={isSubmitting}
-          disabled={isSubmitting}
-        >
-          Sign Up
-        </Button>
-      </form>
+          <FormField
+            control={form.control}
+            name="first_name"
+            render={({ field }) => (
+              <FormItem className="mb-4">
+                <FormLabel className="text-slate-400">First Name</FormLabel>
+                <FormControl>
+                  <Input
+                    {...field}
+                    type="text"
+                    id="first_name"
+                    placeholder="John"
+                    className="placeholder:text-slate-300"
+                  />
+                </FormControl>
+                <FormMessage className="text-xs" />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="last_name"
+            render={({ field }) => (
+              <FormItem className="mb-4">
+                <FormLabel className="text-slate-400">Last Name</FormLabel>
+                <FormControl>
+                  <Input
+                    {...field}
+                    type="text"
+                    id="last_name"
+                    placeholder="Doe"
+                    className="placeholder:text-slate-300"
+                  />
+                </FormControl>
+                <FormMessage className="text-xs" />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="password"
+            render={({ field }) => (
+              <FormItem className="mb-4">
+                <FormLabel className="text-slate-400">Password</FormLabel>
+                <FormControl>
+                  <Input
+                    {...field}
+                    type="password"
+                    id="password"
+                    placeholder="**********"
+                    className="placeholder:text-slate-300"
+                  />
+                </FormControl>
+                <FormMessage className="text-xs" />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="confirm_password"
+            render={({ field }) => (
+              <FormItem className="mb-4">
+                <FormLabel className="text-slate-400">
+                  Confirm Password
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    {...field}
+                    type="password"
+                    id="confirm_password"
+                    placeholder="**********"
+                    className="placeholder:text-slate-300"
+                  />
+                </FormControl>
+                <FormMessage className="text-xs" />
+              </FormItem>
+            )}
+          />
+
+          <Button
+            disabled={form.formState.isSubmitting}
+            className="flex justify-center items-center w-full my-4 bg-teal-400 hover:bg-teal-500 text-md"
+          >
+            Sign Up
+            {form.formState.isSubmitting ? <Loader /> : null}
+          </Button>
+        </form>
+      </Form>
     </motion.div>
   );
 }
@@ -329,11 +439,7 @@ function ModalAuthSignUp({
 function ModalAuthPasswordForgot({
   handleModalAuthType,
 }: ModalAuthCommonProps) {
-  const {
-    register,
-    handleSubmit,
-    formState: { isSubmitting, isSubmitSuccessful, errors },
-  } = useForm<AuthForgotPasswordFields>({
+  const form = useForm<AuthForgotPasswordFields>({
     defaultValues: { email: "" },
     resolver: zodResolver(VALIDATION_SCHEMA_AUTH_FORGOT_PASSWORD),
   });
@@ -372,26 +478,37 @@ function ModalAuthPasswordForgot({
         Forgot your password?
       </h3>
 
-      <form onSubmit={handleSubmit(handleSendEmail)} autoComplete="">
-        <FormTextInput
-          label="Email"
-          register={register("email")}
-          error={errors.email}
-          placeholder="your@email.com"
-          autoComplete="new-password"
-        />
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(handleSendEmail)}>
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem className="mb-4">
+                <FormLabel className="text-slate-400">Email</FormLabel>
+                <FormControl>
+                  <Input
+                    {...field}
+                    type="text"
+                    id="email"
+                    placeholder="your@email.com"
+                    className="placeholder:text-slate-300"
+                  />
+                </FormControl>
+                <FormMessage className="text-xs" />
+              </FormItem>
+            )}
+          />
 
-        <Button
-          type="submit"
-          variant="primary"
-          size="full"
-          modifierClass="mb-4"
-          disabled={isSubmitting || isSubmitSuccessful}
-          isLoading={isSubmitting}
-        >
-          {isSubmitSuccessful ? "Email Sent!" : "Send Email"}
-        </Button>
-      </form>
+          <Button
+            disabled={form.formState.isSubmitting}
+            className="flex justify-center items-center w-full my-4 bg-teal-400 hover:bg-teal-500 text-md"
+          >
+            {form.formState.isSubmitSuccessful ? "Email Sent!" : "Send Email"}
+            {form.formState.isSubmitting ? <Loader /> : null}
+          </Button>
+        </form>
+      </Form>
     </motion.div>
   );
 }
@@ -400,11 +517,7 @@ function ModalAuthPasswordReset({
   token,
   handleModalAuthType,
 }: ModalAuthPasswordResetProps) {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm<AuthResetPasswordFields>({
+  const form = useForm<AuthResetPasswordFields>({
     defaultValues: { token: token || "", password: "", confirm_password: "" },
     resolver: zodResolver(VALIDATION_SCHEMA_AUTH_RESET_PASSWORD),
   });
@@ -448,31 +561,59 @@ function ModalAuthPasswordReset({
         Reset your password
       </h3>
 
-      <form onSubmit={handleSubmit(handleResetPassword)} autoComplete="">
-        <FormPasswordInput
-          label="Password"
-          register={register("password")}
-          error={errors.password}
-          autoComplete="new-password"
-        />
-        <FormPasswordInput
-          label="Confirm Password"
-          register={register("confirm_password")}
-          error={errors.confirm_password}
-          autoComplete="new-password"
-        />
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(handleResetPassword)}>
+          <FormField
+            control={form.control}
+            name="password"
+            render={({ field }) => (
+              <FormItem className="mb-4">
+                <FormLabel className="text-slate-400">Password</FormLabel>
+                <FormControl>
+                  <Input
+                    {...field}
+                    type="text"
+                    id="password"
+                    placeholder="***********"
+                    className="placeholder:text-slate-300"
+                  />
+                </FormControl>
+                <FormMessage className="text-xs" />
+              </FormItem>
+            )}
+          />
 
-        <Button
-          type="submit"
-          variant="primary"
-          size="full"
-          modifierClass="mb-4"
-          isLoading={isSubmitting}
-          disabled={isSubmitting}
-        >
-          Reset Password
-        </Button>
-      </form>
+          <FormField
+            control={form.control}
+            name="confirm_password"
+            render={({ field }) => (
+              <FormItem className="mb-4">
+                <FormLabel className="text-slate-400">
+                  Confirm Password
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    {...field}
+                    type="text"
+                    id="confirm_password"
+                    placeholder="***********"
+                    className="placeholder:text-slate-300"
+                  />
+                </FormControl>
+                <FormMessage className="text-xs" />
+              </FormItem>
+            )}
+          />
+
+          <Button
+            disabled={form.formState.isSubmitting}
+            className="flex justify-center items-center w-full my-4 bg-teal-400 hover:bg-teal-500 text-md"
+          >
+            Reset Password
+            {form.formState.isSubmitting ? <Loader /> : null}
+          </Button>
+        </form>
+      </Form>
     </motion.div>
   );
 }
