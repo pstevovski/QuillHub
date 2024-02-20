@@ -1,7 +1,7 @@
 "use client";
 
+import { User } from "@/db/schema/users";
 import cn from "@/utils/classnames";
-import { JWTPayload } from "jose";
 import { usePathname, useSearchParams, useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -40,11 +40,7 @@ const BLOG_SECTIONS: BlogSections[] = [
   },
 ];
 
-export default function HomepageBlogFilters({
-  userToken,
-}: {
-  userToken: JWTPayload | null;
-}) {
+export default function HomepageBlogFilters({ user }: { user: User | null }) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -66,12 +62,12 @@ export default function HomepageBlogFilters({
     <section
       className={cn(
         "px-24 mx-auto duration-300",
-        userToken ? "max-w-screen-xl" : "max-w-screen-md"
+        user ? "max-w-screen-xl" : "max-w-screen-md"
       )}
     >
       <ul className="flex items-center justify-center gap-x-20">
         {BLOG_SECTIONS.filter((section) => {
-          return !userToken
+          return !user
             ? !["bookmarked", "for_you"].includes(section.name)
             : section;
         }).map((section) => (

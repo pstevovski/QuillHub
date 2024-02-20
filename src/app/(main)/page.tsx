@@ -4,7 +4,7 @@ import { FaArrowRightLong as SeeAllIcon } from "react-icons/fa6";
 import HomepageBlogFilters, {
   type BlogFilter,
 } from "./_components/BlogFilters";
-import TokenService from "@/services/token";
+import UsersService from "@/services/users";
 
 export default async function Home({
   searchParams,
@@ -12,7 +12,9 @@ export default async function Home({
   searchParams: { filter: BlogFilter | undefined };
 }) {
   const blogsFilter = searchParams.filter;
-  const userToken = await TokenService.decodeToken();
+  const user = await UsersService.getCurrentUser()
+    .then((user) => user)
+    .catch(() => null);
 
   return (
     <main>
@@ -47,7 +49,7 @@ export default async function Home({
         </Link>
       </section>
 
-      <HomepageBlogFilters userToken={userToken} />
+      <HomepageBlogFilters user={user} />
 
       {/* WIP: TRENDING SECTION*/}
       {[undefined, "trending"].includes(blogsFilter) ? (
