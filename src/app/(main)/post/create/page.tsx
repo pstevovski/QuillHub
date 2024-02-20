@@ -9,7 +9,6 @@ import fetchHandler from "@/utils/fetchHandler";
 import useWarnForUnsavedChanges from "@/hooks/useWarnForUnsavedChanges";
 
 // Form
-import FormFieldErrorMessage from "@/components/Form/FormFieldErrorMessage";
 import { PostsNew } from "@/db/schema/posts";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { SubmitHandler, useForm } from "react-hook-form";
@@ -17,6 +16,7 @@ import { VALIDATION_SCHEMA_BLOG_POSTS_NEW } from "@/zod/blog-posts";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -33,7 +33,6 @@ import { UploadButton } from "@/components/UploadThing";
 // Components
 import Button from "@/components/Buttons/Button";
 import Tiptap from "@/components/WYSIWYG/TipTap";
-import { Label } from "@/ui/label";
 import {
   Select,
   SelectContent,
@@ -141,32 +140,50 @@ export default function PostCreate() {
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(handlePostCreate)}>
-          <div className="flex flex-col items-start mb-6">
-            <Label className="text-sm text-slate-400">Cover Photo</Label>
-            <p className="text-xs text-slate-400 mb-4">
-              Upload a cover photo for your blog post
-            </p>
-            <UploadButton
-              endpoint="blogPostCoverPhoto"
-              onUploadBegin={() => setIsUploadingCoverPhoto(true)}
-              onClientUploadComplete={handleUploadCoverPhoto}
-              onUploadError={() => {
-                toast.error("Failed uploading cover photo. Please try again!");
-                setIsUploadingCoverPhoto(false);
-              }}
-              appearance={{
-                button: ({ isUploading }) =>
-                  `bg-teal-400 hover:bg-teal-500 duration-300 ${
-                    isUploading ? "bg-slate-200 cursor-not-allowed" : ""
-                  }`,
-                allowedContent: "w-full text-slate-400 font-medium",
-              }}
-            />
-            {watchCoverPhoto ? (
-              <img width="300" height="300" src={watchCoverPhoto} />
-            ) : null}
-            <FormFieldErrorMessage error={form.formState.errors.cover_photo} />
-          </div>
+          <FormField
+            control={form.control}
+            name="cover_photo"
+            render={() => (
+              <FormItem className="mb-8">
+                <FormLabel className="text-sm text-slate-400">
+                  Cover Photo
+                </FormLabel>
+
+                <FormControl>
+                  <UploadButton
+                    endpoint="blogPostCoverPhoto"
+                    onUploadBegin={() => setIsUploadingCoverPhoto(true)}
+                    onClientUploadComplete={handleUploadCoverPhoto}
+                    onUploadError={() => {
+                      toast.error(
+                        "Failed uploading cover photo. Please try again!"
+                      );
+                      setIsUploadingCoverPhoto(false);
+                    }}
+                    appearance={{
+                      button: ({ isUploading }) =>
+                        `bg-teal-400 hover:bg-teal-500 duration-300 ${
+                          isUploading ? "bg-slate-200 cursor-not-allowed" : ""
+                        }`,
+                      container: "items-start",
+                      allowedContent: "hidden",
+                    }}
+                  />
+                </FormControl>
+                <FormDescription className="text-xs text-slate-400 mb-4">
+                  Upload a cover photo for your blog post
+                  <span className="block text-xs text-teal-600 font-medium">
+                    Maximum allowed image size: 4MB
+                  </span>
+                </FormDescription>
+
+                {watchCoverPhoto ? (
+                  <img width="300" height="300" src={watchCoverPhoto} />
+                ) : null}
+                <FormMessage className="text-xs" />
+              </FormItem>
+            )}
+          />
 
           <FormField
             control={form.control}
@@ -189,22 +206,32 @@ export default function PostCreate() {
           />
 
           {/* STATUS */}
-          <Label className="text-sm text-slate-400">Status</Label>
-          <Select
-            onValueChange={(status) => {
-              form.setValue("status", status as "draft" | "published", {
-                shouldDirty: true,
-              });
-            }}
-          >
-            <SelectTrigger className="max-w-[200px] text-slate-400 mb-10">
-              <SelectValue placeholder="Select Status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="draft">Draft</SelectItem>
-              <SelectItem value="published">Published</SelectItem>
-            </SelectContent>
-          </Select>
+          <FormField
+            control={form.control}
+            name="status"
+            render={({ field }) => (
+              <FormItem className="mb-4">
+                <FormLabel className="text-slate-400">Status</FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
+                  <FormControl>
+                    <SelectTrigger className="max-w-[200px] text-slate-400 mb-10">
+                      <SelectValue placeholder="Select Status" />
+                    </SelectTrigger>
+                  </FormControl>
+
+                  <SelectContent>
+                    <SelectItem value="draft">Draft</SelectItem>
+                    <SelectItem value="published">Published</SelectItem>
+                  </SelectContent>
+                </Select>
+
+                <FormMessage className="text-xs" />
+              </FormItem>
+            )}
+          />
 
           {/* TOPIC */}
           {/* <DropdownSelect
@@ -229,14 +256,26 @@ export default function PostCreate() {
           <FormFieldErrorMessage error={errors.topic_id} />
         </DropdownSelect> */}
 
-          <Tiptap
-            defaultContent=""
-            handleEditorUpdate={(text) =>
-              form.setValue("content", text, { shouldDirty: true })
-            }
-            handleUploadedImageKey={handleUploadedContentImagesKeys}
+          {/* CONTENT */}
+          <FormField
+            control={form.control}
+            name="content"
+            render={() => (
+              <FormItem className="mb-4">
+                <FormLabel className="text-slate-400">Content</FormLabel>
+                <FormControl>
+                  <Tiptap
+                    defaultContent=""
+                    handleEditorUpdate={(text) =>
+                      form.setValue("content", text, { shouldDirty: true })
+                    }
+                    handleUploadedImageKey={handleUploadedContentImagesKeys}
+                  />
+                </FormControl>
+                <FormMessage className="text-xs" />
+              </FormItem>
+            )}
           />
-          <FormFieldErrorMessage error={form.formState.errors.content} />
 
           <Button
             type="submit"
