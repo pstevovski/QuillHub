@@ -2,9 +2,8 @@ import handleErrorMessage from "@/utils/handleErrorMessage";
 import db from "@/db/connection";
 import { schemaTopics } from "@/db/schema/topics";
 import { eq, inArray } from "drizzle-orm";
-import TokenService from "./token";
 import { ApiErrorMessage } from "@/app/api/handleApiError";
-import { UserRoles } from "@/app/api/constants";
+import UsersService from "./users";
 
 class Topics {
   /** Construct a slug based on the name of the topic */
@@ -66,14 +65,12 @@ class Topics {
    */
   async create(name: string) {
     try {
-      // const { user_id } = await TokenService.decodeToken();
-      const userToken = await TokenService.decodeToken();
-      if (!userToken) throw new Error(ApiErrorMessage.UNAUTHENTICATED);
+      const currentUser = await UsersService.getCurrentUser();
 
       await db.insert(schemaTopics).values({
         name: name,
         slug: this.generateUniqueTopicSlug(name),
-        created_by: userToken.user_id,
+        created_by: currentUser.id,
       });
 
       console.log("TOPICS - Topic created successfully!");
@@ -103,14 +100,8 @@ class Topics {
       if (!targetedTopic[0]) throw new Error(ApiErrorMessage.NOT_FOUND);
 
       // Check for authorization before allowing deletion
-      const userToken = await TokenService.decodeToken();
-      if (!userToken) throw new Error(ApiErrorMessage.UNAUTHENTICATED);
-
-      // Throw an error if user that didnt create the topic (or not an admin) tries to delete it
-      if (
-        targetedTopic[0].created_by !== userToken.user_id ||
-        userToken.role_id !== UserRoles.ADMIN
-      ) {
+      const currentUser = await UsersService.getCurrentUser();
+      if (targetedTopic[0].created_by !== currentUser.id) {
         throw new Error(ApiErrorMessage.UNAUTHORIZED);
       }
 
@@ -141,17 +132,8 @@ class Topics {
       if (!targetedTopics.length) throw new Error(ApiErrorMessage.NOT_FOUND);
 
       // Check if the user that tries deleting the topics is the one that created them
-      const userToken = await TokenService.decodeToken();
-      if (!userToken) throw new Error(ApiErrorMessage.UNAUTHENTICATED);
-
-      // If the user is not the one that created all of the targeted topics
-      // and at the same time is not an admin, then prevent the delete action from happening
-      if (
-        !targetedTopics.every(
-          (topic) => topic.created_by === userToken.user_id
-        ) &&
-        userToken.role_id !== UserRoles.ADMIN
-      ) {
+      const user = await UsersService.getCurrentUser();
+      if (!targetedTopics.every((topic) => topic.created_by === user.id)) {
         throw new Error(ApiErrorMessage.UNAUTHORIZED);
       }
 

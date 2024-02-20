@@ -10,9 +10,8 @@ import { postsImagesSchema, postsSchema } from "@/db/schema/posts";
 
 // Services
 import UploadService from "./uploads";
-import TokenService from "./token";
 import { ApiErrorMessage } from "@/app/api/handleApiError";
-import { UserRoles } from "@/app/api/constants";
+import UsersService from "./users";
 
 interface BlogNewPostPayload {
   title: string;
@@ -80,15 +79,13 @@ class BlogPosts {
     cover_photo,
   }: BlogNewPostPayload) {
     try {
-      const userToken = await TokenService.decodeToken();
-      if (!userToken) throw new Error(ApiErrorMessage.UNAUTHENTICATED);
-
+      const currentUser = await UsersService.getCurrentUser();
       const newPost = await db.insert(postsSchema).values({
         title,
         status,
         content,
         cover_photo,
-        created_by: userToken.user_id,
+        created_by: currentUser.id,
       });
 
       // Extract the keys for those cover and content images
@@ -146,24 +143,20 @@ class BlogPosts {
    */
   async delete(blogPostID: number) {
     try {
-      const userToken = await TokenService.decodeToken();
-      if (!userToken) throw new Error(ApiErrorMessage.UNAUTHENTICATED);
+      const currentUser = await UsersService.getCurrentUser();
 
       // Find the matching blog post that should be deleted
-      const matchingBlogPost = await db
+      const targetedBlogPost = await db
         .select()
         .from(postsSchema)
         .where(eq(postsSchema.id, blogPostID));
 
       // Throw if the blog post does not exist
-      if (!matchingBlogPost[0]) throw new Error(ApiErrorMessage.NOT_FOUND);
+      if (!targetedBlogPost[0]) throw new Error(ApiErrorMessage.NOT_FOUND);
 
       // Prevent deletion if user that didnt create the blog post tries to delete it
       // Or if the user thats trying to delete the blog post is not an admin
-      if (
-        matchingBlogPost[0].created_by !== userToken.user_id ||
-        userToken.role_id !== UserRoles.ADMIN
-      ) {
+      if (targetedBlogPost[0].created_by !== currentUser.id) {
         throw new Error(ApiErrorMessage.UNAUTHORIZED);
       }
 
