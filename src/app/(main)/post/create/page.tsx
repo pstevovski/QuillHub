@@ -31,7 +31,6 @@ import { UploadFileResponse } from "uploadthing/client";
 import { UploadButton } from "@/components/UploadThing";
 
 // Components
-import Button from "@/components/Buttons/Button";
 import Tiptap from "@/components/WYSIWYG/TipTap";
 import {
   Select,
@@ -41,6 +40,8 @@ import {
   SelectValue,
 } from "@/ui/select";
 import { Input } from "@/ui/input";
+import { Button } from "@/ui/button";
+import Loader from "@/components/Loaders/Loader";
 
 export default function PostCreate() {
   const form = useForm<PostsNew>({
@@ -279,15 +280,18 @@ export default function PostCreate() {
 
           <Button
             type="submit"
-            isLoading={form.formState.isSubmitting}
+            size="lg"
             disabled={
               !form.formState.isDirty ||
               isUploadingCoverPhoto ||
               form.formState.isSubmitting
             }
-            modifierClass="my-10"
+            className="my-10"
           >
-            {form.formState.isSubmitting ? "Creating..." : "Create Blog Post"}
+            Create Blog Post
+            {form.formState.isSubmitting ? (
+              <Loader modifierClass="ml-3" />
+            ) : null}
           </Button>
         </form>
       </Form>

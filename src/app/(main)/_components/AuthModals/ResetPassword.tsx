@@ -125,10 +125,7 @@ export default function ModalResetPassword({
             )}
           />
 
-          <Button
-            disabled={form.formState.isSubmitting}
-            className="flex justify-center items-center w-full my-4 bg-teal-400 hover:bg-teal-500 text-md"
-          >
+          <Button disabled={form.formState.isSubmitting} className="my-4">
             Reset Password
             {form.formState.isSubmitting ? <Loader /> : null}
           </Button>

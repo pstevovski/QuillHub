@@ -185,10 +185,7 @@ export default function ModalSignIn({
             Forgot Password?
           </button>
 
-          <Button
-            className="flex justify-center items-center w-full my-4 bg-teal-400 hover:bg-teal-500 text-md"
-            disabled={form.formState.isSubmitting}
-          >
+          <Button className="my-4" disabled={form.formState.isSubmitting}>
             Sign In
             {form.formState.isSubmitting ? (
               <Loader modifierClass="ml-3" />
