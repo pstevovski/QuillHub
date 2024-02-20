@@ -1,4 +1,3 @@
-import TokenService from "@/services/token";
 import TopicsService from "@/services/topics";
 import {
   VALIDATION_SCHEMA_TOPICS,
@@ -34,16 +33,8 @@ export async function POST(request: Request) {
     // Check if the received payload passes validation schema
     await handlePayloadValidation(VALIDATION_SCHEMA_TOPICS, payload);
 
-    // Get the ID of the currently logged in user
-    // Note: This will become repetitive, find solution
-    // TODO: Remove this, handle within method
-    const tokenDetails = await TokenService.decodeToken();
-
-    if (!tokenDetails) {
-      return NextResponse.json({ error: "Unauthenticated" }, { status: 401 });
-    }
-
-    await TopicsService.create(tokenDetails.id as number, payload.name);
+    // Create a new Topic
+    await TopicsService.create(payload.name);
 
     return NextResponse.json({ message: "Topic created!" }, { status: 200 });
   } catch (error) {

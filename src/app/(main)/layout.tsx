@@ -11,7 +11,9 @@ export default async function MainLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const user = await UsersService.getCurrentUser();
+  const user = await UsersService.getCurrentUser()
+    .then((user) => user)
+    .catch(() => null);
 
   return (
     <>

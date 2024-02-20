@@ -5,14 +5,14 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 // Types
-import type { User } from "@/db/schema/users";
+import type { UserNoPassword } from "@/db/schema/users";
 
 // Components
-import { ModalAuth } from "@/components/Modals/ModalAuth";
 import { AnimatePresence } from "framer-motion";
+import { ModalAuth } from "./AuthModals/Auth";
 import AccountMenu from "./AccountMenu";
 
-export default function UserMenu({ user }: { user: User | null }) {
+export default function UserMenu({ user }: { user: UserNoPassword | null }) {
   const searchParams = useSearchParams();
   const router = useRouter();
   const passwordToken = searchParams.get("password_token");

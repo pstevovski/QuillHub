@@ -1,4 +1,4 @@
-import BlogPostsService from "@/services/posts";
+import BlogPostsService from "@/services/blog-posts";
 import { NextResponse } from "next/server";
 import { handleApiErrorResponse } from "../../handleApiError";
 

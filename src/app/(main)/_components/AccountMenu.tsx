@@ -29,9 +29,13 @@ import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 
 // Types
-import type { User } from "@/db/schema/users";
+import type { UserNoPassword } from "@/db/schema/users";
 
-export default function AccountMenu({ userDetails }: { userDetails: User }) {
+export default function AccountMenu({
+  userDetails,
+}: {
+  userDetails: UserNoPassword;
+}) {
   const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
 

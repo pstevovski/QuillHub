@@ -10,8 +10,8 @@ import { postsImagesSchema, postsSchema } from "@/db/schema/posts";
 
 // Services
 import UploadService from "./uploads";
-import TokenService from "./token";
 import { ApiErrorMessage } from "@/app/api/handleApiError";
+import UsersService from "./users";
 
 interface BlogNewPostPayload {
   title: string;
@@ -79,19 +79,13 @@ class BlogPosts {
     cover_photo,
   }: BlogNewPostPayload) {
     try {
-      // Extract the currently logged in user's ID
-      const userToken = await TokenService.decodeToken();
-
-      if (!userToken) throw new Error(ApiErrorMessage.UNAUTHENTICATED);
-
+      const currentUser = await UsersService.getCurrentUser();
       const newPost = await db.insert(postsSchema).values({
         title,
         status,
         content,
         cover_photo,
-        likes: 0,
-        views: 0,
-        created_by: userToken.id as number,
+        created_by: currentUser.id,
       });
 
       // Extract the keys for those cover and content images
@@ -149,13 +143,28 @@ class BlogPosts {
    */
   async delete(blogPostID: number) {
     try {
+      const currentUser = await UsersService.getCurrentUser();
+
+      // Find the matching blog post that should be deleted
+      const targetedBlogPost = await db
+        .select()
+        .from(postsSchema)
+        .where(eq(postsSchema.id, blogPostID));
+
+      // Throw if the blog post does not exist
+      if (!targetedBlogPost[0]) throw new Error(ApiErrorMessage.NOT_FOUND);
+
+      // Prevent deletion if user that didnt create the blog post tries to delete it
+      // Or if the user thats trying to delete the blog post is not an admin
+      if (targetedBlogPost[0].created_by !== currentUser.id) {
+        throw new Error(ApiErrorMessage.UNAUTHORIZED);
+      }
+
       // Get all attached images keys that belong to the specific blog post
       const attachedImages = await db
         .select()
         .from(postsImagesSchema)
         .where(eq(postsImagesSchema.post_id, blogPostID));
-
-      // TODO: Only allow the deletion of a blog post by Admins or user that created it
 
       // If there are any attached images, remove them from UploadThing's servers
       if (attachedImages.length > 0) {

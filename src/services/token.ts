@@ -3,7 +3,13 @@ import { cookies } from "next/headers";
 
 // Utilities
 import handleErrorMessage from "@/utils/handleErrorMessage";
-import { SignJWT, decodeJwt, jwtVerify } from "jose";
+import { JWTPayload, SignJWT, decodeJwt, jwtVerify } from "jose";
+import { ApiErrorMessage } from "@/app/api/handleApiError";
+
+interface DecodedTokenDetails extends JWTPayload {
+  user_id: number;
+  role_id: number;
+}
 
 class Token {
   public ACCESS_TOKEN_NAME: string = "jwt-access-token";
@@ -132,16 +138,22 @@ class Token {
   }
 
   /** Decodes the provided token containing some user-specific details */
-  async decodeToken() {
+  async decodeToken(): Promise<DecodedTokenDetails> {
     const token = cookies().get(this.ACCESS_TOKEN_NAME)?.value;
-    if (!token) return;
+
+    // Throw an error if there's no valid access token value in the cookies
+    if (!token) throw new Error(ApiErrorMessage.UNAUTHENTICATED);
 
     try {
       const decodedToken = decodeJwt(token);
-      return decodedToken;
+      return {
+        ...decodedToken,
+        user_id: decodedToken.id as number,
+        role_id: decodedToken.role_id as number,
+      };
     } catch (error) {
       console.log(`Failed decoding token: ${handleErrorMessage(error)}`);
-      throw new Error("Failed decoding token!");
+      throw new Error(handleErrorMessage(error));
     }
   }
 

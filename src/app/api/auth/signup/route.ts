@@ -1,5 +1,5 @@
 import AuthService from "@/services/authentication";
-import { AuthSignUpSchema } from "@/zod/auth";
+import { VALIDATION_SCHEMA_AUTH_SIGNUP } from "@/zod/auth";
 import { handlePayloadValidation } from "../../handlePayloadValidation";
 import { handleApiErrorResponse } from "../../handleApiError";
 
@@ -8,7 +8,7 @@ export async function POST(request: Request) {
     const payload = await request.json();
 
     // Validate the received payload
-    await handlePayloadValidation(AuthSignUpSchema, payload);
+    await handlePayloadValidation(VALIDATION_SCHEMA_AUTH_SIGNUP, payload);
 
     // Create a new user in the system
     await AuthService.signUp(payload);

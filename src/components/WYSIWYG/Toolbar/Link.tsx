@@ -30,7 +30,7 @@ import { toast } from "sonner";
 import { Checkbox } from "@/ui/checkbox";
 import { TipTapExtensionComponentProps } from "../TipTap";
 
-const LinkFormSchema = z.object({
+const VALIDATION_SCHEMA_EDITOR_LINK = z.object({
   url: z
     .string()
     .url("Please enter a valid URL. It must start with http(s)://"),
@@ -40,8 +40,8 @@ const LinkFormSchema = z.object({
 export default function Link({ editor }: TipTapExtensionComponentProps) {
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
 
-  const form = useForm<z.infer<typeof LinkFormSchema>>({
-    resolver: zodResolver(LinkFormSchema),
+  const form = useForm<z.infer<typeof VALIDATION_SCHEMA_EDITOR_LINK>>({
+    resolver: zodResolver(VALIDATION_SCHEMA_EDITOR_LINK),
     defaultValues: {
       url: "",
       new_tab: true,
@@ -51,7 +51,7 @@ export default function Link({ editor }: TipTapExtensionComponentProps) {
   const handleSubmitURL = ({
     url,
     new_tab,
-  }: z.infer<typeof LinkFormSchema>) => {
+  }: z.infer<typeof VALIDATION_SCHEMA_EDITOR_LINK>) => {
     if (editor.state.selection.empty) {
       toast.error(
         "You must first select the text to which you want to add this link."

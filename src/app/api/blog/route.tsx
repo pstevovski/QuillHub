@@ -1,5 +1,5 @@
-import BlogPostsService from "@/services/posts";
-import { BlogNewPostSchema } from "@/zod/blog-posts";
+import BlogPostsService from "@/services/blog-posts";
+import { VALIDATION_SCHEMA_BLOG_POSTS_NEW } from "@/zod/blog-posts";
 import { NextResponse } from "next/server";
 import { handlePayloadValidation } from "../handlePayloadValidation";
 import { handleApiErrorResponse } from "../handleApiError";
@@ -14,7 +14,10 @@ export async function POST(request: Request) {
     const blogPostPayload = await request.json();
 
     // Validate the received payload
-    await handlePayloadValidation(BlogNewPostSchema, blogPostPayload);
+    await handlePayloadValidation(
+      VALIDATION_SCHEMA_BLOG_POSTS_NEW,
+      blogPostPayload
+    );
 
     // Create the new blog post and save it in database
     await BlogPostsService.create(blogPostPayload);
