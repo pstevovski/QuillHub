@@ -1,9 +1,6 @@
 "use client";
 
 import Button from "@/components/Buttons/Button";
-import DropdownLabel from "@/components/Dropdown/DropdownLabel";
-import DropdownSelect from "@/components/Dropdown/Select/DropdownSelect";
-import { DropdownSelectClickedItem } from "@/components/Dropdown/Select/DropdownSelectItem";
 import FormFieldErrorMessage from "@/components/Form/FormFieldErrorMessage";
 import FormTextInput from "@/components/Form/FormTextInput";
 import { PostsNew } from "@/db/schema/posts";
@@ -23,6 +20,13 @@ import { VALIDATION_SCHEMA_BLOG_POSTS_NEW } from "@/zod/blog-posts";
 import { UploadButton } from "@/components/UploadThing";
 import { Label } from "@/ui/label";
 import useWarnForUnsavedChanges from "@/hooks/useWarnForUnsavedChanges";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/ui/select";
 
 export default function PostCreate() {
   const {
@@ -43,21 +47,6 @@ export default function PostCreate() {
   const watchCoverPhoto = watch("cover_photo");
   const [isUploadingCoverPhoto, setIsUploadingCoverPhoto] =
     useState<boolean>(false);
-
-  /*================================
-    BLOG POST STATUS
-  =================================*/
-  const [status, setStatus] = useState<DropdownSelectClickedItem[]>([]);
-  const handleStatusSelection = (selectedStatus: DropdownSelectClickedItem) => {
-    // Updates the inner selection state of the dropdown component
-    setStatus([selectedStatus]);
-
-    // Updates the value to be sent in the form
-    // todo: figure a way to autocast the selected value to the defined schema
-    setValue("status", selectedStatus.value as "draft" | "published", {
-      shouldDirty: true,
-    });
-  };
 
   /*================================
     BLOG POST TOPICS
@@ -179,26 +168,21 @@ export default function PostCreate() {
         />
 
         {/* STATUS */}
-        <DropdownSelect
-          selection={status}
-          handleSelection={handleStatusSelection}
-          modifierClass="mb-6"
+        <Select
+          onValueChange={(status) => {
+            setValue("status", status as "draft" | "published", {
+              shouldDirty: true,
+            });
+          }}
         >
-          <DropdownLabel>Status</DropdownLabel>
-          <DropdownSelect.Trigger
-            loading={false}
-            disabled={false}
-            placeholderText="Select Status"
-            modifierClass={errors.status ? "border-red-500" : ""}
-          />
-          <DropdownSelect.Body>
-            <DropdownSelect.Item value="draft">Draft</DropdownSelect.Item>
-            <DropdownSelect.Item value="published">
-              Published
-            </DropdownSelect.Item>
-          </DropdownSelect.Body>
-          <FormFieldErrorMessage error={errors.status} />
-        </DropdownSelect>
+          <SelectTrigger className="max-w-[200px] text-slate-400">
+            <SelectValue placeholder="Select Status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="draft">Draft</SelectItem>
+            <SelectItem value="published">Published</SelectItem>
+          </SelectContent>
+        </Select>
 
         {/* TOPIC */}
         {/* <DropdownSelect
