@@ -1,3 +1,5 @@
+"use client";
+
 import { Button } from "@/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/ui/popover";
 import { useMemo, useState } from "react";
@@ -9,6 +11,7 @@ import useDebounce from "@/hooks/useDebounce";
 import { Separator } from "@/ui/separator";
 import { Input } from "@/ui/input";
 import cn from "@/utils/classnames";
+import { ScrollArea } from "@/ui/scroll-area";
 
 const MOCK_TOPICS = [
   {
@@ -23,13 +26,29 @@ const MOCK_TOPICS = [
     value: "topic-3",
     name: "Topic 3",
   },
+  {
+    value: "topic-4",
+    name: "Topic 4",
+  },
+  {
+    value: "topic-5",
+    name: "Topic-5",
+  },
+  {
+    value: "topic-6",
+    name: "Topic 6",
+  },
+  {
+    value: "topic-7",
+    name: "Topic 7",
+  },
 ];
 
 export default function TopicsMenu() {
   const [open, setOpen] = useState<boolean>(false);
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
   const [searchValue, setSearchValue] = useState<string>("");
-  const debouncedSearch = useDebounce(searchValue, 100);
+  const debouncedSearch = useDebounce(searchValue.trim(), 100);
 
   const TOPICS_LIST = useMemo(() => {
     if (!debouncedSearch) return MOCK_TOPICS;
@@ -41,28 +60,24 @@ export default function TopicsMenu() {
     return filteredList;
   }, [MOCK_TOPICS, debouncedSearch]);
 
-  const handleSearch = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    const typedValue = event.currentTarget.value;
+  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const typed: string = event.currentTarget.value;
+    setSearchValue(typed);
+  };
 
-    // Remove empty spaces
-    const trimmedSearchValue: string = typedValue.trim();
-    setSearchValue(trimmedSearchValue);
+  const handleOnEnter = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key !== "Enter") return;
 
-    // TODO: Handle selection on "Enter"
-    if (event.key === "Enter") {
-      // find fully matching item from the filtered list
-      const matchingTopic = TOPICS_LIST.find((topic) => {
-        return topic.name.toLowerCase() === trimmedSearchValue.toLowerCase();
-      });
+    // Find fully matching item from the filtered list
+    const matchingItem = TOPICS_LIST.find((topic) => {
+      return topic.name.toLowerCase() === searchValue.toLowerCase();
+    });
 
-      if (!matchingTopic) {
-        // todo: send API request to create a new topic and select it
-      } else {
-        handleTopicSelection(matchingTopic);
-      }
+    // todo: handle sending a request
+    if (!matchingItem) return;
 
-      // todo: clear out input field
-    }
+    // Select the matching topic
+    handleTopicSelection(matchingItem);
   };
 
   const handleTopicSelection = (selectedTopic: any) => {
@@ -78,10 +93,17 @@ export default function TopicsMenu() {
     }
 
     setSelectedTopics(topicsCopy);
+    setSearchValue("");
   };
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover
+      open={open}
+      onOpenChange={(open) => {
+        setOpen(open);
+        setSearchValue("");
+      }}
+    >
       <PopoverTrigger asChild>
         <Button
           variant="outline"
@@ -105,40 +127,47 @@ export default function TopicsMenu() {
         <Input
           placeholder="Search Topics"
           className="border-none"
-          onKeyUp={handleSearch}
+          onChange={handleSearch}
+          onKeyUp={handleOnEnter}
+          value={searchValue}
         />
         <Separator />
-        {TOPICS_LIST.length > 0 ? (
-          <ul>
-            {TOPICS_LIST.map((topic) => (
-              <li
-                tabIndex={1}
-                key={topic.value}
-                className={cn(
-                  "flex items-center text-slate-400 text-sm p-2 cursor-pointer hover:bg-slate-50 hover:text-slate-500 duration-200",
-                  selectedTopics.find(
-                    (selectedTopic) => selectedTopic === topic.name
-                  )
-                    ? "bg-slate-50 text-slate-500"
-                    : ""
-                )}
-                onClick={() => handleTopicSelection(topic)}
-              >
-                <Check
+
+        <ScrollArea className="h-[150px]">
+          {TOPICS_LIST.length > 0 ? (
+            <ul className="px-1">
+              {TOPICS_LIST.map((topic) => (
+                <li
+                  tabIndex={0}
+                  key={topic.value}
                   className={cn(
-                    "mr-2 h-4 w-4 duration-200",
-                    selectedTopics.includes(topic.name)
-                      ? "opacity-100"
-                      : "opacity-0"
+                    "flex items-center text-slate-400 text-sm p-2 my-1 cursor-pointer hover:bg-slate-100 hover:text-slate-500 duration-200 focus:text-slate-900/80 focus:outline-none focus-visible:outline-none",
+                    selectedTopics.find(
+                      (selectedTopic) => selectedTopic === topic.name
+                    )
+                      ? "bg-slate-100 text-slate-500"
+                      : ""
                   )}
-                />
-                {topic.name}
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <h6>No matching Topics found.</h6>
-        )}
+                  onClick={() => handleTopicSelection(topic)}
+                >
+                  <Check
+                    className={cn(
+                      "mr-2 h-4 w-4 duration-200",
+                      selectedTopics.includes(topic.name)
+                        ? "opacity-100"
+                        : "opacity-0"
+                    )}
+                  />
+                  {topic.name}
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <h6 className="py-4 text-sm text-slate-400 text-center">
+              No matching Topics found.
+            </h6>
+          )}
+        </ScrollArea>
       </PopoverContent>
     </Popover>
   );
