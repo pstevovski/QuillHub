@@ -2,10 +2,11 @@ import handleErrorMessage from "./handleErrorMessage";
 
 type Methods = "GET" | "POST" | "PUT" | "DELETE";
 
+// todo: Update to use different property types based on "method" value
 export default async function fetchHandler(
   method: Methods,
   endpoint: string,
-  body: Record<string, unknown> | undefined
+  body?: Record<string, unknown> | undefined
 ) {
   try {
     const URL: string = `${process.env.NEXT_PUBLIC_API_BASE_URL}/${endpoint}`;
