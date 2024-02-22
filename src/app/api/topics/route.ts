@@ -33,10 +33,10 @@ export async function POST(request: Request) {
     // Check if the received payload passes validation schema
     await handlePayloadValidation(VALIDATION_SCHEMA_TOPICS, payload);
 
-    // Create a new Topic
-    await TopicsService.create(payload.name);
+    // Create a new Topic and save it in the database
+    const createdTopic = await TopicsService.create(payload.name);
 
-    return NextResponse.json({ message: "Topic created!" }, { status: 200 });
+    return NextResponse.json(createdTopic, { status: 200 });
   } catch (error) {
     return handleApiErrorResponse(error);
   }

@@ -11,3 +11,6 @@ export const schemaTopics = mysqlTable("topics", {
   ),
   created_at: timestamp("created_at", { mode: "date" }).notNull().defaultNow(),
 });
+
+export type Topic = typeof schemaTopics.$inferSelect;
+export type TopicNew = typeof schemaTopics.$inferInsert;
