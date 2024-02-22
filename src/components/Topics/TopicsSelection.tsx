@@ -72,6 +72,7 @@ export default function TopicsSelection({
     if (debouncedSearch) {
       topics = matchSorter(topics, debouncedSearch, {
         keys: ["name"],
+        threshold: matchSorter.rankings.WORD_STARTS_WITH,
       });
     }
 
@@ -86,15 +87,14 @@ export default function TopicsSelection({
   const handleOnEnter = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key !== "Enter" || createTopic.isPending) return;
 
-    // Find fully matching item from the filtered list
-    // todo: use match sorter for better filtering?
-    const matchingItem = TOPICS_LIST.find((topic) => {
-      return topic.name.toLowerCase() === searchValue.toLowerCase();
+    const matchingTopics = matchSorter(TOPICS_LIST, searchValue.toLowerCase(), {
+      keys: ["name"],
+      threshold: matchSorter.rankings.WORD_STARTS_WITH,
     });
 
     // Select the matching topic or send a request to create a new one
-    if (matchingItem) {
-      handleTopicSelection(matchingItem);
+    if (matchingTopics.length > 0) {
+      handleTopicSelection(matchingTopics[0]);
     } else {
       handleTopicCreate();
     }
@@ -163,7 +163,7 @@ export default function TopicsSelection({
       </span>
 
       {/* TOPICS CONTENT */}
-      {open ? (
+      {open || searchValue ? (
         <ul className="absolute z-10 top-[50px] max-w-md w-full max-h-[250px] mb-6 p-2 overflow-y-auto bg-white rounded shadow-sm border">
           {TOPICS_LIST.length > 0 ? (
             TOPICS_LIST.map((topic) => (
