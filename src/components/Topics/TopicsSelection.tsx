@@ -140,10 +140,7 @@ export default function TopicsSelection({
   };
 
   return (
-    <div
-      className={cn("inline-block relative", modifierClass)}
-      ref={topicsMenuRef}
-    >
+    <div className={cn("block relative", modifierClass)} ref={topicsMenuRef}>
       <div className="relative">
         <Search className="size-[18px] text-slate-400 absolute top-1/2 -translate-y-1/2 left-2" />
         <Input
@@ -160,6 +157,12 @@ export default function TopicsSelection({
       <span className="text-slate-400 text-xs">
         Type the name of the topic in the search box. If what you're looking for
         doesn't exist, press "Enter" to create it.
+        <br />
+        {/* MAXIMUM ALLOWED SELECTION LIMIT */}
+        <span className="inline-block font-semibold text-slate-600 text-xs">
+          Selection Limit: {selectionLimit}{" "}
+          {selectionLimit > 1 ? "topics" : "topic"}.
+        </span>
       </span>
 
       {/* TOPICS CONTENT */}
@@ -208,13 +211,6 @@ export default function TopicsSelection({
             </Badge>
           ))}
         </div>
-      ) : null}
-
-      {/* MAXIMUM ALLOWED SELECTION LIMIT */}
-      {selectedTopics.length >= selectionLimit ? (
-        <span className="inline-block font-medium text-red-400 text-xs mb-4">
-          You can select up to {selectionLimit} topics.
-        </span>
       ) : null}
     </div>
   );
