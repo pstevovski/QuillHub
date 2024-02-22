@@ -4,6 +4,7 @@ import "./globals.css";
 
 import { GeistSans } from "geist/font/sans";
 import { Toaster } from "sonner";
+import Providers from "./providers";
 
 export const metadata: Metadata = {
   title: "QuillHub",
@@ -17,7 +18,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`${GeistSans.className} antialiased`}>{children}</body>
+      <body className={`${GeistSans.className} antialiased`}>
+        <Providers>{children}</Providers>
+      </body>
       <Toaster richColors closeButton />
     </html>
   );
