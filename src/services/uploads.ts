@@ -15,25 +15,19 @@ class Upload {
    * @param source The source against which we should check if some of the listed keys exist
    *
    */
-  handleImageKeys(keys: string[], source: string) {
-    if (!keys.length || !source) {
-      return {
-        imagesToBeSaved: [],
-        imagesToBeRemoved: [],
-      };
-    }
+  handleImageKeys(keys: string[], source: string): string[] {
+    if (!keys.length || !source) return [];
 
     // List of image keys that will be removed from Uploadthing
     const imagesToBeRemoved: string[] = [...keys].filter((key) => {
       return !source.includes(key);
     });
 
-    // List of image keys that will be saved in our database
-    const imagesToBeSaved: string[] = [...keys].filter((key) => {
-      return source.includes(key);
-    });
+    // Send API request to delete uploaded images
+    this.deleteImagesFromUploadthing(imagesToBeRemoved);
 
-    return { imagesToBeRemoved, imagesToBeSaved };
+    // List of image keys that will be saved in our database
+    return [...keys].filter((key) => source.includes(key));
   }
 
   /**
