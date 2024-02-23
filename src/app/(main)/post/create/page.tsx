@@ -240,7 +240,7 @@ export default function PostCreate() {
                 <TopicsSelection
                   selectionLimit={1}
                   handleSelectedTopics={(topics) => {
-                    form.setValue("topic_id", topics[0].id, {
+                    form.setValue("topic_id", topics[0]?.id || null, {
                       shouldDirty: true,
                       shouldValidate: true,
                     });

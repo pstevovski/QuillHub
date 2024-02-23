@@ -19,5 +19,5 @@ export const VALIDATION_SCHEMA_BLOG_POSTS_NEW = z.object({
     .url("Please provide a valid cover photo URL."),
   topic_id: z.number({
     required_error: "Please select the topic of the blog post",
-  }),
+  }).nullable(),
 });
