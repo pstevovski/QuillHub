@@ -42,6 +42,7 @@ import {
 import { Input } from "@/ui/input";
 import { Button } from "@/ui/button";
 import Loader from "@/components/Loaders/Loader";
+import TopicsSelection from "@/components/Topics/TopicsSelection";
 
 export default function PostCreate() {
   const form = useForm<PostsNew>({
@@ -50,26 +51,13 @@ export default function PostCreate() {
       content: "",
       status: undefined,
       cover_photo: undefined,
+      topic_id: null,
     },
     resolver: zodResolver(VALIDATION_SCHEMA_BLOG_POSTS_NEW),
   });
   const watchCoverPhoto = form.watch("cover_photo");
   const [isUploadingCoverPhoto, setIsUploadingCoverPhoto] =
     useState<boolean>(false);
-
-  /*================================
-    BLOG POST TOPICS
-
-    To be implemented
-  =================================*/
-  // const [topic, setTopic] = useState<DropdownSelectClickedItem[]>([]);
-  // const handleTopicSelection = (selectedTopic: DropdownSelectClickedItem) => {
-  //   // Updates the inner selection state of the dropdown component
-  //   setTopic([selectedTopic]);
-
-  //   // Updates the value to be sent in the form
-  //   setValue("topic_id", parseInt(selectedTopic.value as string));
-  // };
 
   /*================================
     COVER PHOTO
@@ -210,7 +198,7 @@ export default function PostCreate() {
           <FormField
             control={form.control}
             name="status"
-            render={({ field }) => (
+            render={({ field, fieldState }) => (
               <FormItem className="mb-4">
                 <FormLabel className="text-slate-400">Status</FormLabel>
                 <Select
@@ -218,14 +206,22 @@ export default function PostCreate() {
                   defaultValue={field.value}
                 >
                   <FormControl>
-                    <SelectTrigger className="max-w-[200px] text-slate-400 mb-10">
+                    <SelectTrigger
+                      className={`max-w-[200px] text-slate-400 mb-10 ${
+                        fieldState.error ? "border-red-500" : ""
+                      }`}
+                    >
                       <SelectValue placeholder="Select Status" />
                     </SelectTrigger>
                   </FormControl>
 
                   <SelectContent>
-                    <SelectItem value="draft">Draft</SelectItem>
-                    <SelectItem value="published">Published</SelectItem>
+                    <SelectItem className="text-slate-400" value="draft">
+                      Draft
+                    </SelectItem>
+                    <SelectItem className="text-slate-400" value="published">
+                      Published
+                    </SelectItem>
                   </SelectContent>
                 </Select>
 
@@ -235,27 +231,29 @@ export default function PostCreate() {
           />
 
           {/* TOPIC */}
-          {/* <DropdownSelect
-          selection={topic}
-          handleSelection={handleTopicSelection}
-          modifierClass="mb-6"
-        >
-          <DropdownLabel>Topic</DropdownLabel>
-          <DropdownSelect.Trigger
-            loading={false}
-            disabled={false}
-            placeholderText="Select Topic"
-            modifierClass={errors.topic_id ? "border-red-500" : ""}
+          <FormField
+            control={form.control}
+            name="topic_id"
+            render={({ fieldState }) => (
+              <FormItem className="mb-4">
+                <FormLabel className="text-slate-400">Topics</FormLabel>
+                <TopicsSelection
+                  selectionLimit={1}
+                  handleSelectedTopics={(topics) => {
+                    form.setValue("topic_id", topics[0]?.id || null, {
+                      shouldDirty: true,
+                      shouldValidate: true,
+                    });
+                  }}
+                  modifierClass={
+                    fieldState.error ? `[&>div>input]:border-red-500` : ""
+                  }
+                />
+
+                <FormMessage className="text-xs" />
+              </FormItem>
+            )}
           />
-          <DropdownSelect.Body>
-            <DropdownSelect.Item value="1">Topic #1</DropdownSelect.Item>
-            <DropdownSelect.Item value="2">Topic #2</DropdownSelect.Item>
-            <DropdownSelect.Item value="3">Topic #3</DropdownSelect.Item>
-            <DropdownSelect.Item value="4">Topic #4</DropdownSelect.Item>
-            <DropdownSelect.Item value="5">Topic #5</DropdownSelect.Item>
-          </DropdownSelect.Body>
-          <FormFieldErrorMessage error={errors.topic_id} />
-        </DropdownSelect> */}
 
           {/* CONTENT */}
           <FormField
@@ -268,7 +266,10 @@ export default function PostCreate() {
                   <Tiptap
                     defaultContent=""
                     handleEditorUpdate={(text) =>
-                      form.setValue("content", text, { shouldDirty: true })
+                      form.setValue("content", text, {
+                        shouldDirty: true,
+                        shouldValidate: true,
+                      })
                     }
                     handleUploadedImageKey={handleUploadedContentImagesKeys}
                   />

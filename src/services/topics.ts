@@ -1,6 +1,6 @@
 import handleErrorMessage from "@/utils/handleErrorMessage";
 import db from "@/db/connection";
-import { schemaTopics } from "@/db/schema/topics";
+import { TopicNew, schemaTopics } from "@/db/schema/topics";
 import { eq, inArray } from "drizzle-orm";
 import { ApiErrorMessage } from "@/app/api/handleApiError";
 import UsersService from "./users";
@@ -63,21 +63,20 @@ class Topics {
    * @param name The name of the topic
    *
    */
-  async create(name: string) {
+  async create(name: string): Promise<TopicNew> {
     try {
       const currentUser = await UsersService.getCurrentUser();
 
-      await db.insert(schemaTopics).values({
-        name: name,
+      const createdTopic: TopicNew = {
+        name,
         slug: this.generateUniqueTopicSlug(name),
         created_by: currentUser.id,
-      });
+      };
 
-      console.log("TOPICS - Topic created successfully!");
+      await db.insert(schemaTopics).values(createdTopic);
+
+      return createdTopic;
     } catch (error) {
-      console.log(
-        `TOPICS - Failed creating topic: ${handleErrorMessage(error)}`
-      );
       throw new Error(handleErrorMessage(error));
     }
   }
