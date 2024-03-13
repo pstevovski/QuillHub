@@ -1,5 +1,8 @@
 import handleErrorMessage from "@/utils/handleErrorMessage";
 
+/** The specific base URL that Uploadthing uses for the uploaded files */
+export const UPLOADTHING_UPLOADED_IMAGE_BASE_URL = "https://utfs.io/f/";
+
 class Upload {
   /**
    *
@@ -16,7 +19,7 @@ class Upload {
    *
    */
   handleImageKeys(keys: string[], source: string): string[] {
-    if (!keys.length || !source) return [];
+    if (!keys || !keys.length || !source) return [];
 
     // List of image keys that will be removed from Uploadthing
     const imagesToBeRemoved: string[] = [...keys].filter((key) => {
@@ -49,6 +52,7 @@ class Upload {
         headers: {
           "Content-Type": "application/json",
           "X-Uploadthing-Api-Key": process.env.UPLOADTHING_SECRET || "",
+          "X-Uploadthing-Version": "6.3.3",
         },
         body: JSON.stringify({ fileKeys: imageKeys }),
       });
