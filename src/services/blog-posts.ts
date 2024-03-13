@@ -9,7 +9,7 @@ import { eq } from "drizzle-orm";
 import { postsImagesSchema, postsSchema } from "@/db/schema/posts";
 
 // Services
-import UploadService from "./uploads";
+import UploadService, { UPLOADTHING_UPLOADED_IMAGE_BASE_URL } from "./uploads";
 import { ApiErrorMessage } from "@/app/api/handleApiError";
 import UsersService from "./users";
 
@@ -27,6 +27,9 @@ interface BlogPostSaveImageKeys {
   cover_image_keys: string[];
   content_image_keys: string[];
 }
+
+const UPLOADTHING_IMAGE_KEY_REGEX =
+  /https:\/\/utfs.io\/f\/.+(.jpg|.jpeg|.png|.svg)/gi;
 
 class BlogPosts {
   /**
@@ -156,15 +159,52 @@ class BlogPosts {
         .where(eq(postsSchema.id, blogPostID));
       console.log("Blog post successfully updated!");
 
+      // todo: remove the keys from the database
+      // todo: read the previously uploaded cover photo key
+      // todo: read the keys of previously uploaded images as part of the content
+      const alreadyExistingContentImageKeys =
+        targetedBlogPost[0].content
+          .match(UPLOADTHING_IMAGE_KEY_REGEX)
+          ?.flatMap((key) => {
+            return key.split(UPLOADTHING_UPLOADED_IMAGE_BASE_URL)[1];
+          }) || [];
+
+      const alreadyExistingCoverImageKeys =
+        targetedBlogPost[0].cover_photo
+          .match(UPLOADTHING_IMAGE_KEY_REGEX)
+          ?.flatMap((key) => {
+            return key.split(UPLOADTHING_UPLOADED_IMAGE_BASE_URL)[1];
+          }) || [];
+
+      console.log("TEST", {
+        alreadyExistingContentImageKeys,
+        alreadyExistingCoverImageKeys,
+      });
+
+      const contentImageKeys = [
+        ...updatedDetails.uploaded_content_images_keys,
+        ...alreadyExistingContentImageKeys,
+      ];
+
+      const coverImageKeys = [
+        ...updatedDetails.uploaded_cover_images_keys,
+        ...alreadyExistingCoverImageKeys,
+      ];
+
+      console.log("CONTENT & COVER IMAGE KEYS", {
+        contentImageKeys,
+        coverImageKeys,
+      });
+
       // Update the pairings between the image keys and the updated post
       await this.saveBlogPostImageKeys({
         post_id: blogPostID,
         cover_image_keys: UploadService.handleImageKeys(
-          updatedDetails.uploaded_cover_images_keys,
+          coverImageKeys,
           updatedDetails.cover_photo
         ),
         content_image_keys: UploadService.handleImageKeys(
-          updatedDetails.uploaded_content_images_keys,
+          contentImageKeys,
           updatedDetails.content
         ),
       });
