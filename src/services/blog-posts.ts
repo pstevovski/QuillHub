@@ -5,7 +5,7 @@ import handleErrorMessage from "@/utils/handleErrorMessage";
 
 // Drizzle
 import db from "@/db/connection";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { postsImagesSchema, postsSchema } from "@/db/schema/posts";
 
 // Services
@@ -159,9 +159,7 @@ class BlogPosts {
         .where(eq(postsSchema.id, blogPostID));
       console.log("Blog post successfully updated!");
 
-      // todo: remove the keys from the database
-      // todo: read the previously uploaded cover photo key
-      // todo: read the keys of previously uploaded images as part of the content
+      // TODO: This must be refactored
       const alreadyExistingContentImageKeys =
         targetedBlogPost[0].content
           .match(UPLOADTHING_IMAGE_KEY_REGEX)
@@ -176,25 +174,53 @@ class BlogPosts {
             return key.split(UPLOADTHING_UPLOADED_IMAGE_BASE_URL)[1];
           }) || [];
 
-      console.log("TEST", {
-        alreadyExistingContentImageKeys,
-        alreadyExistingCoverImageKeys,
-      });
-
       const contentImageKeys = [
-        ...updatedDetails.uploaded_content_images_keys,
         ...alreadyExistingContentImageKeys,
+        ...(updatedDetails.uploaded_content_images_keys
+          ? [...updatedDetails.uploaded_content_images_keys]
+          : []),
       ];
 
       const coverImageKeys = [
-        ...updatedDetails.uploaded_cover_images_keys,
         ...alreadyExistingCoverImageKeys,
+        ...(updatedDetails.uploaded_cover_images_keys
+          ? [...updatedDetails.uploaded_cover_images_keys]
+          : []),
       ];
 
-      console.log("CONTENT & COVER IMAGE KEYS", {
-        contentImageKeys,
-        coverImageKeys,
+      // extract keys that will be deleted
+      const contentImageKeysToBeDeleted = [...contentImageKeys].filter(
+        (key) => {
+          if (!updatedDetails.content) return;
+
+          return !updatedDetails?.content.includes(key);
+        }
+      );
+
+      const coverImageKeysToBeDeleted = [...coverImageKeys].filter((key) => {
+        if (!updatedDetails.cover_photo) return;
+
+        return !updatedDetails.cover_photo.includes(key);
       });
+
+      // send request to the API
+      const editedBlogPostImages = await db
+        .select()
+        .from(postsImagesSchema)
+        .where(eq(postsImagesSchema.post_id, blogPostID));
+
+      // If there are any attached images, remove them from UploadThing's servers
+      if (editedBlogPostImages.length > 0) {
+        const keysToDelete = [
+          ...contentImageKeysToBeDeleted,
+          ...coverImageKeysToBeDeleted,
+        ];
+
+        await db
+          .delete(postsImagesSchema)
+          .where(sql`${postsImagesSchema.key} IN (${keysToDelete.join(",")})`);
+      }
+      // TODO: This must be refactored
 
       // Update the pairings between the image keys and the updated post
       await this.saveBlogPostImageKeys({
@@ -246,6 +272,7 @@ class BlogPosts {
       }
 
       // Get all attached images keys that belong to the specific blog post
+      // TODO: Move functionality to separate method
       const attachedImages = await db
         .select()
         .from(postsImagesSchema)
