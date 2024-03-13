@@ -20,9 +20,7 @@ import GeneralPurpose from "./Toolbar/GeneralPurpose";
 import Link from "./Toolbar/Link";
 import Image from "./Toolbar/Image";
 import History from "./Toolbar/History";
-
-/** The specific base URL that Uploadthing uses for the uploaded files */
-const UPLOADTHING_UPLOADED_IMAGE_BASE_URL = "https://utfs.io/f/";
+import { UPLOADTHING_UPLOADED_IMAGE_BASE_URL } from "@/services/uploads";
 
 interface TipTapEditorProps {
   defaultContent: string | undefined;
