@@ -9,7 +9,10 @@ import { eq, sql } from "drizzle-orm";
 import { postsImagesSchema, postsSchema } from "@/db/schema/posts";
 
 // Services
-import UploadService, { UPLOADTHING_UPLOADED_IMAGE_BASE_URL } from "./uploads";
+import UploadService, {
+  UPLOADTHING_IMAGE_KEY_REGEX,
+  UPLOADTHING_UPLOADED_IMAGE_BASE_URL,
+} from "./uploads";
 import { ApiErrorMessage } from "@/app/api/handleApiError";
 import UsersService from "./users";
 
@@ -27,9 +30,6 @@ interface BlogPostSaveImageKeys {
   cover_image_keys: string[];
   content_image_keys: string[];
 }
-
-const UPLOADTHING_IMAGE_KEY_REGEX =
-  /https:\/\/utfs.io\/f\/.+(.jpg|.jpeg|.png|.svg)/gi;
 
 class BlogPosts {
   /**
