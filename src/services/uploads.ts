@@ -5,7 +5,7 @@ export const UPLOADTHING_UPLOADED_IMAGE_BASE_URL = "https://utfs.io/f/";
 
 // prettier-ignore
 /** Regex to target only the keys of the uploaded files */
-export const UPLOADTHING_IMAGE_KEY_REGEX = /https:\/\/utfs.io\/f\/.+(.jpg|.jpeg|.png|.svg)/gi;
+export const UPLOADTHING_IMAGE_KEY_REGEX = /(?<=https:\/\/utfs.io\/f\/)([A-Za-z0-9-]+(.jpg|.jpeg|.png|.svg))/gi;
 
 class Upload {
   /**
