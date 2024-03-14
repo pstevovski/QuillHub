@@ -6,7 +6,7 @@ import handleErrorMessage from "@/utils/handleErrorMessage";
 // Drizzle
 import db from "@/db/connection";
 import { eq, sql } from "drizzle-orm";
-import { postsImagesSchema, postsSchema } from "@/db/schema/posts";
+import { Post, postsImagesSchema, postsSchema } from "@/db/schema/posts";
 
 // Services
 import UploadService, {
@@ -40,7 +40,7 @@ class BlogPosts {
    * before saving the "post" / "image key" pairings inn the database
    *
    */
-  private async saveBlogPostImageKeys({
+  private async saveImageKeys({
     post_id,
     cover_image_keys,
     content_image_keys,
@@ -69,12 +69,129 @@ class BlogPosts {
 
       await db.insert(postsImagesSchema).values(postKeyPairs);
       console.log(
-        "Blog post 'cover' and 'content' image keys saved to database"
+        "BLOG POST - 'cover' and 'content' image keys saved to database"
       );
     } catch (error) {
       console.log("Failed saving the keys of the uploaded images to database.");
       throw new Error(handleErrorMessage(error));
     }
+  }
+
+  /**
+   *
+   * Delete the images of the targeted blog post from the database
+   * and trigger API call to remove them from Uploadthing.
+   *
+   * If no specific image keys are being passed as the second argument,
+   * then all of the images associated with the targeted blog post will be deleted.
+   *
+   * Otherwise only the specifically targeted images will be deleted.
+   *
+   * @param postID The ID of the targeted blog post
+   * @param specificImageKeys List of specific image keys that we want to delete
+   *
+   */
+  private async deleteUnusedImages(
+    postID: number,
+    specificImageKeys: string[] | null = null
+  ) {
+    try {
+      // Find the blog post to which the attached images belong to
+      const blogPostImages = await db
+        .select()
+        .from(postsImagesSchema)
+        .where(eq(postsImagesSchema.post_id, postID));
+
+      // Do not do anything if the targeted blog post does not exit
+      if (!blogPostImages) return;
+
+      // If no image keys parameter is received, remove all images that belong to the blog post
+      // Otherwise delete only those images that were specified
+      let keysToDelete = specificImageKeys || [];
+
+      // Extract the keys of images that exist in the database for the targeted blog post
+      if (!specificImageKeys) {
+        keysToDelete = blogPostImages.map((image) => image.key);
+      }
+
+      // Do not do anything i there are no keys to be deleted
+      if (!keysToDelete.length) return;
+
+      // Delete the unused image keys from the database
+      await db
+        .delete(postsImagesSchema)
+        .where(sql`${postsImagesSchema.key} IN ${keysToDelete}`);
+
+      // Delete the images from Uploadthing that are associated with the specific keys
+      await UploadService.deleteImagesFromUploadthing(keysToDelete);
+
+      console.log(
+        `BLOG POSTS - Unused images for blog post with ID ${postID} were successfully removed.`
+      );
+    } catch (error) {
+      console.log(
+        `BLOG POSTS - Failed removing blog post images: ${handleErrorMessage(
+          error
+        )}`
+      );
+      throw new Error(handleErrorMessage(error));
+    }
+  }
+
+  /**
+   *
+   * Extract only the unused "cover" and "content" image keys
+   * so they can be removed both from the database and Uploadthing
+   *
+   * @param existingData
+   * @param updatedData
+   *
+   */
+  private extractUnusedImageKeys(
+    existingData: Post,
+    updatedData: BlogNewPostPayload
+  ): string[] {
+    let unusedImageKeys: string[] = [];
+
+    const { cover_photo: old_cover_photo } = existingData;
+    const { cover_photo: new_cover_photo, content: new_content } = updatedData;
+
+    // If the cover photo was updated, mark the previously existing one for removal
+    // As the cover photo is saved in the following format: "https://utfs.io/f/<key>"
+    // this will extract only the "key" part of the URL
+    if (new_cover_photo && new_cover_photo !== old_cover_photo) {
+      unusedImageKeys.push(
+        old_cover_photo.split(UPLOADTHING_UPLOADED_IMAGE_BASE_URL)[1]
+      );
+    }
+
+    // If the main content of blog post was updated, extract all of the
+    // pre-update images that were uploaded to Uploadthing and mark them for deletion
+    if (new_content) {
+      const { content: preUpdateContent } = existingData;
+
+      // Find all images that existed in the blog post content pre-update
+      let contentImages: string[] = [];
+      const checkExistingContentImages = preUpdateContent.match(
+        UPLOADTHING_IMAGE_KEY_REGEX
+      );
+
+      if (checkExistingContentImages) {
+        contentImages = checkExistingContentImages.flatMap((imageKey) => {
+          return imageKey;
+        });
+      }
+
+      // Compare the updated content against the list of content image keys (pre and after update)
+      // Those image keys that are not present in the updated content get marked for deletion
+      const contentImageKeysDiff = contentImages.filter((imageKey) => {
+        return !new_content.includes(imageKey);
+      });
+
+      unusedImageKeys = [...unusedImageKeys, ...contentImageKeysDiff];
+    }
+
+    return unusedImageKeys;
   }
 
   /**
@@ -100,7 +217,7 @@ class BlogPosts {
       console.log("Blog post successfully created!");
 
       // Save the pairings between the image keys and the newly created post
-      await this.saveBlogPostImageKeys({
+      await this.saveImageKeys({
         post_id: newPost[0].insertId,
         cover_image_keys: UploadService.handleImageKeys(
           uploaded_cover_images_keys,
@@ -159,81 +276,24 @@ class BlogPosts {
         .where(eq(postsSchema.id, blogPostID));
       console.log("Blog post successfully updated!");
 
-      // TODO: This must be refactored
-      const alreadyExistingContentImageKeys =
-        targetedBlogPost[0].content
-          .match(UPLOADTHING_IMAGE_KEY_REGEX)
-          ?.flatMap((key) => {
-            return key.split(UPLOADTHING_UPLOADED_IMAGE_BASE_URL)[1];
-          }) || [];
-
-      const alreadyExistingCoverImageKeys =
-        targetedBlogPost[0].cover_photo
-          .match(UPLOADTHING_IMAGE_KEY_REGEX)
-          ?.flatMap((key) => {
-            return key.split(UPLOADTHING_UPLOADED_IMAGE_BASE_URL)[1];
-          }) || [];
-
-      const contentImageKeys = [
-        ...alreadyExistingContentImageKeys,
-        ...(updatedDetails.uploaded_content_images_keys
-          ? [...updatedDetails.uploaded_content_images_keys]
-          : []),
-      ];
-
-      const coverImageKeys = [
-        ...alreadyExistingCoverImageKeys,
-        ...(updatedDetails.uploaded_cover_images_keys
-          ? [...updatedDetails.uploaded_cover_images_keys]
-          : []),
-      ];
-
-      // extract keys that will be deleted
-      const contentImageKeysToBeDeleted = [...contentImageKeys].filter(
-        (key) => {
-          if (!updatedDetails.content) return;
-
-          return !updatedDetails?.content.includes(key);
-        }
-      );
-
-      const coverImageKeysToBeDeleted = [...coverImageKeys].filter((key) => {
-        if (!updatedDetails.cover_photo) return;
-
-        return !updatedDetails.cover_photo.includes(key);
-      });
-
-      // send request to the API
-      const editedBlogPostImages = await db
-        .select()
-        .from(postsImagesSchema)
-        .where(eq(postsImagesSchema.post_id, blogPostID));
-
-      // If there are any attached images, remove them from UploadThing's servers
-      if (editedBlogPostImages.length > 0) {
-        const keysToDelete = [
-          ...contentImageKeysToBeDeleted,
-          ...coverImageKeysToBeDeleted,
-        ];
-
-        await db
-          .delete(postsImagesSchema)
-          .where(sql`${postsImagesSchema.key} IN (${keysToDelete.join(",")})`);
-      }
-      // TODO: This must be refactored
-
-      // Update the pairings between the image keys and the updated post
-      await this.saveBlogPostImageKeys({
+      // Save the updated cover and content images
+      await this.saveImageKeys({
         post_id: blogPostID,
         cover_image_keys: UploadService.handleImageKeys(
-          coverImageKeys,
+          updatedDetails.uploaded_cover_images_keys,
           updatedDetails.cover_photo
         ),
         content_image_keys: UploadService.handleImageKeys(
-          contentImageKeys,
+          updatedDetails.uploaded_content_images_keys,
           updatedDetails.content
         ),
       });
+
+      // Delete the unused blog post images
+      await this.deleteUnusedImages(
+        blogPostID,
+        this.extractUnusedImageKeys(targetedBlogPost[0], updatedDetails)
+      );
     } catch (error) {
       console.log(
         `BLOG POSTS - Failed editing blog post with ID ${blogPostID}: ${handleErrorMessage(
@@ -271,32 +331,15 @@ class BlogPosts {
         throw new Error(ApiErrorMessage.UNAUTHORIZED);
       }
 
-      // Get all attached images keys that belong to the specific blog post
-      // TODO: Move functionality to separate method
-      const attachedImages = await db
-        .select()
-        .from(postsImagesSchema)
-        .where(eq(postsImagesSchema.post_id, blogPostID));
-
-      // If there are any attached images, remove them from UploadThing's servers
-      if (attachedImages.length > 0) {
-        // Extract the unique file keys for each of the uploaded images
-        const fileKeys = attachedImages.map((image) => image.key);
-
-        // Remove the uploaded image URLs (including the cover photo)
-        // associated with the blog post from the database
-        await db
-          .delete(postsImagesSchema)
-          .where(eq(postsImagesSchema.post_id, blogPostID));
-
-        // Delete images from Uploadthing servers after deleting them from database
-        await UploadService.deleteImagesFromUploadthing(fileKeys);
-      }
+      // Delete all images associated with this blog post
+      await this.deleteUnusedImages(blogPostID);
 
       // Remove the blog post from the database
       await db.delete(postsSchema).where(eq(postsSchema.id, blogPostID));
     } catch (error) {
-      console.log(`Failed deleting blog post: ${handleErrorMessage(error)}`);
+      console.log(
+        `BLOG POST - Failed deleting blog post: ${handleErrorMessage(error)}`
+      );
       throw new Error(handleErrorMessage(error));
     }
   }
