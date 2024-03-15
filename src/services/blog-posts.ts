@@ -123,7 +123,7 @@ class BlogPosts {
         .where(sql`${postsImagesSchema.key} IN ${keysToDelete}`);
 
       // Delete the images from Uploadthing that are associated with the specific keys
-      await UploadService.deleteImagesFromUploadthing(keysToDelete);
+      await UploadService.deleteUploadedFiles(keysToDelete);
 
       console.log(
         `BLOG POSTS - Unused images for blog post with ID ${postID} were successfully removed.`
@@ -243,7 +243,7 @@ class BlogPosts {
    * Edit the targeted blog post
    *
    * @param blogPostID ID of the blog post to be updated
-   * @param {Object} updatedDetails
+   * @param {Object} updatedDetails The updated details of the blog post
    *
    */
   async edit(blogPostID: number, updatedDetails: BlogNewPostPayload) {

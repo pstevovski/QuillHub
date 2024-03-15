@@ -31,7 +31,7 @@ class Upload {
     });
 
     // Send API request to delete uploaded images
-    this.deleteImagesFromUploadthing(imagesToBeRemoved);
+    this.deleteUploadedFiles(imagesToBeRemoved);
 
     // List of image keys that will be saved in our database
     return [...keys].filter((key) => source.includes(key));
@@ -42,13 +42,13 @@ class Upload {
    * Deletes images that were uploaded to Uploadthing servers
    * but won't be used anymore, in order to free up unused space.
    *
-   * @param imageKeys List of unique `file keys` corresponding
+   * @param fileKeys List of unique `file keys` corresponding
    * to the files that will be deleted from Uploadthing servers.
    *
    */
-  async deleteImagesFromUploadthing(imageKeys: string[]) {
+  async deleteUploadedFiles(fileKeys: string[]) {
     // Prevent sending any unnecessary API requests if there are no keys
-    if (!imageKeys.length) return;
+    if (!fileKeys.length) return;
 
     try {
       await fetch("https://uploadthing.com/api/deleteFile", {
@@ -58,7 +58,7 @@ class Upload {
           "X-Uploadthing-Api-Key": process.env.UPLOADTHING_SECRET || "",
           "X-Uploadthing-Version": "6.3.3",
         },
-        body: JSON.stringify({ fileKeys: imageKeys }),
+        body: JSON.stringify({ fileKeys }),
       });
 
       console.log(
