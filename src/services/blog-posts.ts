@@ -281,7 +281,7 @@ class BlogPosts {
       const blogPostImages = await db
         .select()
         .from(postsImagesSchema)
-        .where(eq(postsImagesSchema.id, blogPostID));
+        .where(eq(postsImagesSchema.post_id, blogPostID));
 
       if (blogPostImages) {
         const imageKeys = blogPostImages.map((image) => image.key);
