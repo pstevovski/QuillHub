@@ -15,6 +15,13 @@
       "when": 1708349307918,
       "tag": "0001_bored_sprite",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1710497133805,
+      "tag": "0002_thin_sir_ram",
+      "breakpoints": true
     }
   ]
 }
