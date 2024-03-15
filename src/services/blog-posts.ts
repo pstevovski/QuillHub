@@ -79,67 +79,6 @@ class BlogPosts {
 
   /**
    *
-   * Delete the images of the targeted blog post from the database
-   * and trigger API call to remove them from Uploadthing.
-   *
-   * If no specific image keys are being passed as the second argument,
-   * then all of the images associated with the targeted blog post will be deleted.
-   *
-   * Otherwise only the specifically targeted images will be deleted.
-   *
-   * @param postID The ID of the targeted blog post
-   * @param specificImageKeys List of specific image keys that we want to delete
-   *
-   */
-  private async deleteUnusedImages(
-    postID: number,
-    specificImageKeys: string[] | null = null
-  ) {
-    try {
-      // Find the blog post to which the attached images belong to
-      const blogPostImages = await db
-        .select()
-        .from(postsImagesSchema)
-        .where(eq(postsImagesSchema.post_id, postID));
-
-      // Do not do anything if the targeted blog post does not exit
-      if (!blogPostImages) return;
-
-      // If no image keys parameter is received, remove all images that belong to the blog post
-      // Otherwise delete only those images that were specified
-      let keysToDelete = specificImageKeys || [];
-
-      // Extract the keys of images that exist in the database for the targeted blog post
-      if (!specificImageKeys) {
-        keysToDelete = blogPostImages.map((image) => image.key);
-      }
-
-      // Do not do anything i there are no keys to be deleted
-      if (!keysToDelete.length) return;
-
-      // Delete the unused image keys from the database
-      await db
-        .delete(postsImagesSchema)
-        .where(sql`${postsImagesSchema.key} IN ${keysToDelete}`);
-
-      // Delete the images from Uploadthing that are associated with the specific keys
-      await UploadService.deleteUploadedFiles(keysToDelete);
-
-      console.log(
-        `BLOG POSTS - Unused images for blog post with ID ${postID} were successfully removed.`
-      );
-    } catch (error) {
-      console.log(
-        `BLOG POSTS - Failed removing blog post images: ${handleErrorMessage(
-          error
-        )}`
-      );
-      throw new Error(handleErrorMessage(error));
-    }
-  }
-
-  /**
-   *
    * Extract only the unused "cover" and "content" image keys
    * so they can be removed both from the database and Uploadthing
    *
@@ -289,11 +228,17 @@ class BlogPosts {
         ),
       });
 
-      // Delete the unused blog post images
-      await this.deleteUnusedImages(
-        blogPostID,
-        this.extractUnusedImageKeys(targetedBlogPost[0], updatedDetails)
+      // Delete the unused image keys from the database and from Uploadthing servers
+      const unusedImageKeys = this.extractUnusedImageKeys(
+        targetedBlogPost[0],
+        updatedDetails
       );
+
+      await db
+        .delete(postsImagesSchema)
+        .where(sql`${postsImagesSchema.key} IN ${unusedImageKeys}`);
+
+      await UploadService.deleteUploadedFiles(unusedImageKeys);
     } catch (error) {
       console.log(
         `BLOG POSTS - Failed editing blog post with ID ${blogPostID}: ${handleErrorMessage(
@@ -331,8 +276,17 @@ class BlogPosts {
         throw new Error(ApiErrorMessage.UNAUTHORIZED);
       }
 
-      // Delete all images associated with this blog post
-      await this.deleteUnusedImages(blogPostID);
+      // Get the saved image keys for the targeted blog post
+      // and use them to remove the images from Uploadthing servers
+      const blogPostImages = await db
+        .select()
+        .from(postsImagesSchema)
+        .where(eq(postsImagesSchema.post_id, blogPostID));
+
+      if (blogPostImages) {
+        const imageKeys = blogPostImages.map((image) => image.key);
+        await UploadService.deleteUploadedFiles(imageKeys);
+      }
 
       // Remove the blog post from the database
       await db.delete(postsSchema).where(eq(postsSchema.id, blogPostID));

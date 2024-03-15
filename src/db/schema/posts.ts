@@ -48,7 +48,10 @@ export type PostsNew = typeof postsSchema.$inferInsert;
 export const postsImagesSchema = mysqlTable("posts_images", {
   id: bigint("id", { mode: "number" }).primaryKey().autoincrement(),
   post_id: bigint("post_id", { mode: "number" }).references(
-    () => postsSchema.id
+    () => postsSchema.id,
+    {
+      onDelete: "cascade",
+    }
   ),
   key: varchar("key", { length: 512 }).notNull(),
 });
