@@ -1,20 +1,36 @@
-import { BlogPostCard } from "@/components/BlogPost/BlogPostCard";
 import Link from "next/link";
-import { FaArrowRightLong as SeeAllIcon } from "react-icons/fa6";
-import HomepageBlogFilters, {
-  type BlogFilter,
-} from "./_components/BlogFilters";
-import UsersService from "@/services/users";
+import { type BlogFilter } from "./_components/BlogFilters";
+import BlogPostsService from "@/services/blog-posts";
+import fetchHandler from "@/utils/fetchHandler";
+
+// Assets
+import { FaHeart as LikeIcon } from "react-icons/fa";
+import {
+  FaBookmark as BookmarkIcon,
+  FaArrowRightLong as ReadMoreIcon,
+} from "react-icons/fa6";
+import cn from "@/utils/classnames";
+import SearchPosts from "./_components/SearchPosts";
 
 export default async function Home({
   searchParams,
 }: {
-  searchParams: { filter: BlogFilter | undefined };
+  searchParams: { search: string | undefined; filter: BlogFilter | undefined };
 }) {
-  const blogsFilter = searchParams.filter;
-  const user = await UsersService.getCurrentUser()
-    .then((user) => user)
-    .catch(() => null);
+  const data = await fetchHandler("GET", "blog");
+  console.log("DATA", data);
+
+  // const blogsFilter = searchParams.filter;
+  // const user = await UsersService.getCurrentUser()
+  //   .then((user) => user)
+  //   .catch(() => null);
+
+  const blogPosts = await BlogPostsService.getAll({
+    search: searchParams.search,
+  });
+  console.log("server side blog posts", blogPosts);
+
+  console.log("searchParams", searchParams);
 
   return (
     <main>
@@ -49,9 +65,88 @@ export default async function Home({
         </Link>
       </section>
 
-      <HomepageBlogFilters user={user} />
+      <div className="max-w-sm mb-10">
+        <SearchPosts />
+      </div>
 
-      {/* WIP: TRENDING SECTION*/}
+      <section className="grid grid-cols-3 gap-14">
+        {blogPosts.posts && blogPosts.posts.length > 0 ? (
+          blogPosts.posts.map((post) => (
+            <div
+              key={post.id}
+              className="border w-full rounded-md col-span-12 lg:col-span-1"
+            >
+              <div className="flex items-center justify-center h-64 bg-slate-100">
+                {post.cover_photo ? (
+                  <img
+                    className="h-64 w-full rounded-t-md object-fill"
+                    src={post.cover_photo}
+                  />
+                ) : (
+                  <h1>PLACEHOLDER COVER PHOTO</h1>
+                )}
+              </div>
+
+              {/* Content */}
+              <div className="p-6">
+                <div className="flex items-center justify-between mb-8">
+                  {/* title & author */}
+                  <div className="flex flex-col">
+                    <h3 className="text-lg font-semibold">{post.title}</h3>
+                    <h6 className="text-xs text-slate-400 font-light">
+                      <em>
+                        by {post.created_by as string},{" "}
+                        <span>{`${new Date(post.created_at)}`}</span>
+                      </em>
+                    </h6>
+                  </div>
+
+                  {/* like & bookmark icons */}
+                  <div className="flex items-center">
+                    <LikeIcon
+                      className={cn(
+                        "text-slate-300 text-2xl mx-4 hover:text-rose-500 duration-300 cursor-pointer hover:scale-125"
+                      )}
+                    />
+                    <BookmarkIcon
+                      className={cn(
+                        "text-slate-300 text-2xl hover:text-teal-500 duration-300 cursor-pointer hover:scale-125"
+                      )}
+                    />
+                  </div>
+                </div>
+                <p className="mb-8">{post.content}</p>
+
+                <Link
+                  href={`/post/${post.id}`}
+                  className="py-2 flex items-center group font-semibold"
+                >
+                  <span className="group-hover:text-teal-500 duration-200">
+                    Read More
+                  </span>
+                  <ReadMoreIcon className="opacity-0 group-hover:text-teal-500 group-hover:opacity-100 group-hover:translate-x-2 duration-200" />
+                </Link>
+              </div>
+            </div>
+          ))
+        ) : (
+          <h1>No blog post data available.</h1>
+        )}
+      </section>
+
+      {/* <HomepageBlogFilters user={user} />
+
+      {blogPosts && blogPosts.posts ? (
+        blogPosts.posts.map((post) => (
+          <div key={post.id}>
+            <h3>{post.title}</h3>
+            <p>{post.content}</p>
+          </div>
+        ))
+      ) : (
+        <h1>No blog posts available</h1>
+      )}
+
       {[undefined, "trending"].includes(blogsFilter) ? (
         <section className="px-24 py-24">
           <h2 className="text-4xl font-semibold text-slate-600">Trending</h2>
@@ -79,7 +174,7 @@ export default async function Home({
             No blog posts available at this moment.
           </h2>
         </div>
-      )}
+      )} */}
     </main>
   );
 }

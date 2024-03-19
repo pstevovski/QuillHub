@@ -5,7 +5,7 @@ import handleErrorMessage from "@/utils/handleErrorMessage";
 
 // Drizzle
 import db from "@/db/connection";
-import { eq, sql } from "drizzle-orm";
+import { and, count, eq, like, sql } from "drizzle-orm";
 import { Post, postsImagesSchema, postsSchema } from "@/db/schema/posts";
 
 // Services
@@ -15,6 +15,7 @@ import UploadService, {
 } from "./uploads";
 import { ApiErrorMessage } from "@/app/api/handleApiError";
 import UsersService from "./users";
+import { users } from "@/db/schema/users";
 
 interface BlogNewPostPayload {
   title: string;
@@ -29,6 +30,12 @@ interface BlogPostSaveImageKeys {
   post_id: number;
   cover_image_keys: string[];
   content_image_keys: string[];
+}
+
+export interface Filters {
+  page: number;
+  limit: number;
+  search: string | null;
 }
 
 class BlogPosts {
@@ -131,6 +138,53 @@ class BlogPosts {
     }
 
     return unusedImageKeys;
+  }
+
+  async getAll(filters?: Partial<Filters>) {
+    try {
+      // TODO: Handle filter checks here
+      // TODO: Handle joins with users table so we can get the full user's name
+
+      const posts = await db
+        .select({
+          id: postsSchema.id,
+          cover_photo: postsSchema.cover_photo,
+          title: postsSchema.title,
+          created_by: sql`CONCAT(${users.first_name}, " ", ${users.last_name})`,
+          created_at: postsSchema.created_at,
+          content: postsSchema.content,
+        })
+        .from(postsSchema)
+        .where(
+          and(
+            eq(postsSchema.status, "published"),
+            filters?.search
+              ? like(postsSchema.title, `%${filters.search}%`)
+              : undefined
+          )
+        )
+        .limit(filters?.limit || 0)
+        .offset(
+          filters?.page && filters.limit ? filters.page * filters.limit : 0
+        )
+        .leftJoin(users, eq(users.id, postsSchema.created_by));
+
+      console.log("posts", posts);
+
+      // todo: find a better way
+      const totalResults = await db
+        .select({ count: count() })
+        .from(postsSchema);
+
+      return { posts, totalResults: totalResults[0].count };
+    } catch (error) {
+      console.log(
+        `BLOG POSTS - Failed getting all blog posts: ${handleErrorMessage(
+          error
+        )}`
+      );
+      throw new Error(handleErrorMessage(error));
+    }
   }
 
   /**

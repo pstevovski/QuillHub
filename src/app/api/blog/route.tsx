@@ -1,8 +1,45 @@
-import BlogPostsService from "@/services/blog-posts";
+import BlogPostsService, { Filters } from "@/services/blog-posts";
 import { VALIDATION_SCHEMA_BLOG_POSTS_NEW } from "@/zod/blog-posts";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { handlePayloadValidation } from "../handlePayloadValidation";
 import { handleApiErrorResponse } from "../handleApiError";
+
+/**
+ *
+ * Get a list of all existing blog posts
+ * TODO: Maybe remove this, is it necessary?
+ *
+ */
+export async function GET(request: NextRequest) {
+  try {
+    const searchParams = request.nextUrl.searchParams;
+    const pageParam = searchParams.get("page");
+    const limitParam = searchParams.get("limit");
+    const search = searchParams.get("search");
+
+    const filters: Filters = {
+      page: pageParam ? parseInt(pageParam) : 0,
+      limit: limitParam ? parseInt(limitParam) : 10,
+      search,
+    };
+
+    if (isNaN(filters.page) || isNaN(filters.limit)) {
+      return NextResponse.json(
+        { message: "Invalid pagination parameters" },
+        { status: 400 }
+      );
+    }
+
+    const { posts, totalResults } = await BlogPostsService.getAll(filters);
+
+    return NextResponse.json(
+      { results: posts, total_results: totalResults },
+      { status: 200 }
+    );
+  } catch (error) {
+    return handleApiErrorResponse(error);
+  }
+}
 
 /**
  *
