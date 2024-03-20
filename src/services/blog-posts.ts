@@ -142,16 +142,15 @@ class BlogPosts {
 
   async getAll(filters?: Partial<Filters>) {
     try {
-      // TODO: Handle filter checks here
-      // TODO: Handle joins with users table so we can get the full user's name
-
       const posts = await db
         .select({
           id: postsSchema.id,
           cover_photo: postsSchema.cover_photo,
           title: postsSchema.title,
-          created_by: sql`CONCAT(${users.first_name}, " ", ${users.last_name})`,
+          first_name: users.first_name,
+          last_name: users.last_name,
           created_at: postsSchema.created_at,
+          created_by: postsSchema.created_by,
           content: postsSchema.content,
         })
         .from(postsSchema)
@@ -169,12 +168,19 @@ class BlogPosts {
         )
         .leftJoin(users, eq(users.id, postsSchema.created_by));
 
-      console.log("posts", posts);
-
-      // todo: find a better way
+      // Note: Is there a better way to obtain all of the results
+      // without querying the same data for the second time?
       const totalResults = await db
         .select({ count: count() })
-        .from(postsSchema);
+        .from(postsSchema)
+        .where(
+          and(
+            eq(postsSchema.status, "published"),
+            filters?.search
+              ? like(postsSchema.title, `%${filters.search}%`)
+              : undefined
+          )
+        );
 
       return { posts, totalResults: totalResults[0].count };
     } catch (error) {
