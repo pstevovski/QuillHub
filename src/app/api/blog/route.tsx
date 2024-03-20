@@ -7,7 +7,6 @@ import { handleApiErrorResponse } from "../handleApiError";
 /**
  *
  * Get a list of all existing blog posts
- * TODO: Maybe remove this, is it necessary?
  *
  */
 export async function GET(request: NextRequest) {
@@ -25,8 +24,8 @@ export async function GET(request: NextRequest) {
 
     if (isNaN(filters.page) || isNaN(filters.limit)) {
       return NextResponse.json(
-        { message: "Invalid pagination parameters" },
-        { status: 400 }
+        { results: [], total_results: 0 },
+        { status: 200 }
       );
     }
 
