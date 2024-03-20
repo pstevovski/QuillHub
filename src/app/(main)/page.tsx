@@ -11,6 +11,7 @@ import Search from "../../components/Search/Search";
 import fetchHandler from "@/utils/fetchHandler";
 import constructSearchParams from "@/utils/constructSearchParams";
 import { format } from "date-fns";
+import Pagination from "@/components/Pagination/Pagination";
 
 interface SearchParams {
   search: string | undefined;
@@ -61,6 +62,9 @@ export default async function Home({
 
       <div className="max-w-sm mb-6">
         <Search />
+
+        {/* TODO: WIP */}
+        <Pagination />
       </div>
 
       <section className="grid grid-cols-3 gap-14">
