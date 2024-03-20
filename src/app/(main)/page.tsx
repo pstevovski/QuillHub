@@ -1,7 +1,4 @@
 import Link from "next/link";
-import { type BlogFilter } from "./_components/BlogFilters";
-import BlogPostsService from "@/services/blog-posts";
-import fetchHandler from "@/utils/fetchHandler";
 
 // Assets
 import { FaHeart as LikeIcon } from "react-icons/fa";
@@ -10,27 +7,24 @@ import {
   FaArrowRightLong as ReadMoreIcon,
 } from "react-icons/fa6";
 import cn from "@/utils/classnames";
-import SearchPosts from "./_components/SearchPosts";
+import Search from "../../components/Search/Search";
+import fetchHandler from "@/utils/fetchHandler";
+import constructSearchParams from "@/utils/constructSearchParams";
+import { format } from "date-fns";
+
+interface SearchParams {
+  search: string | undefined;
+  limit: number | undefined;
+  page: number | undefined;
+}
 
 export default async function Home({
   searchParams,
 }: {
-  searchParams: { search: string | undefined; filter: BlogFilter | undefined };
+  searchParams: SearchParams;
 }) {
-  const data = await fetchHandler("GET", "blog");
-  console.log("DATA", data);
-
-  // const blogsFilter = searchParams.filter;
-  // const user = await UsersService.getCurrentUser()
-  //   .then((user) => user)
-  //   .catch(() => null);
-
-  const blogPosts = await BlogPostsService.getAll({
-    search: searchParams.search,
-  });
-  console.log("server side blog posts", blogPosts);
-
-  console.log("searchParams", searchParams);
+  const params = constructSearchParams(searchParams);
+  const blogs = await fetchHandler("GET", `blog${params}`);
 
   return (
     <main>
@@ -65,13 +59,13 @@ export default async function Home({
         </Link>
       </section>
 
-      <div className="max-w-sm mb-10">
-        <SearchPosts />
+      <div className="max-w-sm mb-6">
+        <Search />
       </div>
 
       <section className="grid grid-cols-3 gap-14">
-        {blogPosts.posts && blogPosts.posts.length > 0 ? (
-          blogPosts.posts.map((post) => (
+        {blogs.results && blogs.results.length > 0 ? (
+          blogs.results.map((post: any) => (
             <div
               key={post.id}
               className="border w-full rounded-md col-span-12 lg:col-span-1"
@@ -81,6 +75,7 @@ export default async function Home({
                   <img
                     className="h-64 w-full rounded-t-md object-fill"
                     src={post.cover_photo}
+                    alt="Cover Photo"
                   />
                 ) : (
                   <h1>PLACEHOLDER COVER PHOTO</h1>
@@ -95,8 +90,11 @@ export default async function Home({
                     <h3 className="text-lg font-semibold">{post.title}</h3>
                     <h6 className="text-xs text-slate-400 font-light">
                       <em>
-                        by {post.created_by as string},{" "}
-                        <span>{`${new Date(post.created_at)}`}</span>
+                        by {post.first_name} {post.last_name},{" "}
+                        <span>{`${format(
+                          new Date(post.created_at),
+                          "MM/dd/yyyy HH:mm"
+                        )}`}</span>
                       </em>
                     </h6>
                   </div>
@@ -133,48 +131,6 @@ export default async function Home({
           <h1>No blog post data available.</h1>
         )}
       </section>
-
-      {/* <HomepageBlogFilters user={user} />
-
-      {blogPosts && blogPosts.posts ? (
-        blogPosts.posts.map((post) => (
-          <div key={post.id}>
-            <h3>{post.title}</h3>
-            <p>{post.content}</p>
-          </div>
-        ))
-      ) : (
-        <h1>No blog posts available</h1>
-      )}
-
-      {[undefined, "trending"].includes(blogsFilter) ? (
-        <section className="px-24 py-24">
-          <h2 className="text-4xl font-semibold text-slate-600">Trending</h2>
-          <p className="text-slate-400 mb-12">
-            Checkout some of the blog posts that are trending lately!
-            <Link
-              href="/trending"
-              className="ml-2 text-teal-500 inline-flex items-center group"
-            >
-              See All
-              <SeeAllIcon className="opacity-0 group-hover:opacity-100 group-hover:translate-x-1 duration-300" />
-            </Link>
-          </p>
-
-          <div className="grid grid-cols-2 gap-14">
-            <BlogPostCard />
-            <BlogPostCard />
-            <BlogPostCard />
-            <BlogPostCard />
-          </div>
-        </section>
-      ) : (
-        <div className="p-24 text-center">
-          <h2 className="text-2xl font-semibold text-slate-400">
-            No blog posts available at this moment.
-          </h2>
-        </div>
-      )} */}
     </main>
   );
 }
